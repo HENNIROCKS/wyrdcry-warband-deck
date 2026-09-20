@@ -50,7 +50,7 @@
 		align-items: center;
 		justify-content: center;
 		font-family: 'Grenze Gotisch', serif;
-		font-size: calc(20 * var(--u));
+		font-size: calc(20 * var(--t));
 		line-height: 1.15;
 		text-align: center;
 		color: var(--card-ink);

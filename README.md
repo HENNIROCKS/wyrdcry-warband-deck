@@ -42,6 +42,21 @@ as a sibling directory. If it lives elsewhere:
 npm run sync:data -- --from /path/to/wyrdcry/src/data
 ```
 
+It reads two things from there. The JSON files it copies. The universal
+abilities it extracts from `docs/rules/the-combat-phase/abilities.md`, because
+they exist nowhere else — the result becomes `universal-abilities.json`. The
+docs are looked for beside the data's repo; for a data directory on its own,
+point at them:
+
+```sh
+npm run sync:data -- --from /path/to/data --docs /path/to/wyrdcry/docs
+```
+
+Nothing is written before all of it has been read and checked, and a source that
+changed shape upstream stops the run instead of quietly yielding less: a table
+row the extraction cannot read, or a rule hanging on a keyword no fighter
+carries, both end it with a message.
+
 The game data is **not** part of this repo. It belongs to the Wyrdcry project,
 whose licence is currently unresolved, which is why `src/lib/data/*.json` is
 gitignored.
@@ -51,7 +66,7 @@ gitignored.
 | `npm run dev` | development server |
 | `npm run build` | static site into `build/` |
 | `npm run check` | type check |
-| `npm run sync:data` | copy the game data |
+| `npm run sync:data` | fetch the game data |
 
 ## Related projects
 

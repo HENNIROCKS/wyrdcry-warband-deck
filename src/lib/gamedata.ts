@@ -9,6 +9,7 @@ import items from './data/items.json';
 import abilities from './data/abilities.json';
 import factions from './data/factions.json';
 import weaponRules from './data/weapon-rules.json';
+import universalAbilities from './data/universal-abilities.json';
 import ruleset from './data/ruleset.json';
 
 export interface FighterProfile {
@@ -73,14 +74,61 @@ export interface WeaponRule {
 	description: string;
 }
 
-const byId = <T extends { id: string }>(list: T[]) => new Map(list.map((x) => [x.id, x]));
+/**
+ * An ability every fighter carrying `keyword` has. Extracted from the rules
+ * pages by `npm run sync:data`, the JSON data does not hold them.
+ */
+export interface UniversalAbility {
+	id: string;
+	name: string;
+	ability_type: string;
+	/** "Any" for everyone, otherwise a keyword from the fighter profile. */
+	keyword: string;
+	description: string;
+}
 
-export const FIGHTERS = byId(fighters as FighterProfile[]);
-export const WEAPONS = byId(weapons as WeaponProfile[]);
-export const ITEMS = byId(items as ItemProfile[]);
-export const ABILITIES = byId(abilities as AbilityProfile[]);
-export const FACTIONS = byId(factions as FactionProfile[]);
-export const WEAPON_RULES = byId(weaponRules as WeaponRule[]);
+/**
+ * Later entries lose against earlier ones. Ids do repeat in the game data, and
+ * which of the two the app ends up showing must not come down to file order, so
+ * a development build names the collision instead of letting it pass.
+ */
+function byId<T extends { id: string }>(list: T[], what: string): Map<string, T> {
+	const map = new Map<string, T>();
+	const duplicates: string[] = [];
+
+	for (const entry of list) {
+		if (map.has(entry.id)) duplicates.push(entry.id);
+		else map.set(entry.id, entry);
+	}
+
+	if (duplicates.length && import.meta.env.DEV) {
+		console.warn(`${what}: duplicate ids in the game data, first one wins – ${duplicates.join(', ')}`);
+	}
+	return map;
+}
+
+/** Same reasoning as the duplicate ids: what is dropped has to be sayable. */
+function withText<T extends { id: string; description: string }>(list: T[], what: string): T[] {
+	const kept = list.filter((entry) => entry.description.trim() !== '');
+
+	if (kept.length < list.length && import.meta.env.DEV) {
+		const dropped = list.filter((entry) => entry.description.trim() === '').map((e) => e.id);
+		console.warn(`${what}: no description in the game data, dropped – ${dropped.join(', ')}`);
+	}
+	return kept;
+}
+
+export const FIGHTERS = byId(fighters as FighterProfile[], 'fighters');
+export const WEAPONS = byId(weapons as WeaponProfile[], 'weapons');
+export const ITEMS = byId(items as ItemProfile[], 'items');
+export const FACTIONS = byId(factions as FactionProfile[], 'factions');
+export const WEAPON_RULES = byId(weaponRules as WeaponRule[], 'weapon rules');
+
+/* A rule without text is nothing a card can show, and dropping those settles
+   ids the data carries more than once where only one side has a description. */
+export const ABILITIES = byId(withText(abilities as AbilityProfile[], 'abilities'), 'abilities');
+
+export const UNIVERSAL_ABILITIES = universalAbilities as UniversalAbility[];
 
 /** Version of the ruleset this app was built against. Goes into every export. */
 export const RULESET_VERSION: string = (ruleset as { version: string }).version;

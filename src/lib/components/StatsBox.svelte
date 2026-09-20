@@ -50,7 +50,7 @@
 		align-items: center;
 		justify-content: center;
 		font-family: 'Grenze Gotisch', serif;
-		font-size: calc(20 * var(--u));
+		font-size: calc(20 * var(--t));
 		line-height: 1.15;
 		text-align: center;
 	}
@@ -61,6 +61,7 @@
 	 * paper, a touch heavier for the textured edge underneath it.
 	 */
 	.label {
+		font-size: calc(20 * var(--u));
 		background: url('/background.jpg') center center / cover no-repeat;
 		background-clip: text;
 		-webkit-background-clip: text;

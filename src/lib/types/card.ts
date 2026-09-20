@@ -29,13 +29,24 @@ export interface CardEntry {
 	text: string;
 }
 
+/**
+ * A run of entries with one origin. The card separates them by a rule, without
+ * naming them – the labels say where an entry comes from.
+ */
+export interface CardSection {
+	kind: 'fighter' | 'weapon' | 'equipment' | 'faction' | 'universal' | 'other';
+	/** Leading line above the entries, from the profile's ability preamble. */
+	preamble: string;
+	entries: CardEntry[];
+}
+
 export interface FighterCardData {
 	instanceId: string;
 	name: string;
 	subtitle: string;
 	stats: CardStat[];
 	weapons: CardWeapon[];
-	entries: CardEntry[];
+	sections: CardSection[];
 	keywords: string[];
 	xp: number;
 	renown: number;

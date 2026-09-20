@@ -8,8 +8,16 @@
  * card and builder never show different numbers.
  */
 
-import { ABILITIES, FACTIONS, FIGHTERS, ITEMS, WEAPONS, WEAPON_RULES } from './gamedata';
-import type { CardEntry, CardStat, CardWeapon, FighterCardData } from './types/card';
+import {
+	ABILITIES,
+	FACTIONS,
+	FIGHTERS,
+	ITEMS,
+	UNIVERSAL_ABILITIES,
+	WEAPONS,
+	WEAPON_RULES
+} from './gamedata';
+import type { CardEntry, CardSection, CardStat, CardWeapon, FighterCardData } from './types/card';
 import { STAT_KEYS, type FighterInstance, type StatKey, type Warband } from './types/warband';
 
 /* Spelled out as on the printed card, "Defense" included. */
@@ -50,18 +58,24 @@ interface Ability {
 }
 
 /**
- * Assigns a free-form ability to a fighter. The `fighter` field is free text:
- * one name, several separated by commas, or the faction name for everyone.
+ * Free-form abilities aimed at any of the given targets. The `fighter` field is
+ * free text: one name, several separated by commas, or the faction name. Which
+ * of the two was meant decides whether the ability is a faction rule or the
+ * fighter's own, so the two are asked for separately.
+ *
+ * A fighter answers to both names: renaming one in the builder must not drop an
+ * ability that was written against the profile it was recruited from.
  */
-function customAbilitiesFor(warband: Warband, fighterName: string, factionName: string): Ability[] {
-	const wanted = fighterName.trim().toLowerCase();
-	const faction = factionName.trim().toLowerCase();
+function customAbilities(warband: Warband, ...targets: string[]): Ability[] {
+	const wanted = targets.map((t) => t.trim().toLowerCase()).filter((t) => t !== '');
+	if (!wanted.length) return [];
 
 	return warband.customAbilities
-		.filter((entry) => {
-			const targets = entry.fighter.split(',').map((t) => t.trim().toLowerCase());
-			return targets.includes(wanted) || (faction !== '' && targets.includes(faction));
-		})
+		.filter((entry) =>
+			entry.fighter
+				.split(',')
+				.some((t) => wanted.includes(t.trim().toLowerCase()))
+		)
 		.map((entry) => {
 			/* Common spelling in the builder: "[Trait] Name: Description". */
 			const match = entry.ability.match(/^\s*(?:\[([^\]]+)\]\s*)?([^:]{1,60}):\s*([\s\S]+)$/);
@@ -73,8 +87,8 @@ function customAbilitiesFor(warband: Warband, fighterName: string, factionName: 
 		});
 }
 
-/** Abilities first, grouped by type; within a group by name. */
-function abilityEntries(abilities: Ability[]): CardEntry[] {
+/** Grouped by type, within a group by name. */
+function sortAbilities(abilities: Ability[]): CardEntry[] {
 	return abilities
 		.slice()
 		.sort((a, b) => typeRank(a.type) - typeRank(b.type) || a.name.localeCompare(b.name))
@@ -82,6 +96,27 @@ function abilityEntries(abilities: Ability[]): CardEntry[] {
 			label: ability.type ? `[${titleCase(ability.type)}] ${ability.name}` : ability.name,
 			text: ability.description
 		}));
+}
+
+function abilityEntries(ids: string[], custom: Ability[]): CardEntry[] {
+	const resolved: Ability[] = ids
+		.map((id) => ABILITIES.get(id))
+		.filter((a): a is NonNullable<typeof a> => a !== undefined)
+		.map((a) => ({ name: a.name, type: a.ability_type, description: a.description }));
+
+	return sortAbilities([...resolved, ...custom]);
+}
+
+/**
+ * The rules pages name the keyword a fighter needs, "Any" for everyone. Race and
+ * archetype keywords live in different fields of the profile, both count.
+ */
+function universalFor(keywords: string[]): Ability[] {
+	const carried = keywords.map((k) => k.toLowerCase());
+
+	return UNIVERSAL_ABILITIES.filter(
+		(rule) => rule.keyword.toLowerCase() === 'any' || carried.includes(rule.keyword.toLowerCase())
+	).map((rule) => ({ name: rule.name, type: rule.ability_type, description: rule.description }));
 }
 
 export function toCard(instance: FighterInstance, warband: Warband, factionName: string): FighterCardData {
@@ -96,7 +131,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 			subtitle: 'Unknown profile',
 			stats: [],
 			weapons: [],
-			entries: notes,
+			sections: notes.length ? [{ kind: 'other', preamble: '', entries: notes }] : [],
 			keywords: [],
 			xp: instance.xp,
 			renown: instance.renown,
@@ -123,6 +158,8 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	/* Weapon rules follow the weapons in table order, within a weapon by name. */
 	const weaponEntries: CardEntry[] = [];
 	const equipmentEntries: CardEntry[] = [];
+	/* Whatever the game data cannot account for, plus the fighter's own notes. */
+	const otherEntries: CardEntry[] = [];
 	let equipmentCost = 0;
 
 	for (const id of instance.equipment) {
@@ -159,18 +196,34 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 				damage: `${custom.hit}/${custom.crit}`
 			});
 			/* Free text in the builder, so there is no rule to look up and split. */
-			if (custom.special) weaponEntries.push({ label: `(${custom.name})`, text: custom.special });
+			if (custom.special) otherEntries.push({ label: `(${custom.name})`, text: custom.special });
 			continue;
 		}
-		equipmentEntries.push({ label: id, text: 'Not found in the game data.' });
+		otherEntries.push({ label: id, text: 'Not found in the game data.' });
 	}
 
-	const abilities: Ability[] = profile.faction_ability_ids
-		.map((id) => ABILITIES.get(id))
-		.filter((a): a is NonNullable<typeof a> => a !== undefined)
-		.map((a) => ({ name: a.name, type: a.ability_type, description: a.description }));
+	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
 
-	abilities.push(...customAbilitiesFor(warband, name || profile.name, factionName));
+	const sections: CardSection[] = [];
+	const push = (kind: CardSection['kind'], entries: CardEntry[], preamble = '') => {
+		if (entries.length) sections.push({ kind, preamble, entries });
+	};
+
+	const keywords = [...profile.race, ...profile.keywords];
+
+	/* What holds for this one fighter comes first, the general reference last.
+	   Despite its name, the profile's list holds the fighter's own abilities –
+	   two fighters of one faction carry different ones. */
+	push(
+		'fighter',
+		abilityEntries(profile.faction_ability_ids, customAbilities(warband, name, profile.name)),
+		profile.ability_preamble
+	);
+	push('weapon', weaponEntries);
+	push('equipment', equipmentEntries);
+	push('faction', abilityEntries(faction?.faction_ability_ids ?? [], customAbilities(warband, factionName)));
+	push('universal', sortAbilities(universalFor(keywords)));
+	push('other', [...otherEntries, ...notes]);
 
 	return {
 		instanceId: instance.instanceId,
@@ -178,8 +231,8 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 		subtitle: name ? profile.name : '',
 		stats,
 		weapons,
-		entries: [...abilityEntries(abilities), ...weaponEntries, ...equipmentEntries, ...notes],
-		keywords: [...profile.race, ...profile.keywords],
+		sections,
+		keywords,
 		xp: instance.xp,
 		renown: instance.renown,
 		cost: (instance.costOverride ?? profile.cost ?? 0) + equipmentCost,
@@ -190,6 +243,13 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 export function toCards(warband: Warband): FighterCardData[] {
 	/* The builder writes the faction's display name into `customAbilities.fighter`,
 	   while the warband stores its id. */
-	const factionName = warband.factionId ? (FACTIONS.get(warband.factionId)?.name ?? '') : '';
-	return warband.fighters.map((f) => toCard(f, warband, factionName));
+	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
+
+	/* `fighters.json` knows factions `factions.json` does not. Without the entry
+	   the faction rules come out empty on a card that looks complete. */
+	if (warband.factionId && !faction && import.meta.env.DEV) {
+		console.warn(`adapter: no faction "${warband.factionId}" in the game data, its rules stay off the card`);
+	}
+
+	return warband.fighters.map((f) => toCard(f, warband, faction?.name ?? ''));
 }
