@@ -68,6 +68,18 @@ gitignored.
 | `npm run check` | type check |
 | `npm run sync:data` | fetch the game data |
 
+## Deployment
+
+<https://hennirocks.github.io/wyrdcry-warband-deck/>
+
+GitHub Actions builds it on every push to `main`. Because the game data is not
+in this repo, the workflow checks out the site repo alongside and runs
+`sync:data` before the build – the deployed version therefore follows the data
+upstream, and a source that changed shape there stops the deploy.
+
+A service worker makes the app installable. That needs HTTPS, which is why it
+has to be a real host and not a file on the phone.
+
 ## Related projects
 
 - [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry) – rules site and Warband Builder, source of the data

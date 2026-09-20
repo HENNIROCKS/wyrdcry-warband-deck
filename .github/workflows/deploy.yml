@@ -1,0 +1,56 @@
+name: Deploy
+
+# The build happens here rather than on a machine, because the game data is not
+# in this repo: it is fetched from the site repo on every run.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the site repo for the game data
+        uses: actions/checkout@v4
+        with:
+          repository: jomblr/wyrdcry
+          path: wyrdcry-src
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # The docs are looked for beside the data, which is where they sit here.
+      - run: npm run sync:data -- --from wyrdcry-src/src/data
+
+      - run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
