@@ -1,60 +1,59 @@
 # Wyrdcry Warband Deck
 
-Die eigene [Wyrdcry](https://wyrdcry.net)-Bande als Kartendeck auf dem Handy.
-Bande aus dem Warband Builder exportieren, hier importieren, durch die Kämpfer
-wischen.
+Your own [Wyrdcry](https://wyrdcry.net) warband as a deck of cards on your phone.
+Export the warband from the Warband Builder, import it here, swipe through the
+fighters.
 
-Inoffizielles Fanprojekt. Keine Verbindung zu den Autor:innen von Wyrdcry oder
-zu Games Workshop.
+Unofficial fan project. No connection to the authors of Wyrdcry or to Games
+Workshop.
 
-**Status: früh.** Die App zeigt an, sie bearbeitet nicht.
+**Status: early.** The app displays, it does not edit.
 
-## Was sie kann
+## What it does
 
-- Warband-JSON aus dem Builder importieren
-- Kämpfer als Karten anzeigen, horizontal durchwischen
-- Exportieren über das System-Share-Sheet, wahlweise als aktueller Stand oder
-  als datierter Schnappschuss
-- Beim Import warnen, wenn die Datei älter ist als der gespeicherte Stand
+- Import warband JSON from the builder
+- Show fighters as cards and swipe through them
+- Export through the system share sheet, either as the current state or as a
+  dated snapshot
+- Warn on import when the file is older than the stored state
 
-## Daten
+## Data
 
-Alles liegt in IndexedDB, auf genau diesem Gerät. Kein Konto, kein Server, kein
-Sync. Was nicht exportiert wurde, ist nach einer Deinstallation weg.
+Everything lives in IndexedDB, on this one device. No account, no server, no
+sync. Whatever has not been exported is gone after an uninstall.
 
-Die App auf den Home-Bildschirm zu legen ist kein Komfort, sondern
-Voraussetzung: Safari löscht die Daten nicht installierter Seiten nach sieben
-Tagen ohne Nutzung.
+Adding the app to the home screen is not a convenience but a requirement: Safari
+clears the data of sites that are not installed after seven days without use.
 
-## Entwicklung
+## Development
 
-Node 20 oder neuer.
+Node 20 or newer.
 
 ```sh
 npm install
-npm run sync:data     # Spieldaten aus dem Site-Repo kopieren
+npm run sync:data     # copy the game data from the site repo
 npm run dev
 ```
 
-`npm run sync:data` erwartet das Repo [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry)
-als Nachbarordner. Liegt es woanders:
+`npm run sync:data` expects the repo [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry)
+as a sibling directory. If it lives elsewhere:
 
 ```sh
-npm run sync:data -- --from /pfad/zu/wyrdcry/src/data
+npm run sync:data -- --from /path/to/wyrdcry/src/data
 ```
 
-Die Spieldaten sind **nicht** Teil dieses Repos. Sie gehören zum
-Wyrdcry-Projekt, dessen Lizenz derzeit ungeklärt ist; `src/lib/data/*.json` ist
-deshalb gitignored.
+The game data is **not** part of this repo. It belongs to the Wyrdcry project,
+whose licence is currently unresolved, which is why `src/lib/data/*.json` is
+gitignored.
 
-| Befehl | Zweck |
+| Command | Purpose |
 | --- | --- |
-| `npm run dev` | Entwicklungsserver |
-| `npm run build` | statische Seite nach `build/` |
-| `npm run check` | Typecheck |
-| `npm run sync:data` | Spieldaten kopieren |
+| `npm run dev` | development server |
+| `npm run build` | static site into `build/` |
+| `npm run check` | type check |
+| `npm run sync:data` | copy the game data |
 
-## Verwandte Projekte
+## Related projects
 
-- [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry) – Regelwerk-Site und Warband Builder, Quelle der Daten
-- `wyrdcry-card-creator` – Karten zum Ausdrucken; von dort kommt die Gestaltung
+- [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry) – rules site and Warband Builder, source of the data
+- `wyrdcry-card-creator` – cards for printing; the design comes from there

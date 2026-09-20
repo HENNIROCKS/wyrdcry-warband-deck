@@ -1,9 +1,9 @@
 /**
- * Import und Export von Banden.
+ * Import and export of warbands.
  *
- * Es gibt keinen Sync. Jeder Export ist eine bewusste Handlung, und beim Import
- * muss die App sagen können, welcher Stand älter ist – sonst überschreibt ein
- * Griff zur falschen Datei eine ganze Kampagne.
+ * There is no sync. Every export is a deliberate act, and on import the app has
+ * to be able to say which state is older – otherwise reaching for the wrong file
+ * overwrites a whole campaign.
  */
 
 import { RULESET_VERSION } from './gamedata';
@@ -23,7 +23,7 @@ export interface ImportCandidate {
 	warband: Warband;
 	meta: DeckMeta | null;
 	verdict: ImportVerdict;
-	/** Regelstand der Datei weicht vom Regelstand der App ab. */
+	/** The file's ruleset differs from the app's ruleset. */
 	rulesetMismatch: string | null;
 	existing: StoredWarband | null;
 }
@@ -36,7 +36,7 @@ function isWarband(value: unknown): value is ExportedWarband {
 	return typeof v.id === 'string' && typeof v.name === 'string' && Array.isArray(v.fighters);
 }
 
-/** Füllt Felder, die ältere Exporte des Builders nicht kennen. */
+/** Fills in fields that older builder exports do not know about. */
 function normalise(raw: ExportedWarband): Warband {
 	return {
 		id: raw.id,
@@ -68,16 +68,16 @@ function judge(incoming: DeckMeta | null, existing: StoredWarband | null): Impor
 	if (!existing) return { kind: 'new' };
 
 	const storedRevision = existing.revision;
-	/* Dateien direkt aus dem Builder tragen keine Revision. Sie gelten als
-	   Revision 1 – älter als alles, was hier schon bearbeitet wurde. */
+	/* Files straight out of the builder carry no revision. They count as
+	   revision 1 – older than anything already edited here. */
 	const incomingRevision = incoming?.revision ?? 1;
 
 	if (incomingRevision > storedRevision) return { kind: 'newer', storedRevision, incomingRevision };
 	if (incomingRevision < storedRevision) return { kind: 'older', storedRevision, incomingRevision };
 
-	/* Gleiche Revision: entweder ist es genau die Datei, aus der dieser Stand
-	   kommt – dann ändert ein Import nichts – oder zwei Geräte haben dieselbe
-	   Revision unterschiedlich weitergeschrieben. */
+	/* Same revision: either it is exactly the file this state came from – then an
+	   import changes nothing – or two devices carried the same revision forward in
+	   different directions. */
 	if (!incoming) return { kind: 'same' };
 	const origin = existing.origin;
 	if (origin && origin.device === incoming.device && origin.exportedAt === incoming.exportedAt) {
@@ -91,20 +91,20 @@ export async function readFile(file: File): Promise<ImportCandidate> {
 	try {
 		parsed = JSON.parse(await file.text());
 	} catch {
-		throw new ImportError('Die Datei ist kein gültiges JSON.');
+		throw new ImportError('That file is not valid JSON.');
 	}
 
 	if (!isWarband(parsed)) {
-		throw new ImportError('Die Datei sieht nicht nach einer Bande aus.');
+		throw new ImportError('That file does not look like a warband.');
 	}
 
 	const meta = (parsed._deck as DeckMeta | undefined) ?? null;
 	const warband = normalise(parsed);
 
-	/* Der Builder lehnt namenlose Banden beim Import stumm ab. Wer hier eine
-	   speichert, kann sie später nicht zurückspielen. */
+	/* The builder silently rejects unnamed warbands on import. Storing one here
+	   would mean not being able to play it back later. */
 	if (warband.name.trim() === '') {
-		throw new ImportError('Die Bande hat keinen Namen. Im Builder benennen und neu exportieren.');
+		throw new ImportError('This warband has no name. Name it in the builder and export again.');
 	}
 
 	const existing = (await getWarband(warband.id)) ?? null;
@@ -154,9 +154,9 @@ export async function buildExport(entry: StoredWarband): Promise<ExportedWarband
 export type ExportResult = 'shared' | 'downloaded' | 'cancelled';
 
 /**
- * Teilt die Datei über das System-Share-Sheet – dort liegen „In Dateien sichern",
- * Drive, AirDrop und Mail. Wo es das nicht gibt (Desktop), fällt es auf einen
- * Download zurück.
+ * Shares the file through the system share sheet – that is where "Save to Files",
+ * Drive, AirDrop and Mail live. Where there is none (desktop), it falls back to a
+ * download.
  */
 export async function exportWarband(entry: StoredWarband, snapshot: boolean): Promise<ExportResult> {
 	const payload = JSON.stringify(await buildExport(entry), null, 2);
@@ -169,7 +169,7 @@ export async function exportWarband(entry: StoredWarband, snapshot: boolean): Pr
 			return 'shared';
 		} catch (error) {
 			if (error instanceof DOMException && error.name === 'AbortError') return 'cancelled';
-			/* Share abgelehnt oder nicht verfügbar – Download ist immer noch besser als nichts. */
+			/* Share declined or unavailable – a download still beats nothing. */
 		}
 	}
 
@@ -177,8 +177,8 @@ export async function exportWarband(entry: StoredWarband, snapshot: boolean): Pr
 	const anchor = document.createElement('a');
 	anchor.href = url;
 	anchor.download = name;
-	/* Anker muss im DOM hängen und die URL darf erst nach dem Klick weg,
-	   sonst bricht der Download in Safari ab. */
+	/* The anchor has to be in the DOM and the URL may only go after the click,
+	   otherwise the download breaks in Safari. */
 	document.body.appendChild(anchor);
 	anchor.click();
 	anchor.remove();

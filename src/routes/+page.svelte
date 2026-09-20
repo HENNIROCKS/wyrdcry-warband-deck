@@ -31,7 +31,7 @@
 	async function onPick(event: Event) {
 		const input = event.currentTarget as HTMLInputElement;
 		const file = input.files?.[0];
-		/* Zurücksetzen, sonst löst dieselbe Datei beim zweiten Mal kein change aus. */
+		/* Reset, otherwise the same file does not fire a change event twice. */
 		input.value = '';
 		if (!file) return;
 
@@ -39,14 +39,14 @@
 			candidate = await readFile(file);
 			message = null;
 		} catch (error) {
-			message = error instanceof ImportError ? error.message : 'Die Datei konnte nicht gelesen werden.';
+			message = error instanceof ImportError ? error.message : 'That file could not be read.';
 		}
 	}
 
 	async function confirmImport() {
 		if (!candidate) return;
-		/* IndexedDB klont strukturiert und stolpert über den Reaktivitäts-Proxy,
-		   deshalb vorher ein einfaches Objekt herausnehmen. */
+		/* IndexedDB clones structurally and trips over the reactivity proxy, so take
+		   a plain object out of it first. */
 		const entry = toStored($state.snapshot(candidate) as ImportCandidate);
 		await putWarband(entry);
 		await requestPersistence();
@@ -59,15 +59,15 @@
 	async function doExport(snapshot: boolean) {
 		if (!active) return;
 		const result = await exportWarband(active, snapshot);
-		if (result === 'downloaded') message = 'Als Datei heruntergeladen.';
-		else if (result === 'shared') message = 'Geteilt.';
+		if (result === 'downloaded') message = 'Downloaded as a file.';
+		else if (result === 'shared') message = 'Shared.';
 	}
 </script>
 
 <header class="bar">
 	<div class="identity">
 		{#if warbands.length > 1}
-			<select bind:value={activeId} aria-label="Bande wählen">
+			<select bind:value={activeId} aria-label="Choose warband">
 				{#each warbands as entry (entry.warband.id)}
 					<option value={entry.warband.id}>{entry.warband.name}</option>
 				{/each}
@@ -78,19 +78,19 @@
 			<h1>Warband Deck</h1>
 		{/if}
 		{#if active}
-			<p class="sub">{active.warband.fighters.length} Kämpfer · Rev {active.revision}</p>
+			<p class="sub">{active.warband.fighters.length} fighters · Rev {active.revision}</p>
 		{/if}
 	</div>
 
 	<div class="tools">
 		{#if dev}
-			<a class="devlink" href="/dev" title="Auf dem Handy öffnen">QR</a>
+			<a class="devlink" href="/dev" title="Open on your phone">QR</a>
 		{/if}
 		<button onclick={() => fileInput?.click()}>Import</button>
 		{#if active}
 			<button onclick={() => doExport(false)}>Export</button>
-			<button class="ghost" onclick={() => doExport(true)} title="Datierte Kopie, wird nie überschrieben">
-				Schnappschuss
+			<button class="ghost" onclick={() => doExport(true)} title="Dated copy, never overwritten">
+				Snapshot
 			</button>
 		{/if}
 	</div>
@@ -112,12 +112,12 @@
 	<Deck {cards} />
 {:else}
 	<div class="empty">
-		<h2>Noch keine Bande</h2>
+		<h2>No warband yet</h2>
 		<p>
-			Exportiere deine Bande im Warband Builder als JSON und importiere sie hier.
-			Die Daten bleiben auf diesem Gerät.
+			Export your warband from the Warband Builder as JSON and import it here.
+			The data stays on this device.
 		</p>
-		<button onclick={() => fileInput?.click()}>Datei wählen</button>
+		<button onclick={() => fileInput?.click()}>Choose file</button>
 	</div>
 {/if}
 
@@ -150,7 +150,7 @@
 		margin: 0;
 		font-size: 17px;
 		font-weight: 600;
-		/* Einzeilig: der Name darf die Kartenfläche nicht auffressen. */
+		/* Single line: the name must not eat into the card area. */
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -182,7 +182,7 @@
 	}
 
 	.tools button {
-		/* Gleich breit und großflächig – die Leiste wird am Tisch mit einer Hand bedient. */
+		/* Equal width and generous – the bar is operated one-handed at the table. */
 		flex: 1;
 		padding: 10px 8px;
 		border: 1px solid var(--ui-border);
@@ -196,7 +196,7 @@
 		color: var(--ui-text-muted);
 	}
 
-	/* Nur im Dev-Server sichtbar. */
+	/* Only visible in the dev server. */
 	.devlink {
 		flex: 0 0 auto;
 		display: grid;

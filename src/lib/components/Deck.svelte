@@ -6,19 +6,19 @@
 
 	let { cards }: { cards: FighterCardData[] } = $props();
 
-	/** Dauer des Wegfliegens; dieselbe Zahl steuert Übergang und Umschaltpunkt. */
+	/** Duration of the fly-out; the same number drives transition and switch point. */
 	const FLY = 260;
-	/** Anteil der Breite, ab dem die Karte losgelassen wegfliegt statt zurückzufedern. */
+	/** Fraction of the width past which a released card flies out instead of springing back. */
 	const DISTANCE = 0.25;
-	/** Flicken: ab dieser Geschwindigkeit in px/ms zählt auch ein kurzer Weg. */
+	/** Flick: from this speed in px/ms a short distance counts too. */
 	const VELOCITY = 0.5;
 
 	let stack: HTMLDivElement | undefined = $state();
 	let current = $state(0);
-	/** Waagerechter Versatz der obersten Karte am Finger. */
+	/** Horizontal offset of the top card under the finger. */
 	let dx = $state(0);
 	let dragging = $state(false);
-	/** Richtung, in die die Karte gerade wegfliegt: -1 links, 1 rechts, 0 = sie liegt. */
+	/** Direction the card is flying out in: -1 left, 1 right, 0 = it rests. */
 	let leaving = $state(0);
 	let reduced = $state(false);
 
@@ -30,9 +30,9 @@
 	const wrap = (index: number) => ((index % cards.length) + cards.length) % cards.length;
 
 	/**
-	 * Unter der obersten Karte liegt die, auf die die aktuelle Richtung zeigt:
-	 * nach links der nächste Kämpfer, nach rechts der vorige. Der Stapel ist
-	 * geschlossen – hinter dem letzten kommt wieder der erste.
+	 * Beneath the top card lies the one the current direction points at: to the
+	 * left the next fighter, to the right the previous one. The stack is closed –
+	 * behind the last one comes the first again.
 	 */
 	const beneath = $derived(cards.length > 1 ? wrap(current + (dx > 0 ? -1 : 1)) : -1);
 
@@ -44,7 +44,7 @@
 			: `translateX(${dx}px) rotate(${dx * 0.04}deg)`
 	);
 
-	/** Die darunter liegende Karte wächst auf volle Größe, während die obere zieht. */
+	/** The card underneath grows to full size while the one above is dragged. */
 	const progress = $derived(
 		leaving ? 1 : Math.min(1, Math.abs(dx) / ((stack?.clientWidth ?? 320) * DISTANCE))
 	);
@@ -70,7 +70,7 @@
 	function onPointerMove(event: PointerEvent) {
 		if (!dragging || event.pointerId !== pointer) return;
 		dx = event.clientX - startX;
-		/* Erst wenn klar ist, dass gezogen wird – ein Tippen soll die Karte nicht greifen. */
+		/* Only once it is clear this is a drag – a tap must not grab the card. */
 		if (!captured && Math.abs(dx) > 6) {
 			(event.currentTarget as Element).setPointerCapture(event.pointerId);
 			captured = true;
@@ -92,8 +92,8 @@
 	}
 
 	/**
-	 * Der Browser übernimmt das senkrechte Scrollen selbst (touch-action: pan-y)
-	 * und bricht die Geste dann ab – die halb gezogene Karte gehört zurückgelegt.
+	 * The browser takes over vertical scrolling itself (touch-action: pan-y) and
+	 * then cancels the gesture – the half-dragged card belongs back in place.
 	 */
 	function onPointerCancel() {
 		dragging = false;
@@ -103,7 +103,7 @@
 
 	function fly(direction: -1 | 1) {
 		if (leaving) return;
-		/* Ohne Zug (Tastatur) fehlt das Vorzeichen, an dem `beneath` die Richtung abliest. */
+		/* Without a drag (keyboard) the sign `beneath` reads the direction from is missing. */
 		if (dx === 0) dx = direction;
 		leaving = direction;
 		setTimeout(() => {
@@ -149,7 +149,7 @@
 			<div
 				class="pane top"
 				role="group"
-				aria-roledescription="Karte, waagerecht wischen"
+				aria-roledescription="Card, swipe horizontally"
 				style:transform
 				style:opacity={leaving ? 0 : 1}
 				style:transition={dragging
@@ -165,7 +165,7 @@
 		{/key}
 	</div>
 
-	<nav class="dots" aria-label="Kämpfer wählen">
+	<nav class="dots" aria-label="Choose fighter">
 		{#each cards as card, i (card.instanceId)}
 			<button
 				class="dot"
@@ -194,7 +194,7 @@
 		min-height: 0;
 	}
 
-	/* Ein Zug mit der Maus verschiebt die Karte und markiert dabei keinen Text. */
+	/* A drag with the mouse moves the card without selecting any text. */
 	.stack.dragging {
 		user-select: none;
 		-webkit-user-select: none;
@@ -205,13 +205,13 @@
 		inset: 0;
 		padding: 0 10px;
 		overflow-y: auto;
-		/* Senkrechtes Scrollen bleibt in der Karte und zieht die Seite nicht mit. */
+		/* Vertical scrolling stays inside the card and does not drag the page along. */
 		overscroll-behavior: contain;
 		-webkit-overflow-scrolling: touch;
 	}
 
 	.top {
-		/* Senkrecht scrollt der Browser, waagerecht bleibt für die Wischgeste. */
+		/* The browser scrolls vertically, horizontal is left for the swipe gesture. */
 		touch-action: pan-y;
 		will-change: transform;
 		z-index: 1;

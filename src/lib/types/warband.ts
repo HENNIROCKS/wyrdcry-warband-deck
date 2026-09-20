@@ -1,7 +1,7 @@
 /**
- * Spiegel des Warband-Modells aus dem Builder (`useWarband.ts` in jomblr/wyrdcry).
- * Wird beim Import gelesen und beim Export unverändert wieder geschrieben, damit
- * der Rückweg in den Builder offen bleibt.
+ * Mirror of the warband model from the builder (`useWarband.ts` in jomblr/wyrdcry).
+ * Read on import and written back unchanged on export, so the way back into the
+ * builder stays open.
  */
 
 export type StatKey = 'move' | 'fight' | 'shoot' | 'defense' | 'health' | 'bravery';
@@ -24,7 +24,7 @@ export interface FighterInstance {
 
 export interface CustomAbility {
 	id: string;
-	/** Freitext: Name des Kämpfers, mehrere durch Komma getrennt, oder der Fraktionsname. */
+	/** Free text: a fighter name, several separated by commas, or the faction name. */
 	fighter: string;
 	type: string;
 	ability: string;
@@ -53,7 +53,7 @@ export interface Warband {
 	customAbilities: CustomAbility[];
 }
 
-/** Metadaten dieser App. Der Builder ignoriert unbekannte Schlüssel und gibt sie zurück. */
+/** Metadata of this app. The builder ignores unknown keys and hands them back. */
 export interface DeckMeta {
 	format: 'wyrdcry-warband-deck';
 	revision: number;
@@ -65,23 +65,23 @@ export interface DeckMeta {
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
 
 /**
- * Flüchtiger Zustand eines laufenden Spiels – Wunden, Zustände.
- * Noch nicht benutzt; steht hier, damit die Trennung von der Kampagnenebene
- * von Anfang an im Modell verankert ist.
+ * Transient state of a game in progress – wounds, conditions.
+ * Not used yet; it is here so the split from the campaign level is anchored in
+ * the model from the start.
  */
 export interface BattleState {
 	startedAt: string;
 	fighters: Record<string, { wounds: number; conditions: string[] }>;
 }
 
-/** Was in IndexedDB liegt: die Bande plus alles, was nur diese App betrifft. */
+/** What lives in IndexedDB: the warband plus everything only this app cares about. */
 export interface StoredWarband {
 	warband: Warband;
 	revision: number;
 	ruleset: string;
 	importedAt: string;
 	updatedAt: string;
-	/** Aus welchem Export dieser Stand stammt. Null bei Dateien direkt aus dem Builder. */
+	/** Which export this state came from. Null for files straight out of the builder. */
 	origin: { device: string; exportedAt: string } | null;
 	battle: BattleState | null;
 }

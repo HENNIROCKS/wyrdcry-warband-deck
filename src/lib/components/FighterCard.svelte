@@ -6,7 +6,7 @@
 </script>
 
 <article class="card" class:unresolved={card.unresolved}>
-	<!-- Kopfzone bleibt beim Scrollen stehen: auf die Werteleiste schaut man ständig. -->
+	<!-- The head stays put while scrolling: the stat bar is looked at constantly. -->
 	<header class="head">
 		<div class="titles">
 			<h2>{card.name}</h2>
@@ -24,17 +24,17 @@
 	<div class="body">
 		{#if card.unresolved}
 			<p class="warn">
-				Dieses Profil steht nicht in den Stammdaten. Die Bande verweist auf
-				<code>{card.name}</code> – vermutlich ein neuerer Regelstand.
+				This profile is not in the game data. The warband references
+				<code>{card.name}</code> – most likely a newer ruleset.
 			</p>
 		{/if}
 
 		{#if card.weapons.length}
 			<section>
-				<h3>Waffen</h3>
+				<h3>Weapons</h3>
 				<table>
 					<thead>
-						<tr><th>Name</th><th>Rw</th><th>A</th><th>T/K</th></tr>
+						<tr><th>Name</th><th>Rng</th><th>A</th><th>H/C</th></tr>
 					</thead>
 					<tbody>
 						{#each card.weapons as weapon, i (weapon.name + i)}
@@ -55,7 +55,7 @@
 
 		{#if card.items.length}
 			<section>
-				<h3>Ausrüstung</h3>
+				<h3>Equipment</h3>
 				{#each card.items as item, i (item.name + i)}
 					<p class="entry"><strong>{item.name}</strong> {item.description}</p>
 				{/each}
@@ -64,7 +64,7 @@
 
 		{#if card.abilities.length}
 			<section>
-				<h3>Talente</h3>
+				<h3>Abilities</h3>
 				{#each card.abilities as ability, i (ability.name + i)}
 					<p class="entry">
 						<strong>{ability.name}</strong>
@@ -77,7 +77,7 @@
 
 		{#if card.notes}
 			<section>
-				<h3>Notizen</h3>
+				<h3>Notes</h3>
 				<p class="entry">{card.notes}</p>
 			</section>
 		{/if}
@@ -90,7 +90,7 @@
 					{/each}
 				</ul>
 			{/if}
-			<p class="progress">XP {card.xp} · Ruhm {card.renown}</p>
+			<p class="progress">XP {card.xp} · Renown {card.renown}</p>
 		</footer>
 	</div>
 </article>
@@ -103,8 +103,8 @@
 		background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
 		color: var(--parchment-ink);
 		border-radius: 14px;
-		/* Kein overflow: hidden – es würde einen eigenen Clip-Kontext aufmachen
-		   und die klebende Kopfzone mitscrollen lassen. */
+		/* No overflow: hidden – it would open its own clipping context and make the
+		   sticky head scroll along. */
 	}
 
 	.head {
@@ -115,7 +115,7 @@
 		grid-template-columns: 1fr auto;
 		gap: 8px 12px;
 		padding: 12px 14px 12px;
-		/* Deckend, sonst scheint der Text darunter durch die klebende Kopfzone. */
+		/* Opaque, otherwise the text below shows through the sticky head. */
 		background: var(--parchment);
 		border-bottom: 1px solid rgba(28, 24, 16, 0.18);
 		box-shadow: 0 6px 10px -8px rgba(28, 24, 16, 0.55);

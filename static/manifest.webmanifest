@@ -1,7 +1,7 @@
 {
 	"name": "Wyrdcry Warband Deck",
 	"short_name": "Warband Deck",
-	"description": "Die eigene Wyrdcry-Bande als Kartendeck.",
+	"description": "Your own Wyrdcry warband as a deck of cards.",
 	"start_url": "./",
 	"scope": "./",
 	"display": "standalone",

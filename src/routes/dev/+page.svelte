@@ -2,49 +2,49 @@
 	import { dev } from '$app/environment';
 	import { qr, url } from 'virtual:dev-network';
 
-	/* Die Route existiert nur im Dev-Server. Im gebauten Stand ist sie leer. */
+	/* This route only exists in the dev server. In a build it is empty. */
 	const insecure = $derived(url !== null && !url.startsWith('https://'));
 </script>
 
 <main>
-	<h1>Auf dem Handy öffnen</h1>
+	<h1>Open on your phone</h1>
 
 	{#if !dev}
-		<p class="hint">Diese Seite gibt es nur im Entwicklungsmodus.</p>
+		<p class="hint">This page only exists in development mode.</p>
 	{:else if !url}
 		<p class="hint">
-			Keine Netzwerkadresse gefunden. Hängt der Rechner im WLAN? Läuft der Server mit
+			No network address found. Is this machine on Wi-Fi? Is the server running with
 			<code>npm run dev:lan</code>?
 		</p>
 	{:else}
 		<div class="qr">
-			<!-- SVG kommt aus der Vite-Config, nicht aus Nutzereingaben. -->
+			<!-- The SVG comes from the Vite config, not from user input. -->
 			{@html qr}
 		</div>
 
 		<p class="url"><a href={url}>{url}</a></p>
 
 		<p class="hint">
-			Kamera auf den Code halten. Handy und Rechner müssen im selben Netz sein.
+			Point the camera at the code. Phone and machine have to be on the same network.
 		</p>
 
 		{#if insecure}
 			<div class="warn">
 				<p>
-					<strong>Über <code>http://</code> ist das keine PWA.</strong>
-					Layout, Wischen und Tippflächen kannst du so prüfen. Nicht prüfbar sind:
+					<strong>Over <code>http://</code> this is not a PWA.</strong>
+					Layout, swiping and tap targets can be checked this way. What cannot:
 				</p>
 				<ul>
-					<li>Installation auf dem Home-Bildschirm</li>
-					<li>dauerhafter Speicher über <code>navigator.storage.persist()</code></li>
-					<li>Export über das Share-Sheet – er fällt auf den Download zurück</li>
+					<li>installing to the home screen</li>
+					<li>persistent storage via <code>navigator.storage.persist()</code></li>
+					<li>export through the share sheet – it falls back to a download</li>
 				</ul>
-				<p>Alle drei verlangen einen sicheren Kontext, den nur HTTPS und localhost bieten.</p>
+				<p>All three require a secure context, which only HTTPS and localhost provide.</p>
 			</div>
 		{/if}
 	{/if}
 
-	<p class="back"><a href="/">Zurück zum Deck</a></p>
+	<p class="back"><a href="/">Back to the deck</a></p>
 </main>
 
 <style>
@@ -120,7 +120,7 @@
 	.warn ul {
 		margin: 0 0 8px;
 		padding-left: 18px;
-		/* Tailwinds Preflight nimmt Listen ihre Marker. */
+		/* Tailwind's preflight strips list markers. */
 		list-style: disc;
 	}
 

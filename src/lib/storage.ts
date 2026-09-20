@@ -1,6 +1,6 @@
 /**
- * Ablage in IndexedDB. Die Daten hängen an der Origin: zieht die App auf eine
- * andere Adresse um, sind sie weg.
+ * Storage in IndexedDB. The data is bound to the origin: move the app to a
+ * different address and it is gone.
  */
 
 import { browser } from '$app/environment';
@@ -43,7 +43,7 @@ function run<T>(store: string, mode: IDBTransactionMode, fn: (s: IDBObjectStore)
 export async function allWarbands(): Promise<StoredWarband[]> {
 	if (!browser) return [];
 	const list = await run<StoredWarband[]>(STORE, 'readonly', (s) => s.getAll());
-	return list.sort((a, b) => a.warband.name.localeCompare(b.warband.name, 'de'));
+	return list.sort((a, b) => a.warband.name.localeCompare(b.warband.name, 'en'));
 }
 
 export async function getWarband(id: string): Promise<StoredWarband | undefined> {
@@ -60,8 +60,8 @@ export async function deleteWarband(id: string): Promise<void> {
 }
 
 /**
- * Kennung dieses Geräts. Steht in jedem Export, damit beim Import erkennbar ist,
- * ob zwei Stände auseinandergelaufen sind.
+ * Identifier of this device. Goes into every export so an import can tell
+ * whether two states have diverged.
  */
 export async function deviceId(): Promise<string> {
 	const stored = await run<string | undefined>(META, 'readonly', (s) => s.get('device'));
@@ -72,8 +72,8 @@ export async function deviceId(): Promise<string> {
 }
 
 /**
- * Bittet den Browser, die Daten nicht bei Platzmangel zu verwerfen.
- * Safari gewährt das im Wesentlichen nur installierten PWAs.
+ * Asks the browser not to discard the data when storage runs low.
+ * Safari essentially grants this to installed PWAs only.
  */
 export async function requestPersistence(): Promise<boolean> {
 	if (!browser || !navigator.storage?.persist) return false;

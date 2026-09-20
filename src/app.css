@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 
 /*
- * Farben und Typografie folgen dem Card Creator, damit beide Projekte gleich
- * aussehen. Die Kartengeometrie folgt ihm bewusst nicht: die Druckkarte hat eine
- * feste Höhe, hier wächst sie.
+ * Colours and typography follow the Card Creator so both projects look alike.
+ * The card geometry deliberately does not: the printed card has a fixed height,
+ * here it grows.
  */
 
 :root {
@@ -26,7 +26,7 @@
 	--parchment-ink: #1c1810;
 	--parchment-ink-muted: #5a5048;
 
-	/* Höhe der Kopfzone – die Karte scrollt darunter durch. */
+	/* Height of the head area – the card scrolls underneath it. */
 	--card-head: 132px;
 }
 
@@ -36,7 +36,7 @@ body {
 	background: var(--ui-header-bg);
 	color: var(--ui-text);
 	font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-	/* Kein Gummiband-Effekt am Rand des Decks. */
+	/* No rubber-band effect at the edge of the deck. */
 	overscroll-behavior: none;
 }
 

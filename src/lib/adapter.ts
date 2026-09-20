@@ -1,11 +1,11 @@
 /**
- * Leitet Kartendaten aus einer Kämpferinstanz und den Stammdaten ab.
+ * Derives card data from a fighter instance and the game data.
  *
- * Nichts davon wird gespeichert. Ändert sich ein Wert in der Bande, ändert sich
- * die Karte beim nächsten Rendern mit.
+ * None of it is stored. Change a value in the warband and the card changes with
+ * it on the next render.
  *
- * Die Rechenregeln spiegeln den Builder (`FighterCard.tsx` in jomblr/wyrdcry),
- * damit Karte und Builder nie verschiedene Zahlen zeigen.
+ * The arithmetic mirrors the builder (`FighterCard.tsx` in jomblr/wyrdcry) so
+ * card and builder never show different numbers.
  */
 
 import { ABILITIES, FACTIONS, FIGHTERS, ITEMS, WEAPONS, WEAPON_RULES } from './gamedata';
@@ -21,7 +21,7 @@ const STAT_LABELS: Record<StatKey, string> = {
 	bravery: 'B'
 };
 
-/** Nur Rüstung wirkt auf Werte, und nur auf Defense – wie im Builder. */
+/** Only armour affects characteristics, and only Defense – same as the builder. */
 function defenseBonus(equipment: string[]): number {
 	return equipment.reduce((sum, id) => {
 		const item = ITEMS.get(id);
@@ -34,8 +34,8 @@ function weaponRuleNames(ids: string[]): string[] {
 }
 
 /**
- * Ordnet eine freie Ability einem Kämpfer zu. Das Feld `fighter` ist Freitext:
- * ein Name, mehrere durch Komma getrennt, oder der Fraktionsname für alle.
+ * Assigns a free-form ability to a fighter. The `fighter` field is free text:
+ * one name, several separated by commas, or the faction name for everyone.
  */
 function customAbilitiesFor(warband: Warband, fighterName: string, factionName: string): CardAbility[] {
 	const wanted = fighterName.trim().toLowerCase();
@@ -47,10 +47,10 @@ function customAbilitiesFor(warband: Warband, fighterName: string, factionName: 
 			return targets.includes(wanted) || (faction !== '' && targets.includes(faction));
 		})
 		.map((entry) => {
-			/* Häufige Schreibweise im Builder: "[Trait] Name: Beschreibung". */
+			/* Common spelling in the builder: "[Trait] Name: Description". */
 			const match = entry.ability.match(/^\s*(?:\[([^\]]+)\]\s*)?([^:]{1,60}):\s*([\s\S]+)$/);
 			return {
-				name: match ? match[2].trim() : entry.type || 'Notiz',
+				name: match ? match[2].trim() : entry.type || 'Note',
 				type: match?.[1]?.trim() ?? entry.type,
 				description: match ? match[3].trim() : entry.ability,
 				custom: true
@@ -66,7 +66,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 		return {
 			instanceId: instance.instanceId,
 			name: name || instance.fighterId,
-			subtitle: 'Unbekanntes Profil',
+			subtitle: 'Unknown profile',
 			stats: [],
 			weapons: [],
 			items: [],
@@ -129,7 +129,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 			});
 			continue;
 		}
-		items.push({ name: id, description: 'In den Stammdaten nicht gefunden.' });
+		items.push({ name: id, description: 'Not found in the game data.' });
 	}
 
 	const abilities: CardAbility[] = profile.faction_ability_ids
@@ -158,8 +158,8 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 }
 
 export function toCards(warband: Warband): FighterCardData[] {
-	/* Der Builder schreibt in `customAbilities.fighter` den Anzeigenamen der
-	   Fraktion, die Bande speichert ihre ID. */
+	/* The builder writes the faction's display name into `customAbilities.fighter`,
+	   while the warband stores its id. */
 	const factionName = warband.factionId ? (FACTIONS.get(warband.factionId)?.name ?? '') : '';
 	return warband.fighters.map((f) => toCard(f, warband, factionName));
 }

@@ -1,11 +1,11 @@
 /**
- * Kopiert die Spieldaten aus dem Site-Repo nach src/lib/data/.
+ * Copies the game data from the site repo into src/lib/data/.
  *
- * Das Ziel ist gitignored: die Daten gehören dem Wyrdcry-Projekt, ihre
- * Lizenz ist ungeklärt (dort fehlt ein LICENSE). Dieses Repo verteilt sie
- * deshalb nicht mit, sondern holt sie lokal.
+ * The target is gitignored: the data belongs to the Wyrdcry project and its
+ * licence is unresolved (there is no LICENSE over there). This repo therefore
+ * does not ship it, it fetches it locally.
  *
- * Aufruf:  npm run sync:data [-- --from <pfad>]
+ * Usage:  npm run sync:data [-- --from <path>]
  */
 import { mkdir, copyFile, writeFile, access } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
@@ -16,7 +16,7 @@ const TARGET = resolve(HERE, '../src/lib/data');
 
 const DEFAULT_SOURCE = resolve(HERE, '../../wyrdcry/src/data');
 
-/** Ohne diese Dateien startet die App nicht. */
+/** Without these files the app does not start. */
 const REQUIRED = [
 	'fighters.json',
 	'weapons.json',
@@ -28,13 +28,13 @@ const REQUIRED = [
 	'campaign-rules.json'
 ];
 
-/** Liegt derzeit nur auf dem Branch feat/game-reference-print (PR #9). */
+/** Currently only on the branch feat/game-reference-print (PR #9). */
 const OPTIONAL = ['ruleset.json'];
 
-/** Steht in jedem Export und wird beim Import verglichen. */
+/** Goes into every export and is compared on import. */
 const UNKNOWN_RULESET = {
-	version: 'unbekannt',
-	label: 'Regelstand unbekannt',
+	version: 'unknown',
+	label: 'Ruleset unknown',
 	slug: 'unknown'
 };
 
@@ -55,8 +55,8 @@ async function exists(path) {
 const source = sourceDir();
 
 if (!(await exists(source))) {
-	console.error(`Quelle nicht gefunden: ${source}`);
-	console.error('Site-Repo woanders? npm run sync:data -- --from <pfad zu src/data>');
+	console.error(`Source not found: ${source}`);
+	console.error('Site repo elsewhere? npm run sync:data -- --from <path to src/data>');
 	process.exit(1);
 }
 
@@ -74,7 +74,7 @@ for (const file of REQUIRED) {
 }
 
 if (missing.length) {
-	console.error(`\nFehlende Pflichtdateien in ${source}:`);
+	console.error(`\nMissing required files in ${source}:`);
 	for (const file of missing) console.error(`  ${file}`);
 	process.exit(1);
 }
@@ -86,8 +86,8 @@ for (const file of OPTIONAL) {
 		console.log(`  ${file}`);
 	} else {
 		await writeFile(join(TARGET, file), JSON.stringify(UNKNOWN_RULESET, null, 2) + '\n');
-		console.log(`  ${file} (Platzhalter – im Site-Repo nicht vorhanden)`);
+		console.log(`  ${file} (placeholder – not present in the site repo)`);
 	}
 }
 
-console.log(`\nStammdaten aus ${source}`);
+console.log(`\nGame data from ${source}`);

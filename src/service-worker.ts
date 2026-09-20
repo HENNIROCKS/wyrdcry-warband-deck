@@ -1,9 +1,9 @@
 /**
- * Minimaler Service Worker: er macht die App installierbar, mehr nicht.
+ * Minimal service worker: it makes the app installable, nothing more.
  *
- * Installierbar zu sein ist kein Selbstzweck – Safari löscht die Daten einer
- * nicht installierten Seite nach sieben Tagen ohne Nutzung. Echtes
- * Offline-Caching der Stammdaten kommt später.
+ * Being installable is not an end in itself – Safari clears the data of a site
+ * that is not installed after seven days without use. Real offline caching of
+ * the game data comes later.
  */
 
 /// <reference types="@sveltejs/kit" />

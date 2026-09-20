@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import QRCode from 'qrcode';
 import { defineConfig, type Plugin } from 'vite';
 
-/** Erste IPv4-Adresse, unter der dieser Rechner im lokalen Netz erreichbar ist. */
+/** First IPv4 address this machine can be reached at on the local network. */
 function lanAddress(): string | null {
 	for (const entries of Object.values(networkInterfaces())) {
 		for (const entry of entries ?? []) {
@@ -16,11 +16,11 @@ function lanAddress(): string | null {
 }
 
 /**
- * Stellt der Dev-Seite die Netzwerkadresse und einen QR-Code dazu bereit.
+ * Supplies the dev page with the network address and a QR code for it.
  *
- * Der Browser kennt nur `localhost`, und das Handy kommt darüber nicht an den
- * Server. Die Adresse muss also von außen hereingereicht werden. Der QR-Code
- * wird hier in Node erzeugt, damit der Client keine Bibliothek braucht.
+ * The browser only knows `localhost`, and a phone cannot reach the server that
+ * way. So the address has to be handed in from outside. The QR code is generated
+ * here in Node so the client needs no library.
  */
 function devNetworkInfo(): Plugin {
 	const VIRTUAL = 'virtual:dev-network';
@@ -30,8 +30,8 @@ function devNetworkInfo(): Plugin {
 
 	return {
 		name: 'wyrdcry-dev-network',
-		/* Läuft auch im Build: die /dev-Route wird mitgebaut und muss das Modul
-		   auflösen können. Dort gibt es dann nichts zu melden. */
+		/* Runs during the build too: the /dev route is built along and has to be able
+		   to resolve the module. There is nothing to report then. */
 		configResolved: (config) => void (serving = config.command === 'serve'),
 		resolveId: (id) => (id === VIRTUAL ? RESOLVED : null),
 		async load(id) {

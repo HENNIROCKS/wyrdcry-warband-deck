@@ -1,4 +1,4 @@
-/** Was eine Karte zeigt. Wird bei jedem Rendern aus Instanz und Stammdaten abgeleitet. */
+/** What a card shows. Derived from instance and game data on every render. */
 
 import type { StatKey } from './warband';
 
@@ -6,7 +6,7 @@ export interface CardStat {
 	key: StatKey;
 	label: string;
 	value: number;
-	/** Weicht vom Profilwert ab – durch Override oder Ausrüstung. */
+	/** Differs from the profile value – through an override or equipment. */
 	modified: boolean;
 }
 
@@ -14,7 +14,7 @@ export interface CardWeapon {
 	name: string;
 	range: string;
 	attacks: string;
-	/** Trefferwert und kritischer Wert, wie im Wiki: "2/4". */
+	/** Hit value and critical value, as in the wiki: "2/4". */
 	damage: string;
 	rules: string[];
 }
@@ -28,7 +28,7 @@ export interface CardAbility {
 	name: string;
 	type: string;
 	description: string;
-	/** Aus den customAbilities der Bande, nicht aus den Stammdaten. */
+	/** From the warband's customAbilities, not from the game data. */
 	custom: boolean;
 }
 
@@ -46,6 +46,6 @@ export interface FighterCardData {
 	renown: number;
 	cost: number;
 	isHero: boolean;
-	/** Profil-ID ist unbekannt – die Stammdaten kennen diesen Kämpfer nicht. */
+	/** The profile id is unknown – the game data does not know this fighter. */
 	unresolved: boolean;
 }

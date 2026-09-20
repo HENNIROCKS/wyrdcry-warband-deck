@@ -7,8 +7,8 @@
 		oncancel
 	}: { candidate: ImportCandidate; onconfirm: () => void; oncancel: () => void } = $props();
 
-	/* Nur der Normalfall darf sich wie ein Normalfall anfühlen. Alles andere
-	   braucht eine Entscheidung statt eines stillen Überschreibens. */
+	/* Only the ordinary case may feel like an ordinary case. Everything else
+	   needs a decision instead of a silent overwrite. */
 	const harmless = $derived(
 		candidate.verdict.kind === 'new' ||
 			candidate.verdict.kind === 'newer' ||
@@ -20,43 +20,43 @@
 	<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="import-title">
 		<h2 id="import-title">{candidate.warband.name}</h2>
 		<p class="count">
-			{candidate.warband.fighters.length} Kämpfer
+			{candidate.warband.fighters.length} fighters
 			{#if candidate.meta}· Revision {candidate.meta.revision}{/if}
 		</p>
 
 		{#if candidate.verdict.kind === 'new'}
-			<p class="note ok">Neue Bande. Wird hinzugefügt.</p>
+			<p class="note ok">New warband. Will be added.</p>
 		{:else if candidate.verdict.kind === 'newer'}
 			<p class="note ok">
-				Neuer als der gespeicherte Stand (Revision {candidate.verdict.storedRevision} →
+				Newer than the stored state (revision {candidate.verdict.storedRevision} →
 				{candidate.verdict.incomingRevision}).
 			</p>
 		{:else if candidate.verdict.kind === 'same'}
-			<p class="note">Gleicher Stand wie hier gespeichert. Ein Import ändert nichts.</p>
+			<p class="note">Same state as stored here. Importing changes nothing.</p>
 		{:else if candidate.verdict.kind === 'older'}
 			<p class="note danger">
-				<strong>Diese Datei ist älter.</strong> Hier liegt Revision {candidate.verdict.storedRevision},
-				die Datei hat {candidate.verdict.incomingRevision}. Importieren überschreibt den neueren Stand.
+				<strong>This file is older.</strong> Stored here is revision {candidate.verdict.storedRevision},
+				the file has {candidate.verdict.incomingRevision}. Importing overwrites the newer state.
 			</p>
 		{:else if candidate.verdict.kind === 'diverged'}
 			<p class="note danger">
-				<strong>Die Stände sind auseinandergelaufen.</strong> Beide tragen Revision
-				{candidate.verdict.incomingRevision}, kommen aber von verschiedenen Geräten
-				(hier und {candidate.verdict.otherDevice}). Was hier liegt, geht beim Importieren verloren.
+				<strong>These states have diverged.</strong> Both carry revision
+				{candidate.verdict.incomingRevision} but come from different devices
+				(this one and {candidate.verdict.otherDevice}). What is stored here is lost on import.
 			</p>
 		{/if}
 
 		{#if candidate.rulesetMismatch}
 			<p class="note warn">
-				Die Datei stammt vom Regelstand {candidate.rulesetMismatch}, die App kennt einen anderen.
-				Einzelne Werte können abweichen.
+				This file comes from ruleset {candidate.rulesetMismatch}, the app knows a different one.
+				Individual values may differ.
 			</p>
 		{/if}
 
 		<div class="actions">
-			<button class="ghost" onclick={oncancel}>Abbrechen</button>
+			<button class="ghost" onclick={oncancel}>Cancel</button>
 			<button class:danger={!harmless} onclick={onconfirm}>
-				{harmless ? 'Importieren' : 'Trotzdem überschreiben'}
+				{harmless ? 'Import' : 'Overwrite anyway'}
 			</button>
 		</div>
 	</div>

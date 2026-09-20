@@ -45,7 +45,7 @@
 		color: var(--parchment-ink);
 	}
 
-	/* Abweichung vom Profilwert: Override oder Rüstung. */
+	/* Differs from the profile value: override or armour. */
 	.modified {
 		background: var(--ui-accent-bg);
 		box-shadow: inset 0 0 0 1px rgba(22, 117, 74, 0.55);

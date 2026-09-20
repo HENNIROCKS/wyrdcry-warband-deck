@@ -1,6 +1,6 @@
 /**
- * Zugriff auf die Stammdaten. Die Dateien liegen nicht im Repo, sie werden von
- * `npm run sync:data` aus dem Site-Repo kopiert.
+ * Access to the game data. The files are not in the repo; `npm run sync:data`
+ * copies them from the site repo.
  */
 
 import fighters from './data/fighters.json';
@@ -34,7 +34,7 @@ export interface WeaponProfile {
 	id: string;
 	name: string;
 	type: string;
-	/** Nahkampf trägt eine Zahl, Fernkampf eine Spanne wie "3-12". */
+	/** Melee carries a number, ranged a span such as "3-12". */
 	range: number | string;
 	attacks: number;
 	hit: number;
@@ -82,5 +82,5 @@ export const ABILITIES = byId(abilities as AbilityProfile[]);
 export const FACTIONS = byId(factions as FactionProfile[]);
 export const WEAPON_RULES = byId(weaponRules as WeaponRule[]);
 
-/** Version des Regelstands, mit dem diese App gebaut wurde. Steht in jedem Export. */
+/** Version of the ruleset this app was built against. Goes into every export. */
 export const RULESET_VERSION: string = (ruleset as { version: string }).version;
