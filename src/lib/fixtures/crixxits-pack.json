@@ -1,0 +1,159 @@
+{
+  "id": "15cf10b3-a905-4faa-ad74-c8bf08100ae5",
+  "name": "Crixxit's Pack",
+  "factionId": "clan-eshin",
+  "favour": 3,
+  "gold": 1000,
+  "fighters": [
+    {
+      "statOverrides": {},
+      "notes": "",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "135ac2f6-44f3-469c-b65d-2bb53dab5a7e",
+      "fighterId": "assassin-adept",
+      "customName": "Crixxit",
+      "equipment": [
+        "weeping-blades"
+      ],
+      "xp": 2,
+      "renown": 0
+    },
+    {
+      "statOverrides": {},
+      "notes": "",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "e8bb1097-bbf1-4ea8-a842-1a61f5d1c12f",
+      "fighterId": "eshin-sorcerer",
+      "customName": "Kretch",
+      "equipment": [
+        "dagger"
+      ],
+      "xp": 2,
+      "renown": 0
+    },
+    {
+      "statOverrides": {},
+      "notes": "Terrible scars",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "88307a6d-872a-4dfb-b957-8fc119930163",
+      "fighterId": "black-skaven",
+      "customName": "Niritik",
+      "equipment": [
+        "fighting-claws"
+      ],
+      "xp": 1,
+      "renown": 0
+    },
+    {
+      "statOverrides": {},
+      "notes": "",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "ab61862c-c2a2-403a-bc9e-7416386cedd2",
+      "fighterId": "black-skaven",
+      "customName": "Ratch",
+      "equipment": [
+        "fighting-claws"
+      ],
+      "xp": 0,
+      "renown": 1
+    },
+    {
+      "statOverrides": {},
+      "notes": "Terrible scars",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "4f254868-67b3-4300-a121-caca58f9a4aa",
+      "fighterId": "black-skaven",
+      "customName": "Grask",
+      "equipment": [
+        "sword",
+        "sword"
+      ],
+      "xp": 1,
+      "renown": 0
+    },
+    {
+      "statOverrides": {},
+      "notes": "",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "0f1799b4-cd9a-44f6-a962-c10be773609e",
+      "fighterId": "night-runner",
+      "customName": "Mange",
+      "equipment": [
+        "sling"
+      ],
+      "xp": 1,
+      "renown": 0
+    },
+    {
+      "statOverrides": {},
+      "notes": "",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "0ede4df9-431d-4d14-99ea-a4dee75ad8c6",
+      "fighterId": "night-runner",
+      "customName": "Qurirrik",
+      "equipment": [
+        "sling"
+      ],
+      "xp": 2,
+      "renown": 0
+    },
+    {
+      "statOverrides": {},
+      "notes": "",
+      "costOverride": null,
+      "isPending": true,
+      "pendingEquipment": [],
+      "instanceId": "86b9bd4d-be71-4f06-b248-15d5e839f625",
+      "fighterId": "night-runner",
+      "customName": "Yerg",
+      "equipment": [
+        "sling"
+      ],
+      "xp": 1,
+      "renown": 0
+    }
+  ],
+  "stash": [],
+  "factionNotes": "- TODO: Collect income, spend 1 renown for Niritik\n- Battle history: 260919 Draw – Undead",
+  "customWeapons": [],
+  "customAbilities": [
+    {
+      "id": "7b404e21-fc1c-434d-a43f-154cba859601",
+      "fighter": "Niritik, Grask",
+      "type": "",
+      "ability": "[Trait] Terrible scars: This fighter gains the Terrifying keyword."
+    },
+    {
+      "id": "b2fbb9f5-aced-499f-b68c-dfb0b27d8147",
+      "fighter": "Clan Eshin",
+      "type": "",
+      "ability": "Hidden Advance: When deploying a CLAN ESHIN warband to the battlefield, before diving your warband into search parties, you may select up to 4 fighters. Those fighters are hidden, and will not be deployed to the battlefield.  In the beginning of each combat phase after the first, before any fighters are activated, you may set up any amount of hidden fighters on the battlefield, at least 12” from your opponent's battlefield edge, and further than 6” away from enemy fighters and objective markers."
+    },
+    {
+      "id": "70e64b19-e628-4b42-bb14-12f5c2fb68f8",
+      "fighter": "Clan Eshin",
+      "type": "",
+      "ability": "[Trait] Shadowy Killers: When this fighter is activated, if it is not visible to enemy fighters, you may increase their Fight or Shoot characteristic by 1 in their next attack action."
+    },
+    {
+      "id": "bbdd16ce-23f7-47b9-882f-7c16b43b2e26",
+      "fighter": "Clan Eshin",
+      "type": "",
+      "ability": "[Double] Slink Away: A fighter can only use this ability if they are within 1\" of an enemy fighter. This fighter makes a free Retreat action."
+    }
+  ]
+}

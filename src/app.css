@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+/*
+ * Farben und Typografie folgen dem Card Creator, damit beide Projekte gleich
+ * aussehen. Die Kartengeometrie folgt ihm bewusst nicht: die Druckkarte hat eine
+ * feste Höhe, hier wächst sie.
+ */
+
+:root {
+	--ui-text: #e4e4e7;
+	--ui-text-muted: #a1a1aa;
+	--ui-text-subtle: #71717a;
+	--ui-surface: #27272a;
+	--ui-surface-2: #3f3f46;
+	--ui-border: #3f3f46;
+	--ui-header-bg: #1c1c1e;
+	--ui-accent: #16754a;
+	--ui-accent-text: #87e8bc;
+	--ui-accent-bg: rgba(22, 117, 74, 0.2);
+	--ui-warn: #b45309;
+	--ui-warn-bg: rgba(180, 83, 9, 0.15);
+	--ui-danger: #b91c1c;
+
+	--parchment: #e8dcc0;
+	--parchment-2: #dccfae;
+	--parchment-ink: #1c1810;
+	--parchment-ink-muted: #5a5048;
+
+	/* Höhe der Kopfzone – die Karte scrollt darunter durch. */
+	--card-head: 132px;
+}
+
+html,
+body {
+	height: 100%;
+	background: var(--ui-header-bg);
+	color: var(--ui-text);
+	font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+	/* Kein Gummiband-Effekt am Rand des Decks. */
+	overscroll-behavior: none;
+}
+
+body {
+	margin: 0;
+	padding-top: env(safe-area-inset-top);
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+button {
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+}

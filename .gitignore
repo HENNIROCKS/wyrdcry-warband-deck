@@ -1,0 +1,10 @@
+node_modules/
+/build/
+/.svelte-kit/
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Stammdaten werden aus dem Site-Repo kopiert, siehe scripts/sync-data.mjs
+/src/lib/data/*.json

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Warband Deck">
+	<rect width="512" height="512" rx="112" fill="#1c1c1e"/>
+	<g transform="rotate(-9 256 272)">
+		<rect x="150" y="150" width="150" height="214" rx="16" fill="none" stroke="#16754a" stroke-width="14"/>
+	</g>
+	<g transform="rotate(5 256 272)">
+		<rect x="196" y="140" width="164" height="232" rx="18" fill="#27272a" stroke="#87e8bc" stroke-width="16"/>
+		<rect x="228" y="176" width="100" height="58" rx="10" fill="#87e8bc" opacity="0.28"/>
+		<rect x="228" y="256" width="100" height="12" rx="6" fill="#87e8bc" opacity="0.65"/>
+		<rect x="228" y="288" width="72" height="12" rx="6" fill="#87e8bc" opacity="0.45"/>
+		<rect x="228" y="320" width="86" height="12" rx="6" fill="#87e8bc" opacity="0.45"/>
+	</g>
+</svg>
