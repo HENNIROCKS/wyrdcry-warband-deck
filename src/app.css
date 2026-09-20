@@ -27,6 +27,8 @@
 	--card-ink: #000;
 	--card-ink-muted: rgba(0, 0, 0, 0.55);
 	--card-wash: rgba(255, 255, 255, 0.25);
+	/* Denser than the wash, for a surface that has to carry body copy. */
+	--card-wash-strong: rgba(255, 255, 255, 0.55);
 	--card-wash-2: rgba(22, 117, 74, 0.12);
 
 	/* Design width of the printed card. Sizes inside a card are written as

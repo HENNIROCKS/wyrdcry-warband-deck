@@ -131,7 +131,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 			subtitle: 'Unknown profile',
 			stats: [],
 			weapons: [],
-			sections: notes.length ? [{ kind: 'other', preamble: '', entries: notes }] : [],
+			sections: notes.length ? [{ kind: 'notes', preamble: '', entries: notes }] : [],
 			keywords: [],
 			xp: instance.xp,
 			renown: instance.renown,
@@ -223,7 +223,9 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	push('equipment', equipmentEntries);
 	push('faction', abilityEntries(faction?.faction_ability_ids ?? [], customAbilities(warband, factionName)));
 	push('universal', sortAbilities(universalFor(keywords)));
-	push('other', [...otherEntries, ...notes]);
+	push('other', otherEntries);
+	/* The player's own text, not the game's – the card gives it its own ground. */
+	push('notes', notes);
 
 	return {
 		instanceId: instance.instanceId,

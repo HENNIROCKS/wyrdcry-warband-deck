@@ -1,11 +1,34 @@
 <script lang="ts">
 	import runemarkShape from '../runemark-shape.svg?raw';
-	import StatsBox from './StatsBox.svelte';
+	import ValueTable from './ValueTable.svelte';
 	import WeaponTable from './WeaponTable.svelte';
 	import { tokenize } from '../markup';
-	import type { CardEntry, CardSection, FighterCardData } from '../types/card';
+	import type { CardEntry, CardSection, CardStat, FighterCardData } from '../types/card';
 
 	let { card }: { card: FighterCardData } = $props();
+
+	/** Move carries inches, Bravery a target number – as the printed card writes them. */
+	function format(stat: CardStat): string {
+		if (stat.key === 'move') return stat.value === 0 ? '0' : `${stat.value}"`;
+		if (stat.key === 'bravery') return `${stat.value}+`;
+		return String(stat.value);
+	}
+
+	const characteristics = $derived(
+		card.stats.map((stat) => ({
+			key: stat.key,
+			label: stat.label,
+			value: format(stat),
+			modified: stat.modified
+		}))
+	);
+
+	/* What the fighter carries out of a game rather than into one. */
+	const campaign = $derived([
+		{ key: 'cost', label: 'Gold Crowns', value: String(card.cost) },
+		{ key: 'xp', label: 'Experience Points', value: String(card.xp) },
+		{ key: 'renown', label: 'Renown', value: String(card.renown) }
+	]);
 
 	/* General reference rather than this fighter's own rules: worth having on the
 	   card, not worth the room when it is in play. Folded away, with the title in
@@ -39,13 +62,25 @@
 			</p>
 		{/if}
 
-		{#if card.stats.length}
-			<StatsBox stats={card.stats} />
+		{#if card.keywords.length}
+			<ul class="keywords">
+				{#each card.keywords as keyword (keyword)}
+					<li>{keyword}</li>
+				{/each}
+			</ul>
 		{/if}
 
-		{#if card.weapons.length}
-			<WeaponTable weapons={card.weapons} />
-		{/if}
+		<div class="profile">
+			{#if characteristics.length}
+				<ValueTable rows={characteristics} />
+			{/if}
+
+			<ValueTable rows={campaign} />
+
+			{#if card.weapons.length}
+				<WeaponTable weapons={card.weapons} />
+			{/if}
+		</div>
 
 		{#each card.sections as section, i (section.kind)}
 			{#if COLLAPSIBLE[section.kind]}
@@ -58,6 +93,8 @@
 					</summary>
 					<div class="folded">{@render paragraphs(section.entries)}</div>
 				</details>
+			{:else if section.kind === 'notes'}
+				<section class="notes">{@render paragraphs(section.entries)}</section>
 			{:else}
 				{#if i > 0}<hr />{/if}
 				<section>
@@ -66,16 +103,6 @@
 				</section>
 			{/if}
 		{/each}
-
-		{#if card.keywords.length}
-			<ul class="keywords">
-				{#each card.keywords as keyword (keyword)}
-					<li>{keyword}</li>
-				{/each}
-			</ul>
-		{/if}
-
-		<p class="progress">{card.cost} gc · XP {card.xp} · Renown {card.renown}</p>
 	</div>
 </article>
 
@@ -98,10 +125,10 @@
 	 * a display does not. --t buys those two pixels back below 529px card width;
 	 * above it both units are the same and the card reads exactly as it prints.
 	 *
-	 * The one exception is the characteristics labels: six of them share the card
-	 * width, and "Bravery" fills 50 of the 50.3px a column has to give. They stay
-	 * on --u, smaller than their own values – a column head is read once, its
-	 * value constantly.
+	 * Below that width the cells of the three tables keep shrinking while the type
+	 * does not, and the six characteristics labels no longer fit side by side. The
+	 * fitText action scales back the texts that would run over, see
+	 * src/lib/fit-text.ts.
 	 */
 	.card {
 		container-type: inline-size;
@@ -180,6 +207,39 @@
 		padding: calc(24 * var(--u)) calc(38 * var(--u)) calc(26 * var(--u));
 	}
 
+	.keywords {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: calc(8 * var(--u));
+		/* Parts the fighter's name from the profile more than the parchment's own
+		   gap does, so the chips read with the heading above rather than the
+		   characteristics below. */
+		margin: 0 0 calc(16 * var(--u));
+		padding: 0;
+		list-style: none;
+	}
+
+	.keywords li {
+		font-family: 'Alegreya', serif;
+		font-size: calc(14 * var(--t));
+		line-height: 1;
+		text-transform: uppercase;
+		border: 1px solid var(--card-green);
+		border-radius: 999px;
+		background: var(--card-wash);
+		padding: calc(7 * var(--u)) calc(14 * var(--u));
+	}
+
+	/* The three tables read as one block: the parchment's gap between them, roughly
+	   twice that to the keywords above and the rules below. */
+	.profile {
+		display: flex;
+		flex-direction: column;
+		gap: calc(14 * var(--u));
+		margin-bottom: calc(16 * var(--u));
+	}
+
 	/* Some descriptions carry their own line breaks and dashed lists. */
 	.entry {
 		margin: 0;
@@ -198,6 +258,15 @@
 	.keyword {
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
+	}
+
+	/* The surface sets the player's own text off from the rules above it, so it
+	   needs no rule of its own. Denser than the tables' rows: those carry a line of
+	   figures, this one carries prose. */
+	.notes {
+		padding: calc(14 * var(--u)) calc(16 * var(--u));
+		border-radius: calc(7.5 * var(--u));
+		background: var(--card-wash-strong);
 	}
 
 	/* Says the entries below are options, not abilities the fighter all has. */
@@ -272,37 +341,5 @@
 		font-family: 'Alegreya', serif;
 		font-size: calc(18 * var(--t));
 		line-height: 1.3;
-	}
-
-	/* ── Keywords and footer ───────────────────── */
-
-	.keywords {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: calc(8 * var(--u));
-		/* Sits on the card's bottom edge, above the footer line. */
-		margin: auto 0 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.keywords li {
-		font-family: 'Alegreya', serif;
-		font-size: calc(14 * var(--t));
-		line-height: 1;
-		text-transform: uppercase;
-		border: 1px solid var(--card-green);
-		border-radius: 999px;
-		background: var(--card-wash);
-		padding: calc(7 * var(--u)) calc(14 * var(--u));
-	}
-
-	.progress {
-		margin: 0;
-		text-align: center;
-		font-family: 'Alegreya', serif;
-		font-size: calc(14 * var(--t));
-		color: var(--card-ink-muted);
 	}
 </style>

@@ -1,25 +1,19 @@
 <script lang="ts">
-	import type { CardStat } from '../types/card';
+	import { fitText } from '../fit-text';
+	import type { CardValue } from '../types/card';
 
-	let { stats }: { stats: CardStat[] } = $props();
-
-	/** Move carries inches, Bravery a target number – as the printed card writes them. */
-	function format(stat: CardStat): string {
-		if (stat.key === 'move') return stat.value === 0 ? '0' : `${stat.value}"`;
-		if (stat.key === 'bravery') return `${stat.value}+`;
-		return String(stat.value);
-	}
+	let { rows }: { rows: CardValue[] } = $props();
 </script>
 
-<div class="box">
+<div class="box" use:fitText>
 	<div class="row head">
-		{#each stats as stat (stat.key)}
-			<div class="col label"><span>{stat.label}</span></div>
+		{#each rows as row (row.key)}
+			<div class="col label"><span data-fit>{row.label}</span></div>
 		{/each}
 	</div>
 	<div class="row values">
-		{#each stats as stat (stat.key)}
-			<div class="col value" class:modified={stat.modified}>{format(stat)}</div>
+		{#each rows as row (row.key)}
+			<div class="col value" class:modified={row.modified}>{row.value}</div>
 		{/each}
 	</div>
 </div>
@@ -46,6 +40,9 @@
 
 	.col {
 		flex: 1 1 0;
+		/* Equal columns: without this a label that does not wrap widens its own
+		   column at the cost of the others. */
+		min-width: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -53,6 +50,11 @@
 		font-size: calc(20 * var(--t));
 		line-height: 1.15;
 		text-align: center;
+		/* Grenze Gotisch defaults to old-style figures, which reach 77% of the cap
+		   height the column labels are set in and hang below the baseline. The
+		   lining set matches the labels; the tabular one keeps the digits of a
+		   column over each other. */
+		font-variant-numeric: lining-nums tabular-nums;
 	}
 
 	/*
@@ -60,8 +62,13 @@
 	 * the texture, the span paints it again in solid paper. What shows is the
 	 * paper, a touch heavier for the textured edge underneath it.
 	 */
+	/* Past the floor the fit action stops at, a label would run into the next
+	   column – it is cut there instead. */
 	.label {
-		font-size: calc(20 * var(--u));
+		font-size: calc(20 * var(--t) * var(--fit, 1));
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		background: url('/background.jpg') center center / cover no-repeat;
 		background-clip: text;
 		-webkit-background-clip: text;
@@ -75,9 +82,7 @@
 	.value {
 		color: var(--card-ink);
 		white-space: nowrap;
-		/* Grenze Gotisch's old-style figures sit 1–2px below the optical centre of
-		   their line box, while values with a descender sit slightly above it. */
-		padding: 0 calc(4 * var(--u)) calc(3 * var(--u));
+		padding: 0 calc(4 * var(--u));
 	}
 
 	/* Differs from the profile value: override or armour. */

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { fitText } from '../fit-text';
 	import type { CardWeapon } from '../types/card';
 
 	let { weapons }: { weapons: CardWeapon[] } = $props();
@@ -13,7 +14,7 @@
 	</div>
 	{#each weapons as weapon, i (weapon.name + i)}
 		<div class="row">
-			<div class="col name">{weapon.name}</div>
+			<div class="col name" use:fitText><span data-fit>{weapon.name}</span></div>
 			<div class="col">{weapon.range}</div>
 			<div class="col">{weapon.attacks}</div>
 			<div class="col">{weapon.damage}</div>
@@ -54,22 +55,29 @@
 		line-height: 1.15;
 		text-align: center;
 		color: var(--card-ink);
-		/* Grenze Gotisch's old-style figures sit slightly below the optical centre
-		   of their line box; the padding splits the difference. */
-		padding: calc(3 * var(--u)) calc(4 * var(--u)) calc(6 * var(--u));
+		/* Grenze Gotisch defaults to old-style figures, which reach 77% of the cap
+		   height the headers are set in and hang below the baseline. The lining set
+		   matches the headers; the tabular one keeps the digits of a column over
+		   each other. */
+		font-variant-numeric: lining-nums tabular-nums;
+		padding: calc(3 * var(--u)) calc(4 * var(--u));
 	}
 
 	.head .col {
 		color: var(--card-paper);
-		padding-bottom: calc(3 * var(--u));
 	}
 
-	/* Letters carry full ascenders and descenders and already centre. */
 	.col.name {
 		flex: 2 2 0;
-		justify-content: flex-start;
-		text-align: left;
-		padding-left: calc(12 * var(--u));
-		padding-bottom: calc(3 * var(--u));
+		overflow: hidden;
+	}
+
+	/* A name long enough to leave the cell is set smaller rather than wrapped, down
+	   to the floor the action carries – past that it is cut. */
+	.col.name span {
+		font-size: calc(20 * var(--t) * var(--fit, 1));
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 </style>

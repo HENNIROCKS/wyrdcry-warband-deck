@@ -10,6 +10,16 @@ export interface CardStat {
 	modified: boolean;
 }
 
+/** One column of a value table: the label above, its value below. */
+export interface CardValue {
+	/** Unique within its table – the label is game data and could repeat. */
+	key: string;
+	label: string;
+	value: string;
+	/** Differs from the profile value – through an override or equipment. */
+	modified?: boolean;
+}
+
 export interface CardWeapon {
 	name: string;
 	range: string;
@@ -34,7 +44,7 @@ export interface CardEntry {
  * naming them – the labels say where an entry comes from.
  */
 export interface CardSection {
-	kind: 'fighter' | 'weapon' | 'equipment' | 'faction' | 'universal' | 'other';
+	kind: 'fighter' | 'weapon' | 'equipment' | 'faction' | 'universal' | 'other' | 'notes';
 	/** Leading line above the entries, from the profile's ability preamble. */
 	preamble: string;
 	entries: CardEntry[];
