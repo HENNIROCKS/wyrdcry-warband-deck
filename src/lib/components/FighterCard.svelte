@@ -1,27 +1,28 @@
 <script lang="ts">
-	import StatBar from './StatBar.svelte';
+	import runemarkShape from '../runemark-shape.svg?raw';
+	import StatsBox from './StatsBox.svelte';
+	import WeaponTable from './WeaponTable.svelte';
 	import type { FighterCardData } from '../types/card';
 
 	let { card }: { card: FighterCardData } = $props();
+
+	/* The runemark cuts both the image field and, in the Card Creator, the badge.
+	   Inlined as a data URL because a mask cannot point at a Svelte import. */
+	const runemark = `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(runemarkShape)}")`;
 </script>
 
-<article class="card" class:unresolved={card.unresolved}>
-	<!-- The head stays put while scrolling: the stat bar is looked at constantly. -->
-	<header class="head">
-		<div class="titles">
-			<h2>{card.name}</h2>
+<article class="card">
+	<div class="image-section">
+		<div class="image-box">
+			<div class="image-inner" style="mask-image: {runemark}; -webkit-mask-image: {runemark};"></div>
+		</div>
+		<div class="image-header">
+			<h2 class="name">{card.name}</h2>
 			{#if card.subtitle}<p class="subtitle">{card.subtitle}</p>{/if}
 		</div>
-		<div class="meta">
-			<span class="cost">{card.cost}<span class="gc">gc</span></span>
-			{#if card.isHero}<span class="tag">Hero</span>{/if}
-		</div>
-		{#if card.stats.length}
-			<StatBar stats={card.stats} />
-		{/if}
-	</header>
+	</div>
 
-	<div class="body">
+	<div class="parchment">
 		{#if card.unresolved}
 			<p class="warn">
 				This profile is not in the game data. The warband references
@@ -29,271 +30,168 @@
 			</p>
 		{/if}
 
+		{#if card.stats.length}
+			<StatsBox stats={card.stats} />
+		{/if}
+
 		{#if card.weapons.length}
-			<section>
-				<h3>Weapons</h3>
-				<table>
-					<thead>
-						<tr><th>Name</th><th>Rng</th><th>A</th><th>H/C</th></tr>
-					</thead>
-					<tbody>
-						{#each card.weapons as weapon, i (weapon.name + i)}
-							<tr>
-								<td>
-									{weapon.name}
-									{#if weapon.rules.length}<span class="rules">{weapon.rules.join(', ')}</span>{/if}
-								</td>
-								<td class="num">{weapon.range}</td>
-								<td class="num">{weapon.attacks}</td>
-								<td class="num">{weapon.damage}</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</section>
+			<WeaponTable weapons={card.weapons} />
 		{/if}
 
-		{#if card.items.length}
-			<section>
-				<h3>Equipment</h3>
-				{#each card.items as item, i (item.name + i)}
-					<p class="entry"><strong>{item.name}</strong> {item.description}</p>
+		{#each card.entries as entry, i (entry.label + i)}
+			<p class="entry"><strong>{entry.label}</strong>: {entry.text}</p>
+		{/each}
+
+		{#if card.keywords.length}
+			<ul class="keywords">
+				{#each card.keywords as keyword (keyword)}
+					<li>{keyword}</li>
 				{/each}
-			</section>
+			</ul>
 		{/if}
 
-		{#if card.abilities.length}
-			<section>
-				<h3>Abilities</h3>
-				{#each card.abilities as ability, i (ability.name + i)}
-					<p class="entry">
-						<strong>{ability.name}</strong>
-						{#if ability.type}<span class="kind">{ability.type}</span>{/if}
-						{ability.description}
-					</p>
-				{/each}
-			</section>
-		{/if}
-
-		{#if card.notes}
-			<section>
-				<h3>Notes</h3>
-				<p class="entry">{card.notes}</p>
-			</section>
-		{/if}
-
-		<footer>
-			{#if card.keywords.length}
-				<ul class="keywords">
-					{#each card.keywords as keyword (keyword)}
-						<li>{keyword}</li>
-					{/each}
-				</ul>
-			{/if}
-			<p class="progress">XP {card.xp} · Renown {card.renown}</p>
-		</footer>
+		<p class="progress">{card.cost} gc · XP {card.xp} · Renown {card.renown}</p>
 	</div>
 </article>
 
 <style>
+	/*
+	 * Sizes are written as multiples of --u, one pixel of the printed card, so the
+	 * whole thing keeps the Card Creator's proportions at any width. Below roughly
+	 * 420px the floor takes over and the type stops shrinking, which costs the
+	 * proportions a little and keeps the body copy readable.
+	 */
 	.card {
+		container-type: inline-size;
+		--u: max(0.72px, calc(100cqw / var(--card-design-width)));
 		display: flex;
 		flex-direction: column;
 		min-height: 100%;
-		background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
-		color: var(--parchment-ink);
-		border-radius: 14px;
-		/* No overflow: hidden – it would open its own clipping context and make the
-		   sticky head scroll along. */
+		background: url('/background.jpg') center center / cover no-repeat;
+		color: var(--card-ink);
+		border-radius: calc(14 * var(--u));
+		overflow: hidden;
 	}
 
-	.head {
-		position: sticky;
-		top: 0;
-		z-index: 1;
-		display: grid;
-		grid-template-columns: 1fr auto;
-		gap: 8px 12px;
-		padding: 12px 14px 12px;
-		/* Opaque, otherwise the text below shows through the sticky head. */
-		background: var(--parchment);
-		border-bottom: 1px solid rgba(28, 24, 16, 0.18);
-		box-shadow: 0 6px 10px -8px rgba(28, 24, 16, 0.55);
-		border-radius: 14px 14px 0 0;
+	/* ── Image section ─────────────────────────── */
+
+	.image-section {
+		display: flex;
+		gap: calc(12 * var(--u));
+		margin: calc(16 * var(--u)) calc(38 * var(--u)) 0;
 	}
 
-	.head :global(.bar) {
-		grid-column: 1 / -1;
+	.image-box {
+		flex: 0 0 calc(175 * var(--u));
+		height: calc(175 * var(--u));
+		position: relative;
+		top: calc(10 * var(--u));
 	}
 
-	.titles {
+	/* Same shape as the gold coins badge, cut from the runemark SVG. */
+	.image-inner {
+		position: absolute;
+		inset: 0;
+		background: var(--card-green);
+		mask-size: 100% 100%;
+		mask-repeat: no-repeat;
+		-webkit-mask-size: 100% 100%;
+		-webkit-mask-repeat: no-repeat;
+	}
+
+	.image-header {
+		flex: 1 1 auto;
 		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 0 calc(8 * var(--u));
+		text-align: center;
 	}
 
-	h2 {
+	.name {
 		margin: 0;
-		font-size: 21px;
-		line-height: 1.15;
-		font-weight: 700;
+		font-family: 'Grenze Gotisch', serif;
+		font-weight: 600;
+		font-size: calc(38 * var(--u));
+		line-height: 1.1;
 		overflow-wrap: anywhere;
 	}
 
 	.subtitle {
-		margin: 2px 0 0;
-		font-size: 13px;
-		color: var(--parchment-ink-muted);
+		margin: calc(4 * var(--u)) 0 0;
+		font-family: 'Grenze Gotisch', serif;
+		font-size: calc(20 * var(--u));
+		line-height: 1.3;
+		overflow-wrap: anywhere;
 	}
 
-	.meta {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 4px;
-	}
+	/* ── Parchment section ─────────────────────── */
 
-	.cost {
-		font-size: 17px;
-		font-weight: 700;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.gc {
-		font-size: 11px;
-		font-weight: 600;
-		margin-left: 2px;
-		color: var(--parchment-ink-muted);
-	}
-
-	.tag {
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.07em;
-		text-transform: uppercase;
-		padding: 2px 7px;
-		border-radius: 999px;
-		border: 1px solid rgba(22, 117, 74, 0.5);
-		color: #0f5537;
-	}
-
-	.body {
+	.parchment {
 		flex: 1;
-		padding: 12px 14px 16px;
 		display: flex;
 		flex-direction: column;
-		gap: 14px;
+		gap: calc(14 * var(--u));
+		padding: calc(24 * var(--u)) calc(38 * var(--u)) calc(26 * var(--u));
 	}
 
-	h3 {
-		margin: 0 0 5px;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--parchment-ink-muted);
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		font-size: 14px;
-	}
-
-	th {
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--parchment-ink-muted);
-		text-align: left;
-		padding-bottom: 3px;
-	}
-
-	th:not(:first-child),
-	.num {
-		text-align: center;
-		font-variant-numeric: tabular-nums;
-	}
-
-	td {
-		padding: 5px 4px;
-		border-top: 1px solid rgba(28, 24, 16, 0.12);
-		vertical-align: top;
-	}
-
-	td:first-child {
-		padding-left: 0;
-	}
-
-	.rules {
-		display: block;
-		font-size: 11px;
-		color: var(--parchment-ink-muted);
-	}
-
+	/* Some descriptions carry their own line breaks and dashed lists. */
 	.entry {
-		margin: 0 0 7px;
-		font-size: 14px;
-		line-height: 1.4;
+		margin: 0;
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--u));
+		line-height: 1.3;
+		white-space: pre-wrap;
 	}
 
-	.entry:last-child {
-		margin-bottom: 0;
-	}
-
-	.kind {
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--parchment-ink-muted);
-		margin-right: 4px;
+	/* On the printed card a blank line separates the paragraphs, which is wider
+	   than the gap between the boxes above them. */
+	.entry + .entry {
+		margin-top: calc(6 * var(--u));
 	}
 
 	.warn {
 		margin: 0;
-		padding: 9px 11px;
-		border-radius: 9px;
-		font-size: 13px;
-		line-height: 1.4;
-		background: var(--ui-warn-bg);
-		border: 1px solid rgba(180, 83, 9, 0.4);
+		padding: calc(10 * var(--u)) calc(12 * var(--u));
+		border: 1px solid var(--ui-warn);
+		border-radius: calc(7.5 * var(--u));
+		background: rgba(180, 83, 9, 0.18);
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--u));
+		line-height: 1.3;
 	}
 
-	footer {
-		margin-top: auto;
-		border-bottom-left-radius: 14px;
-		border-bottom-right-radius: 14px;
-		padding-top: 10px;
-		border-top: 1px solid rgba(28, 24, 16, 0.12);
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
+	/* ── Keywords and footer ───────────────────── */
 
 	.keywords {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 5px;
-		margin: 0;
+		justify-content: center;
+		gap: calc(8 * var(--u));
+		/* Sits on the card's bottom edge, above the footer line. */
+		margin: auto 0 0;
 		padding: 0;
 		list-style: none;
 	}
 
 	.keywords li {
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.07em;
-		padding: 3px 8px;
+		font-family: 'Alegreya', serif;
+		font-size: calc(14 * var(--u));
+		line-height: 1;
+		text-transform: uppercase;
+		border: 1px solid var(--card-green);
 		border-radius: 999px;
-		border: 1px solid rgba(22, 117, 74, 0.45);
-		background: rgba(255, 255, 255, 0.25);
-		color: #0f5537;
+		background: var(--card-wash);
+		padding: calc(7 * var(--u)) calc(14 * var(--u));
 	}
 
 	.progress {
 		margin: 0;
-		font-size: 12px;
-		color: var(--parchment-ink-muted);
-		font-variant-numeric: tabular-nums;
+		text-align: center;
+		font-family: 'Alegreya', serif;
+		font-size: calc(14 * var(--u));
+		color: var(--card-ink-muted);
 	}
 </style>

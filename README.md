@@ -57,3 +57,10 @@ gitignored.
 
 - [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry) – rules site and Warband Builder, source of the data
 - `wyrdcry-card-creator` – cards for printing; the design comes from there
+
+## Licence
+
+The code is MIT, see [LICENSE](LICENSE). The fonts Grenze Gotisch and Alegreya
+are under the SIL Open Font License 1.1; their licence texts sit beside the
+files in `static/fonts/`. Card texture and card design come from
+`wyrdcry-card-creator`, which is MIT as well.

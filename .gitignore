@@ -8,3 +8,6 @@ node_modules/
 
 # Stammdaten werden aus dem Site-Repo kopiert, siehe scripts/sync-data.mjs
 /src/lib/data/*.json
+
+# Arbeitsmaterial: Referenz-Screenshots, Exporte, Notizen
+/_work/

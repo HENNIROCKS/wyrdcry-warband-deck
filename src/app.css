@@ -21,13 +21,38 @@
 	--ui-warn-bg: rgba(180, 83, 9, 0.15);
 	--ui-danger: #b91c1c;
 
-	--parchment: #e8dcc0;
-	--parchment-2: #dccfae;
-	--parchment-ink: #1c1810;
-	--parchment-ink-muted: #5a5048;
+	/* Card surface – the same values the Card Creator prints with. */
+	--card-green: #16754a;
+	--card-paper: #faf6f3;
+	--card-ink: #000;
+	--card-ink-muted: rgba(0, 0, 0, 0.55);
+	--card-wash: rgba(255, 255, 255, 0.25);
+	--card-wash-2: rgba(22, 117, 74, 0.12);
 
-	/* Height of the head area – the card scrolls underneath it. */
-	--card-head: 132px;
+	/* Design width of the printed card. Sizes inside a card are written as
+	   multiples of --u so the whole thing scales with the container. */
+	--card-design-width: 588;
+}
+
+/*
+ * Fonts – SIL Open Font License 1.1, see static/fonts/*-OFL.txt
+ * Grenze Gotisch: https://fonts.google.com/specimen/Grenze+Gotisch
+ * Alegreya: copyright 2011 The Alegreya Project Authors
+ */
+@font-face {
+	font-family: 'Grenze Gotisch';
+	src: url('/fonts/GrenzeGotisch-Regular.ttf') format('truetype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Alegreya';
+	src: url('/fonts/Alegreya-Regular.ttf') format('truetype');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
 }
 
 html,

@@ -16,20 +16,17 @@ export interface CardWeapon {
 	attacks: string;
 	/** Hit value and critical value, as in the wiki: "2/4". */
 	damage: string;
-	rules: string[];
 }
 
-export interface CardItem {
-	name: string;
-	description: string;
-}
-
-export interface CardAbility {
-	name: string;
-	type: string;
-	description: string;
-	/** From the warband's customAbilities, not from the game data. */
-	custom: boolean;
+/**
+ * One paragraph of the block below the tables: a bold label, then the text.
+ * Abilities, weapon rules, equipment and notes all end up here, the way the
+ * Card Creator writes them by hand.
+ */
+export interface CardEntry {
+	/** "[Triple] Murder-Stab", "(Weeping Blades) Parry", "Shield". */
+	label: string;
+	text: string;
 }
 
 export interface FighterCardData {
@@ -38,14 +35,11 @@ export interface FighterCardData {
 	subtitle: string;
 	stats: CardStat[];
 	weapons: CardWeapon[];
-	items: CardItem[];
-	abilities: CardAbility[];
+	entries: CardEntry[];
 	keywords: string[];
-	notes: string;
 	xp: number;
 	renown: number;
 	cost: number;
-	isHero: boolean;
 	/** The profile id is unknown – the game data does not know this fighter. */
 	unresolved: boolean;
 }

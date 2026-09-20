@@ -9,17 +9,31 @@
  */
 
 import { ABILITIES, FACTIONS, FIGHTERS, ITEMS, WEAPONS, WEAPON_RULES } from './gamedata';
-import type { CardAbility, CardItem, CardStat, CardWeapon, FighterCardData } from './types/card';
+import type { CardEntry, CardStat, CardWeapon, FighterCardData } from './types/card';
 import { STAT_KEYS, type FighterInstance, type StatKey, type Warband } from './types/warband';
 
+/* Spelled out as on the printed card, "Defense" included. */
 const STAT_LABELS: Record<StatKey, string> = {
-	move: 'M',
-	fight: 'F',
-	shoot: 'S',
-	defense: 'D',
-	health: 'H',
-	bravery: 'B'
+	move: 'Move',
+	fight: 'Fight',
+	shoot: 'Shoot',
+	defense: 'Defense',
+	health: 'Health',
+	bravery: 'Bravery'
 };
+
+/**
+ * Order the ability entries appear in, each group sorted by name. Everything the
+ * list does not know – a faction rule, a universal ability, a type the builder
+ * invented – sorts into the first group.
+ */
+const TYPE_ORDER = ['trait', 'double', 'triple', 'quad', 'reaction'];
+
+/* Unknown and empty types come back as -1 and sort ahead of the whole list. */
+const typeRank = (type: string) => TYPE_ORDER.indexOf(type.trim().toLowerCase());
+
+const titleCase = (type: string) =>
+	type.replace(/\w\S*/g, (word) => word[0].toUpperCase() + word.slice(1).toLowerCase());
 
 /** Only armour affects characteristics, and only Defense – same as the builder. */
 function defenseBonus(equipment: string[]): number {
@@ -29,15 +43,17 @@ function defenseBonus(equipment: string[]): number {
 	}, 0);
 }
 
-function weaponRuleNames(ids: string[]): string[] {
-	return ids.map((id) => WEAPON_RULES.get(id)?.name ?? id);
+interface Ability {
+	name: string;
+	type: string;
+	description: string;
 }
 
 /**
  * Assigns a free-form ability to a fighter. The `fighter` field is free text:
  * one name, several separated by commas, or the faction name for everyone.
  */
-function customAbilitiesFor(warband: Warband, fighterName: string, factionName: string): CardAbility[] {
+function customAbilitiesFor(warband: Warband, fighterName: string, factionName: string): Ability[] {
 	const wanted = fighterName.trim().toLowerCase();
 	const faction = factionName.trim().toLowerCase();
 
@@ -52,15 +68,26 @@ function customAbilitiesFor(warband: Warband, fighterName: string, factionName: 
 			return {
 				name: match ? match[2].trim() : entry.type || 'Note',
 				type: match?.[1]?.trim() ?? entry.type,
-				description: match ? match[3].trim() : entry.ability,
-				custom: true
+				description: match ? match[3].trim() : entry.ability
 			};
 		});
+}
+
+/** Abilities first, grouped by type; within a group by name. */
+function abilityEntries(abilities: Ability[]): CardEntry[] {
+	return abilities
+		.slice()
+		.sort((a, b) => typeRank(a.type) - typeRank(b.type) || a.name.localeCompare(b.name))
+		.map((ability) => ({
+			label: ability.type ? `[${titleCase(ability.type)}] ${ability.name}` : ability.name,
+			text: ability.description
+		}));
 }
 
 export function toCard(instance: FighterInstance, warband: Warband, factionName: string): FighterCardData {
 	const profile = FIGHTERS.get(instance.fighterId);
 	const name = instance.customName.trim();
+	const notes: CardEntry[] = instance.notes ? [{ label: 'Notes', text: instance.notes }] : [];
 
 	if (!profile) {
 		return {
@@ -69,14 +96,11 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 			subtitle: 'Unknown profile',
 			stats: [],
 			weapons: [],
-			items: [],
-			abilities: [],
+			entries: notes,
 			keywords: [],
-			notes: instance.notes,
 			xp: instance.xp,
 			renown: instance.renown,
 			cost: instance.costOverride ?? 0,
-			isHero: false,
 			unresolved: true
 		};
 	}
@@ -96,7 +120,9 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	});
 
 	const weapons: CardWeapon[] = [];
-	const items: CardItem[] = [];
+	/* Weapon rules follow the weapons in table order, within a weapon by name. */
+	const weaponEntries: CardEntry[] = [];
+	const equipmentEntries: CardEntry[] = [];
 	let equipmentCost = 0;
 
 	for (const id of instance.equipment) {
@@ -107,15 +133,21 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 				name: weapon.name,
 				range: `${weapon.range}"`,
 				attacks: String(weapon.attacks),
-				damage: `${weapon.hit}/${weapon.crit}`,
-				rules: weaponRuleNames(weapon.special_rules)
+				damage: `${weapon.hit}/${weapon.crit}`
 			});
+			weaponEntries.push(
+				...weapon.special_rules
+					.map((ruleId) => WEAPON_RULES.get(ruleId))
+					.filter((rule): rule is NonNullable<typeof rule> => rule !== undefined)
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((rule) => ({ label: `(${weapon.name}) ${rule.name}`, text: rule.description }))
+			);
 			continue;
 		}
 		const item = ITEMS.get(id);
 		if (item) {
 			equipmentCost += item.cost;
-			items.push({ name: item.name, description: item.description });
+			equipmentEntries.push({ label: item.name, text: item.description });
 			continue;
 		}
 		const custom = warband.customWeapons.find((w) => w.id === id || w.name === id);
@@ -124,18 +156,19 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 				name: custom.name,
 				range: custom.range,
 				attacks: custom.attacks,
-				damage: `${custom.hit}/${custom.crit}`,
-				rules: custom.special ? [custom.special] : []
+				damage: `${custom.hit}/${custom.crit}`
 			});
+			/* Free text in the builder, so there is no rule to look up and split. */
+			if (custom.special) weaponEntries.push({ label: `(${custom.name})`, text: custom.special });
 			continue;
 		}
-		items.push({ name: id, description: 'Not found in the game data.' });
+		equipmentEntries.push({ label: id, text: 'Not found in the game data.' });
 	}
 
-	const abilities: CardAbility[] = profile.faction_ability_ids
+	const abilities: Ability[] = profile.faction_ability_ids
 		.map((id) => ABILITIES.get(id))
 		.filter((a): a is NonNullable<typeof a> => a !== undefined)
-		.map((a) => ({ name: a.name, type: a.ability_type, description: a.description, custom: false }));
+		.map((a) => ({ name: a.name, type: a.ability_type, description: a.description }));
 
 	abilities.push(...customAbilitiesFor(warband, name || profile.name, factionName));
 
@@ -145,14 +178,11 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 		subtitle: name ? profile.name : '',
 		stats,
 		weapons,
-		items,
-		abilities,
+		entries: [...abilityEntries(abilities), ...weaponEntries, ...equipmentEntries, ...notes],
 		keywords: [...profile.race, ...profile.keywords],
-		notes: instance.notes,
 		xp: instance.xp,
 		renown: instance.renown,
 		cost: (instance.costOverride ?? profile.cost ?? 0) + equipmentCost,
-		isHero: profile.keywords.includes('HERO'),
 		unresolved: false
 	};
 }
