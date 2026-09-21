@@ -21,6 +21,20 @@ Workshop.
   dated snapshot
 - Warn on import when the file is older than the stored state
 
+## Roadmap
+
+- [x] Import warband JSON, swipe through the deck, export it again
+- [x] The warband itself as the first card
+- [x] Mark fighters as activated, count the rounds, undo one step
+- [ ] Wounds, and out of action derived from them
+- [ ] Work offline at the table: cache the game data, keep the screen awake
+- [ ] The aftermath sequence – injuries, experience, exploration, buying
+- [ ] Reference cards for weapons, items, abilities and keywords in the same deck
+
+Further out and nothing promised: NFC tags under the model bases, a photo of the
+painted model as the card image, showing an opponent the warband over a
+read-only link.
+
 ## Data
 
 Everything lives in IndexedDB, on this one device. No account, no server, no
