@@ -3,9 +3,19 @@
 
 	import FighterCard from './FighterCard.svelte';
 	import WarbandCard from './WarbandCard.svelte';
+	import { isActivated } from '../battle';
 	import type { DeckCard } from '../types/card';
+	import type { BattleState } from '../types/warband';
 
-	let { cards }: { cards: DeckCard[] } = $props();
+	let {
+		cards,
+		battle = null,
+		ontoggle
+	}: {
+		cards: DeckCard[];
+		battle?: BattleState | null;
+		ontoggle?: (instanceId: string) => void;
+	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
 	const FLY = 260;
@@ -171,6 +181,7 @@
 			<button
 				class="dot"
 				class:active={i === current}
+				class:activated={card.kind === 'fighter' && isActivated(battle, card.instanceId)}
 				aria-label={card.name}
 				aria-current={i === current}
 				onclick={() => goto(i)}
@@ -185,7 +196,11 @@
 	{#if data.kind === 'warband'}
 		<WarbandCard card={data} />
 	{:else}
-		<FighterCard card={data} />
+		<FighterCard
+			card={data}
+			activated={isActivated(battle, data.instanceId)}
+			{ontoggle}
+		/>
 	{/if}
 {/snippet}
 
@@ -252,6 +267,11 @@
 	.dot.active {
 		background: var(--ui-accent-text);
 		transform: scale(1.35);
+	}
+
+	/* A side effect of the card's own marking, not a control of its own. */
+	.dot.activated {
+		opacity: 0.35;
 	}
 
 	.position {

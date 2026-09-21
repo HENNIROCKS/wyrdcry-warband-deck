@@ -5,7 +5,15 @@
 	import { tokenize } from '../markup';
 	import type { CardEntry, CardSection, CardStat, FighterCardData } from '../types/card';
 
-	let { card }: { card: FighterCardData } = $props();
+	let {
+		card,
+		activated = false,
+		ontoggle
+	}: {
+		card: FighterCardData;
+		activated?: boolean;
+		ontoggle?: (instanceId: string) => void;
+	} = $props();
 
 	/** Move carries inches, Bravery a target number – as the printed card writes them. */
 	function format(stat: CardStat): string {
@@ -43,7 +51,11 @@
 	const runemark = `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(runemarkShape)}")`;
 </script>
 
-<article class="card">
+<article class="card" class:activated>
+	{#if activated}
+		<p class="band" aria-hidden="true">Activated</p>
+	{/if}
+
 	<div class="image-section">
 		<div class="image-box">
 			<div class="image-inner" style="mask-image: {runemark}; -webkit-mask-image: {runemark};"></div>
@@ -103,6 +115,12 @@
 				</section>
 			{/if}
 		{/each}
+
+		{#if ontoggle}
+			<button class="toggle" aria-pressed={activated} onclick={() => ontoggle(card.instanceId)}>
+				{activated ? 'Activated' : 'Mark as activated'}
+			</button>
+		{/if}
 	</div>
 </article>
 
@@ -302,6 +320,72 @@
 
 	.folded {
 		padding-top: 1em;
+	}
+
+	/* ── Activated ─────────────────────────────── */
+
+	.card.activated {
+		position: relative;
+	}
+
+	/* The whole card dulls, so a fighter who has acted is recognisable while
+	   flicking through the stack rather than only when read. */
+	.card.activated::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: rgba(18, 18, 22, 0.44);
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	/*
+	 * Across the head of the card rather than its middle: the card scrolls and
+	 * grows with its rules, so the middle is off screen on a long one. The image
+	 * section is what a swipe brings up first.
+	 */
+	.band {
+		position: absolute;
+		top: calc(74 * var(--u));
+		left: calc(-10 * var(--u));
+		right: calc(-10 * var(--u));
+		margin: 0;
+		z-index: 2;
+		transform: rotate(-8deg);
+		padding: calc(6 * var(--u)) 0;
+		background: rgba(18, 18, 22, 0.72);
+		border-top: 1px solid var(--card-wash);
+		border-bottom: 1px solid var(--card-wash);
+		font-family: 'Grenze Gotisch', serif;
+		font-size: calc(40 * var(--t));
+		line-height: 1;
+		letter-spacing: 0.08em;
+		text-align: center;
+		color: var(--card-paper);
+		pointer-events: none;
+	}
+
+	/* Above the scrim: the button is the way back out of the state it marks. */
+	.toggle {
+		position: relative;
+		z-index: 2;
+		/* Sits well apart from the last rules block; the parchment's own gap is
+		   tuned for paragraphs, not for something you press. */
+		margin: calc(24 * var(--u)) 0 0;
+		padding: calc(16 * var(--u)) 0;
+		border: 1px solid var(--card-green);
+		border-radius: calc(7.5 * var(--u));
+		background: var(--card-paper);
+		font-family: 'Grenze Gotisch', serif;
+		font-size: calc(26 * var(--t));
+		line-height: 1;
+		letter-spacing: 0.06em;
+		color: var(--card-green);
+	}
+
+	.card.activated .toggle {
+		background: var(--card-green);
+		color: var(--card-paper);
 	}
 
 	.warn {

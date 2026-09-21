@@ -64,14 +64,26 @@ export interface DeckMeta {
 
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
 
+/** One round: its number, and who has already acted in it. */
+export interface BattleRound {
+	round: number;
+	/** Keyed by instanceId. Ids the warband no longer has are ignored on read. */
+	fighters: Record<string, { activated: boolean }>;
+}
+
 /**
- * Transient state of a game in progress – wounds, conditions.
- * Not used yet; it is here so the split from the campaign level is anchored in
- * the model from the start.
+ * State of a battle in progress. Lives on this device only: it never goes into
+ * an export and never touches the revision counter, so playing a game does not
+ * make one device look newer than another.
  */
-export interface BattleState {
+export interface BattleState extends BattleRound {
 	startedAt: string;
-	fighters: Record<string, { wounds: number; conditions: string[] }>;
+	/**
+	 * The round the last `nextRound` left behind, so a mistaken tap can be taken
+	 * back. Null once the new round has been played into – from there on there is
+	 * nothing left to return to.
+	 */
+	undo: BattleRound | null;
 }
 
 /** What lives in IndexedDB: the warband plus everything only this app cares about. */

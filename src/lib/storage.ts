@@ -4,7 +4,7 @@
  */
 
 import { browser } from '$app/environment';
-import type { StoredWarband } from './types/warband';
+import type { BattleState, StoredWarband } from './types/warband';
 
 const DB_NAME = 'wyrdcry-warband-deck';
 const DB_VERSION = 1;
@@ -55,8 +55,18 @@ export async function putWarband(entry: StoredWarband): Promise<void> {
 	await run(STORE, 'readwrite', (s) => s.put(entry, entry.warband.id));
 }
 
-export async function deleteWarband(id: string): Promise<void> {
-	await run(STORE, 'readwrite', (s) => s.delete(id));
+/**
+ * Writes the battle state and nothing else.
+ *
+ * Separate from `putWarband` because a battle must not raise `revision` or
+ * `updatedAt`: those say how far the campaign has been carried, and a tap on
+ * "activate" carries it nowhere. Were they to move, every game would make this
+ * device look newer than the other one on the next import.
+ */
+export async function putBattle(id: string, battle: BattleState | null): Promise<void> {
+	const entry = await getWarband(id);
+	if (!entry) return;
+	await run(STORE, 'readwrite', (s) => s.put({ ...entry, battle }, id));
 }
 
 /**

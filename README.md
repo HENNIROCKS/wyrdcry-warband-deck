@@ -7,7 +7,7 @@ fighters.
 Unofficial fan project. No connection to the authors of Wyrdcry or to Games
 Workshop.
 
-**Status: early.** The app displays, it does not edit.
+**Status: early.** The app tracks a battle; it does not edit the warband.
 
 ## What it does
 
@@ -15,6 +15,8 @@ Workshop.
 - Show the warband itself as the first card: faction, standing, favour,
   reputation, gold, value, stash and the warband notes
 - Show fighters as cards and swipe through them
+- Mark fighters as activated during a battle, count the rounds and clear the
+  activations for the next one – one step of that is undoable
 - Export through the system share sheet, either as the current state or as a
   dated snapshot
 - Warn on import when the file is older than the stored state

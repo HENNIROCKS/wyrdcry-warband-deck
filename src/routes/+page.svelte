@@ -5,10 +5,12 @@
 
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
+	import MenuButton from '$lib/components/MenuButton.svelte';
 	import { toCards } from '$lib/adapter';
-	import { allWarbands, putWarband, requestPersistence } from '$lib/storage';
+	import { nextRound, remaining, start, toggle, undoRound } from '$lib/battle';
+	import { allWarbands, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
-	import type { StoredWarband } from '$lib/types/warband';
+	import type { BattleState, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
@@ -18,6 +20,21 @@
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
 	const cards = $derived(active ? toCards(active.warband) : []);
+	const battle = $derived(active?.battle ?? null);
+	const left = $derived(
+		remaining(battle, active?.warband.fighters.map((f) => f.instanceId) ?? [])
+	);
+
+	/**
+	 * Writes the battle state through and keeps the copy in memory in step. It
+	 * goes to the database on every tap: at the table the screen goes dark long
+	 * before anyone thinks about saving.
+	 */
+	async function setBattle(next: BattleState | null) {
+		if (!active) return;
+		active.battle = next;
+		await putBattle(active.warband.id, next ? ($state.snapshot(next) as BattleState) : null);
+	}
 
 	onMount(refresh);
 
@@ -80,15 +97,57 @@
 	</div>
 
 	<div class="tools">
-		{#if dev}
-			<a class="devlink" href="/dev" title="Open on your phone">QR</a>
-		{/if}
-		<button onclick={() => fileInput?.click()}>Import</button>
+		<MenuButton label="Warband file">
+			{#snippet icon()}
+				<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+					<path d="M8 8l4-5 4 5" />
+					<path d="M12 3v13" />
+				</svg>
+			{/snippet}
+			{#snippet children()}
+				<button onclick={() => fileInput?.click()}>Import…</button>
+				{#if active}
+					<hr />
+					<button onclick={() => doExport(false)}>Export</button>
+					<button onclick={() => doExport(true)} title="Dated copy, never overwritten">
+						Snapshot
+					</button>
+				{/if}
+				{#if dev}
+					<hr />
+					<a href="/dev">Open on your phone</a>
+				{/if}
+			{/snippet}
+		</MenuButton>
+
 		{#if active}
-			<button onclick={() => doExport(false)}>Export</button>
-			<button class="ghost" onclick={() => doExport(true)} title="Dated copy, never overwritten">
-				Snapshot
-			</button>
+			<MenuButton label="Battle">
+				{#snippet icon()}
+					<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M4 3h3l11 11" />
+						<path d="M20 3h-3L6 14" />
+						<path d="M14.5 16.5 18 20l2-2-3.5-3.5" />
+						<path d="M9.5 16.5 6 20l-2-2 3.5-3.5" />
+					</svg>
+				{/snippet}
+				{#snippet children()}
+					{#if battle}
+						<p>Round {battle.round} · {left} to act</p>
+						<button onclick={() => setBattle(nextRound(battle))}>Next round</button>
+						{#if battle.undo}
+							<button onclick={() => setBattle(undoRound(battle))}>
+								Back to round {battle.undo.round}
+							</button>
+						{/if}
+						<hr />
+						<button onclick={() => setBattle(null)}>End battle</button>
+					{:else}
+						<p>No battle</p>
+						<button onclick={() => setBattle(start())}>Start battle</button>
+					{/if}
+				{/snippet}
+			</MenuButton>
 		{/if}
 	</div>
 </header>
@@ -106,7 +165,7 @@
 {/if}
 
 {#if cards.length}
-	<Deck {cards} />
+	<Deck {cards} {battle} ontoggle={(id) => setBattle(toggle(battle, id))} />
 {:else}
 	<div class="empty">
 		<h2>No warband yet</h2>
@@ -129,7 +188,7 @@
 <style>
 	.bar {
 		display: flex;
-		flex-direction: column;
+		align-items: center;
 		gap: 8px;
 		padding: 9px 12px 10px;
 		background: var(--ui-header-bg);
@@ -138,6 +197,7 @@
 
 	.identity {
 		display: flex;
+		flex: 1;
 		min-width: 0;
 	}
 
@@ -164,37 +224,8 @@
 
 	.tools {
 		display: flex;
+		flex: none;
 		gap: 6px;
-	}
-
-	.tools button {
-		/* Equal width and generous – the bar is operated one-handed at the table. */
-		flex: 1;
-		padding: 10px 8px;
-		border: 1px solid var(--ui-border);
-		border-radius: 9px;
-		background: var(--ui-surface);
-		font-size: 13px;
-		font-weight: 600;
-	}
-
-	.tools .ghost {
-		color: var(--ui-text-muted);
-	}
-
-	/* Only visible in the dev server. */
-	.devlink {
-		flex: 0 0 auto;
-		display: grid;
-		place-items: center;
-		padding: 10px 12px;
-		border: 1px solid var(--ui-border);
-		border-radius: 9px;
-		background: var(--ui-surface);
-		font-size: 13px;
-		font-weight: 600;
-		text-decoration: none;
-		color: var(--ui-text-muted);
 	}
 
 	.message {
