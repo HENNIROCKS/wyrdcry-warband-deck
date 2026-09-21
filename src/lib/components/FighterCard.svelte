@@ -115,34 +115,6 @@
 {/snippet}
 
 <style>
-	/*
-	 * Sizes are written as multiples of --u, one pixel of the printed card, so the
-	 * whole thing keeps the Card Creator's proportions at any width.
-	 *
-	 * Type runs on --t instead, which carries a higher floor. Held at the printed
-	 * card's physical width, a phone shows the body copy at an x-height of 8px,
-	 * where the reading size of the system is 10px – paper gets away with 5pt,
-	 * a display does not. --t buys those two pixels back below 529px card width;
-	 * above it both units are the same and the card reads exactly as it prints.
-	 *
-	 * Below that width the cells of the three tables keep shrinking while the type
-	 * does not, and the six characteristics labels no longer fit side by side. The
-	 * fitText action scales back the texts that would run over, see
-	 * src/lib/fit-text.ts.
-	 */
-	.card {
-		container-type: inline-size;
-		--u: max(0.72px, calc(100cqw / var(--card-design-width)));
-		--t: max(0.9px, calc(100cqw / var(--card-design-width)));
-		display: flex;
-		flex-direction: column;
-		min-height: 100%;
-		background: url('/background.jpg') center center / cover no-repeat;
-		color: var(--card-ink);
-		border-radius: calc(14 * var(--u));
-		overflow: hidden;
-	}
-
 	/* ── Image section ─────────────────────────── */
 
 	.image-section {

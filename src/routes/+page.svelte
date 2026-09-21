@@ -77,9 +77,6 @@
 		{:else}
 			<h1>Warband Deck</h1>
 		{/if}
-		{#if active}
-			<p class="sub">{active.warband.fighters.length} fighters · Rev {active.revision}</p>
-		{/if}
 	</div>
 
 	<div class="tools">
@@ -141,8 +138,6 @@
 
 	.identity {
 		display: flex;
-		align-items: baseline;
-		gap: 8px;
 		min-width: 0;
 	}
 
@@ -165,15 +160,6 @@
 		padding: 5px 8px;
 		font-size: 15px;
 		font-weight: 600;
-	}
-
-	.sub {
-		margin: 0;
-		flex: none;
-		white-space: nowrap;
-		font-size: 11px;
-		color: var(--ui-text-subtle);
-		font-variant-numeric: tabular-nums;
 	}
 
 	.tools {

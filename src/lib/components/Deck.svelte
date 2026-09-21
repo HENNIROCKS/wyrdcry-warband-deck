@@ -2,9 +2,10 @@
 	import { onMount } from 'svelte';
 
 	import FighterCard from './FighterCard.svelte';
-	import type { FighterCardData } from '../types/card';
+	import WarbandCard from './WarbandCard.svelte';
+	import type { DeckCard } from '../types/card';
 
-	let { cards }: { cards: FighterCardData[] } = $props();
+	let { cards }: { cards: DeckCard[] } = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
 	const FLY = 260;
@@ -140,7 +141,7 @@
 					style:opacity={0.55 + 0.45 * progress}
 					aria-hidden="true"
 				>
-					<FighterCard card={cards[beneath]} />
+					{@render card(cards[beneath])}
 				</div>
 			{/key}
 		{/if}
@@ -160,7 +161,7 @@
 				onpointerup={onPointerUp}
 				onpointercancel={onPointerCancel}
 			>
-				<FighterCard card={cards[current]} />
+				{@render card(cards[current])}
 			</div>
 		{/key}
 	</div>
@@ -179,6 +180,14 @@
 
 	<p class="position">{current + 1} / {cards.length}</p>
 </div>
+
+{#snippet card(data: DeckCard)}
+	{#if data.kind === 'warband'}
+		<WarbandCard card={data} />
+	{:else}
+		<FighterCard card={data} />
+	{/if}
+{/snippet}
 
 <style>
 	.deck {

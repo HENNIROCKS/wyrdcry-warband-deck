@@ -12,6 +12,8 @@ Workshop.
 ## What it does
 
 - Import warband JSON from the builder
+- Show the warband itself as the first card: faction, standing, favour,
+  reputation, gold, value, stash and the warband notes
 - Show fighters as cards and swipe through them
 - Export through the system share sheet, either as the current state or as a
   dated snapshot

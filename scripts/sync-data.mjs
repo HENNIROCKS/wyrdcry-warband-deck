@@ -37,17 +37,26 @@ const UNKNOWN_RULESET = {
 	slug: 'unknown'
 };
 
+/** The campaign level of the warband card. Without it the card drops its tier. */
+const NO_CAMPAIGN_RULES = {
+	default_favour: 0,
+	warband_budget: 0,
+	standing_thresholds: [],
+	favour_tiers: []
+};
+
 /**
  * Copied when present, and what to fall back to when not.
  *
  * `ruleset.json` is currently only on the branch feat/game-reference-print
  * (PR #9), and every export carries its version, so it gets a placeholder.
- * `campaign-rules.json` is fetched for the campaign level; no code reads it
- * yet, which is why its absence stops nothing.
+ * Both files are imported by the app, so neither may be missing from the
+ * target – an empty stand-in costs a label on one card, an absent file the
+ * whole build.
  */
 const OPTIONAL = {
 	'ruleset.json': UNKNOWN_RULESET,
-	'campaign-rules.json': null
+	'campaign-rules.json': NO_CAMPAIGN_RULES
 };
 
 /**

@@ -51,6 +51,7 @@ export interface CardSection {
 }
 
 export interface FighterCardData {
+	kind: 'fighter';
 	instanceId: string;
 	name: string;
 	subtitle: string;
@@ -64,3 +65,23 @@ export interface FighterCardData {
 	/** The profile id is unknown – the game data does not know this fighter. */
 	unresolved: boolean;
 }
+
+/**
+ * The warband itself as a card: what the builder's info row carries, plus the
+ * stash and the warband notes. Everything on it is derived from the warband and
+ * the game data, the same way a fighter card is.
+ */
+export interface WarbandCardData {
+	kind: 'warband';
+	/** The deck addresses every card by this, warband card included. */
+	instanceId: string;
+	name: string;
+	/** Runs in the banderole under the name, where a text card names its category. */
+	faction: string;
+	tables: CardValue[][];
+	/** The names alone: whoever picks a thing up has its rules on their own card. */
+	stash: string;
+	notes: string;
+}
+
+export type DeckCard = WarbandCardData | FighterCardData;

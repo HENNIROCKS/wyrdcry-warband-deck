@@ -1,0 +1,296 @@
+{
+	"id": "maximum-0000-0000-0000-000000000000",
+	"name": "The Most Blessed Sisterhood of the Twin-Tailed Comet",
+	"factionId": "sisters-of-sigmar",
+	"favour": 10,
+	"gold": 9999,
+	"fighters": [
+		{
+			"instanceId": "max-00",
+			"fighterId": "matriarch",
+			"customName": "Matriarch Ulrike Steinhauer",
+			"equipment": [
+				"sigmarite-warhammer",
+				"steel-whip",
+				"heavy-armour",
+				"shield"
+			],
+			"pendingEquipment": [
+				"shield"
+			],
+			"isPending": false,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-01",
+			"fighterId": "sister-superior",
+			"customName": "Sister Superior Adelheid",
+			"equipment": [
+				"sigmarite-warhammer",
+				"steel-whip",
+				"heavy-armour",
+				"shield"
+			],
+			"pendingEquipment": [],
+			"isPending": false,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-02",
+			"fighterId": "sister-superior",
+			"customName": "Sister Superior Brunhilde",
+			"equipment": [
+				"sigmarite-warhammer",
+				"steel-whip",
+				"heavy-armour",
+				"shield"
+			],
+			"pendingEquipment": [
+				"shield"
+			],
+			"isPending": false,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-03",
+			"fighterId": "augur",
+			"customName": "Augur Clementia",
+			"equipment": [
+				"sigmarite-warhammer",
+				"steel-whip",
+				"heavy-armour",
+				"shield"
+			],
+			"pendingEquipment": [],
+			"isPending": false,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-04",
+			"fighterId": "augur",
+			"customName": "Augur Dorothea",
+			"equipment": [
+				"sigmarite-warhammer",
+				"steel-whip",
+				"heavy-armour",
+				"shield"
+			],
+			"pendingEquipment": [
+				"shield"
+			],
+			"isPending": false,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-05",
+			"fighterId": "sister",
+			"customName": "Sister Elsbeth",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": false,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-06",
+			"fighterId": "sister",
+			"customName": "Sister Friederike",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-07",
+			"fighterId": "sister",
+			"customName": "Sister Gertrud",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-08",
+			"fighterId": "sister",
+			"customName": "Sister Hildegard",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-09",
+			"fighterId": "sister",
+			"customName": "Sister Irmgard",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-10",
+			"fighterId": "novice",
+			"customName": "Novice Johanna",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-11",
+			"fighterId": "novice",
+			"customName": "Novice Katharina",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-12",
+			"fighterId": "novice",
+			"customName": "Novice Lieselotte",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-13",
+			"fighterId": "novice",
+			"customName": "Novice Mechthild",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		},
+		{
+			"instanceId": "max-14",
+			"fighterId": "novice",
+			"customName": "Novice Notburga",
+			"equipment": [
+				"great-weapon",
+				"sling",
+				"light-armour",
+				"dagger"
+			],
+			"pendingEquipment": [],
+			"isPending": true,
+			"notes": "",
+			"costOverride": null,
+			"xp": 36,
+			"renown": 9,
+			"statOverrides": {}
+		}
+	],
+	"stash": [
+		"great-weapon",
+		"flail",
+		"warhammer",
+		"heavy-armour",
+		"light-armour",
+		"shield"
+	],
+	"factionNotes": "- TODO: Collect income, promote two Novices, spend renown on the Matriarch\n- Battle history: 260901 Win – Possessed, 260908 Loss – Undead, 260915 Draw – Witch Hunters\n- The Augurs still owe the Temple of Sigmar a tithe of 120 gold crowns",
+	"customWeapons": [],
+	"customAbilities": []
+}

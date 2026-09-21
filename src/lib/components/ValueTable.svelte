@@ -5,15 +5,17 @@
 	let { rows }: { rows: CardValue[] } = $props();
 </script>
 
-<div class="box" use:fitText>
-	<div class="row head">
+<!-- Each row fits on its own: a long value would otherwise pull the labels down
+     with it, and those have room left. -->
+<div class="box">
+	<div class="row head" use:fitText>
 		{#each rows as row (row.key)}
 			<div class="col label"><span data-fit>{row.label}</span></div>
 		{/each}
 	</div>
-	<div class="row values">
+	<div class="row values" use:fitText>
 		{#each rows as row (row.key)}
-			<div class="col value" class:modified={row.modified}>{row.value}</div>
+			<div class="col value" class:modified={row.modified}><span data-fit>{row.value}</span></div>
 		{/each}
 	</div>
 </div>
@@ -79,9 +81,13 @@
 		color: var(--card-paper);
 	}
 
+	/* Standing carries a word where the other columns carry figures; past the
+	   floor the fit action stops at, it is cut rather than run into the next. */
 	.value {
 		color: var(--card-ink);
+		font-size: calc(20 * var(--t) * var(--fit, 1));
 		white-space: nowrap;
+		overflow: hidden;
 		padding: 0 calc(4 * var(--u));
 	}
 

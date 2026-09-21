@@ -10,6 +10,7 @@
 
 import {
 	ABILITIES,
+	CAMPAIGN_RULES,
 	FACTIONS,
 	FIGHTERS,
 	ITEMS,
@@ -17,7 +18,16 @@ import {
 	WEAPONS,
 	WEAPON_RULES
 } from './gamedata';
-import type { CardEntry, CardSection, CardStat, CardWeapon, FighterCardData } from './types/card';
+import type {
+	CardEntry,
+	CardSection,
+	CardStat,
+	CardValue,
+	CardWeapon,
+	DeckCard,
+	FighterCardData,
+	WarbandCardData
+} from './types/card';
 import { STAT_KEYS, type FighterInstance, type StatKey, type Warband } from './types/warband';
 
 /* Spelled out as on the printed card, "Defense" included. */
@@ -42,6 +52,11 @@ const typeRank = (type: string) => TYPE_ORDER.indexOf(type.trim().toLowerCase())
 
 const titleCase = (type: string) =>
 	type.replace(/\w\S*/g, (word) => word[0].toUpperCase() + word.slice(1).toLowerCase());
+
+/** Cost of whatever the warband stores by this id. Anything else is free. */
+function itemCost(id: string): number {
+	return WEAPONS.get(id)?.cost ?? ITEMS.get(id)?.cost ?? 0;
+}
 
 /** Only armour affects characteristics, and only Defense – same as the builder. */
 function defenseBonus(equipment: string[]): number {
@@ -126,6 +141,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 
 	if (!profile) {
 		return {
+			kind: 'fighter',
 			instanceId: instance.instanceId,
 			name: name || instance.fighterId,
 			subtitle: 'Unknown profile',
@@ -163,9 +179,10 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	let equipmentCost = 0;
 
 	for (const id of instance.equipment) {
+		equipmentCost += itemCost(id);
+
 		const weapon = WEAPONS.get(id);
 		if (weapon) {
-			equipmentCost += weapon.cost;
 			weapons.push({
 				name: weapon.name,
 				range: `${weapon.range}"`,
@@ -183,7 +200,6 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 		}
 		const item = ITEMS.get(id);
 		if (item) {
-			equipmentCost += item.cost;
 			equipmentEntries.push({ label: item.name, text: item.description });
 			continue;
 		}
@@ -228,6 +244,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	push('notes', notes);
 
 	return {
+		kind: 'fighter',
 		instanceId: instance.instanceId,
 		name: name || profile.name,
 		subtitle: name ? profile.name : '',
@@ -242,7 +259,93 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	};
 }
 
-export function toCards(warband: Warband): FighterCardData[] {
+/**
+ * Which tier the warband's favour puts it in – the standing, the way the
+ * builder's info row reads it. The thresholds are open at the top in the data
+ * as well, so anything past the last one keeps its label.
+ */
+function standingFor(favour: number): string {
+	const tiers = CAMPAIGN_RULES.favour_tiers;
+	const tier = tiers.find((t) => favour >= t.min && favour <= t.max);
+	return tier?.label ?? tiers[tiers.length - 1]?.label ?? '';
+}
+
+/**
+ * The warband as a card. Takes the fighter cards rather than the instances: the
+ * value of the warband is the sum of what those cards already cost out, and
+ * computing it twice is how the two numbers start to differ.
+ *
+ * The arithmetic mirrors the builder (`useWarband.ts` in jomblr/wyrdcry).
+ */
+export function toWarbandCard(warband: Warband, cards: FighterCardData[]): WarbandCardData {
+	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
+
+	/* A fighter is pending until the purchase is confirmed in the builder – it
+	   counts against the gold, but not yet as part of the warband's value. */
+	let value = warband.stash.reduce((sum, id) => sum + itemCost(id), 0);
+	let pending = 0;
+
+	warband.fighters.forEach((instance, i) => {
+		const cost = cards[i]?.cost ?? 0;
+		if (instance.isPending) pending += cost;
+		else {
+			value += cost;
+			pending += instance.pendingEquipment.reduce((sum, id) => sum + itemCost(id), 0);
+		}
+	});
+
+	const reputation = warband.fighters.reduce((sum, f) => sum + f.renown, 0) + warband.favour;
+	const remaining = warband.gold - value;
+
+	const size = faction?.warband_size;
+	const fighters = size ? `${warband.fighters.length} / ${size}` : String(warband.fighters.length);
+
+	/* Weapons ahead of the gear, each group in the order the warband stores it.
+	   An id the game data does not know stands there as itself. */
+	const stashWeapons: string[] = [];
+	const stashItems: string[] = [];
+
+	for (const id of warband.stash) {
+		const weapon = WEAPONS.get(id);
+		if (weapon) stashWeapons.push(weapon.name);
+		else stashItems.push(ITEMS.get(id)?.name ?? id);
+	}
+
+	const tables: CardValue[][] = [
+		[
+			{ key: 'fighters', label: 'Fighters', value: fighters },
+			{ key: 'favour', label: 'Favour', value: String(warband.favour) },
+			/* Between the two it is read as what the favour buys, which is what it is. */
+			{ key: 'standing', label: 'Standing', value: standingFor(warband.favour) },
+			{ key: 'reputation', label: 'Reputation', value: String(reputation) }
+		],
+		[
+			/* As in the builder: what is left to spend, and ahead of it what the
+			   unconfirmed purchases will take once they are. */
+			{
+				key: 'gold',
+				label: 'Gold Coins',
+				value: pending > 0 ? `${pending}/${remaining}` : String(remaining),
+				modified: pending > 0
+			},
+			{ key: 'value', label: 'Value', value: String(value) },
+			{ key: 'stash', label: 'Stash', value: String(warband.stash.length) }
+		]
+	];
+
+	return {
+		kind: 'warband',
+		instanceId: 'warband',
+		name: warband.name,
+		faction: faction?.name ?? 'Warband',
+		tables,
+		stash: [...stashWeapons, ...stashItems].join(', '),
+		notes: warband.factionNotes.trim()
+	};
+}
+
+/** The whole deck: the warband itself first, then its fighters. */
+export function toCards(warband: Warband): DeckCard[] {
 	/* The builder writes the faction's display name into `customAbilities.fighter`,
 	   while the warband stores its id. */
 	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
@@ -253,5 +356,7 @@ export function toCards(warband: Warband): FighterCardData[] {
 		console.warn(`adapter: no faction "${warband.factionId}" in the game data, its rules stay off the card`);
 	}
 
-	return warband.fighters.map((f) => toCard(f, warband, faction?.name ?? ''));
+	const fighters = warband.fighters.map((f) => toCard(f, warband, faction?.name ?? ''));
+
+	return [toWarbandCard(warband, fighters), ...fighters];
 }
