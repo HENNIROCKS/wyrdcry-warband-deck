@@ -30,6 +30,7 @@ Workshop.
 - [ ] Work offline at the table: cache the game data, keep the screen awake
 - [ ] The aftermath sequence – injuries, experience, exploration, buying
 - [ ] Reference cards for weapons, items, abilities and keywords in the same deck
+- [ ] Waiting as a third battle state, alongside activated
 
 Further out and nothing promised: NFC tags under the model bases, a photo of the
 painted model as the card image, showing an opponent the warband over a
