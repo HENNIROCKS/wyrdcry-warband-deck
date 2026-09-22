@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 
 	import { dev } from '$app/environment';
+	import { base } from '$app/paths';
 
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
@@ -116,7 +117,7 @@
 				{/if}
 				{#if dev}
 					<hr />
-					<a href="/dev">Open on your phone</a>
+					<a href="{base}/dev">Open on your phone</a>
 				{/if}
 			{/snippet}
 		</MenuButton>
@@ -149,6 +150,14 @@
 				{/snippet}
 			</MenuButton>
 		{/if}
+
+		<a class="icon-button" href="{base}/info" aria-label="About" title="About">
+			<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<circle cx="12" cy="12" r="9" />
+				<path d="M12 11v5" />
+				<path d="M12 7.6v.5" />
+			</svg>
+		</a>
 	</div>
 </header>
 

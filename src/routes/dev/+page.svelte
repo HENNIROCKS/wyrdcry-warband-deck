@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { dev } from '$app/environment';
+	import { base } from '$app/paths';
 	import { qr, url } from 'virtual:dev-network';
 
 	/* This route only exists in the dev server. In a build it is empty. */
@@ -44,7 +45,7 @@
 		{/if}
 	{/if}
 
-	<p class="back"><a href="/">Back to the deck</a></p>
+	<p class="back"><a href="{base}/">Back to the deck</a></p>
 </main>
 
 <style>

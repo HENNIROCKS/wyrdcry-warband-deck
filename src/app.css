@@ -80,6 +80,23 @@ button {
 }
 
 /*
+ * The square icon controls in the header bar. Global because the row mixes
+ * buttons that open a menu with links that go somewhere, and the three have to
+ * sit next to each other as one set.
+ */
+.icon-button {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	padding: 0;
+	border: 1px solid var(--ui-border);
+	border-radius: 9px;
+	background: var(--ui-surface);
+	color: var(--ui-text);
+}
+
+/*
  * The card surface, shared by every kind of card in the deck.
  *
  * Sizes inside a card are written as multiples of --u, one pixel of the printed

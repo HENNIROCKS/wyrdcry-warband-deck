@@ -39,7 +39,10 @@ jobs:
       # The docs are looked for beside the data, which is where they sit here.
       - run: npm run sync:data -- --from wyrdcry-src/src/data
 
+      # Pages serves from /<repo>/, which the links between routes have to carry.
       - run: npm run build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

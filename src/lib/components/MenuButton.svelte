@@ -42,7 +42,7 @@
 </script>
 
 <button
-	class="trigger"
+	class="icon-button"
 	bind:this={trigger}
 	popovertarget={id}
 	aria-label={label}
@@ -62,18 +62,6 @@
 </div>
 
 <style>
-	.trigger {
-		display: grid;
-		place-items: center;
-		width: 38px;
-		height: 38px;
-		padding: 0;
-		border: 1px solid var(--ui-border);
-		border-radius: 9px;
-		background: var(--ui-surface);
-		color: var(--ui-text);
-	}
-
 	.menu {
 		/* The UA centres a popover with `inset: 0` and auto margins. */
 		position: fixed;
