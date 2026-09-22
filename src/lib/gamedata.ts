@@ -78,8 +78,8 @@ export interface WeaponRule {
 }
 
 /**
- * An ability every fighter carrying `keyword` has. Extracted from the rules
- * pages by `npm run sync:data`, the JSON data does not hold them.
+ * An ability or reaction every fighter carrying `keyword` has. Extracted from the
+ * rules pages by `npm run sync:data`, the JSON data does not hold them.
  */
 export interface UniversalAbility {
 	id: string;

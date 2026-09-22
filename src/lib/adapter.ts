@@ -47,6 +47,9 @@ const STAT_LABELS: Record<StatKey, string> = {
  */
 const TYPE_ORDER = ['trait', 'double', 'triple', 'quad', 'reaction'];
 
+/** Reactions sit under their own heading on the card, not with the abilities. */
+const REACTION = 'reaction';
+
 /* Unknown and empty types come back as -1 and sort ahead of the whole list. */
 const typeRank = (type: string) => TYPE_ORDER.indexOf(type.trim().toLowerCase());
 
@@ -238,7 +241,11 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	push('weapon', weaponEntries);
 	push('equipment', equipmentEntries);
 	push('faction', abilityEntries(faction?.faction_ability_ids ?? [], customAbilities(warband, factionName)));
-	push('universal', sortAbilities(universalFor(keywords)));
+	/* Two headings out of one list: an ability is spent on your own activation, a
+	   reaction during the enemy's, and at the table you look for one or the other. */
+	const universal = universalFor(keywords);
+	push('universal', sortAbilities(universal.filter((rule) => rule.type !== REACTION)));
+	push('universal-reaction', sortAbilities(universal.filter((rule) => rule.type === REACTION)));
 	push('other', otherEntries);
 	/* The player's own text, not the game's – the card gives it its own ground. */
 	push('notes', notes);

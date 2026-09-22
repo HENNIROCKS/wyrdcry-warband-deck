@@ -43,7 +43,8 @@
 	   the rule that separates the sections. */
 	const COLLAPSIBLE: Partial<Record<CardSection['kind'], string>> = {
 		faction: 'Faction Rules',
-		universal: 'Universal Abilities'
+		universal: 'Universal Abilities',
+		'universal-reaction': 'Universal Reactions'
 	};
 
 	/* The runemark cuts both the image field and, in the Card Creator, the badge.

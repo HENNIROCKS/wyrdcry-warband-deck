@@ -44,7 +44,15 @@ export interface CardEntry {
  * naming them – the labels say where an entry comes from.
  */
 export interface CardSection {
-	kind: 'fighter' | 'weapon' | 'equipment' | 'faction' | 'universal' | 'other' | 'notes';
+	kind:
+		| 'fighter'
+		| 'weapon'
+		| 'equipment'
+		| 'faction'
+		| 'universal'
+		| 'universal-reaction'
+		| 'other'
+		| 'notes';
 	/** Leading line above the entries, from the profile's ability preamble. */
 	preamble: string;
 	entries: CardEntry[];
