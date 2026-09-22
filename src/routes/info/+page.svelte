@@ -128,7 +128,7 @@
 		width: 100%;
 		max-width: 38rem;
 		margin: 0 auto;
-		padding: 24px 20px 32px;
+		padding: 40px 20px;
 	}
 
 	h1 {

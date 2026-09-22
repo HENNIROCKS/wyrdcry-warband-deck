@@ -199,7 +199,7 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		padding: 9px 12px 10px;
+		padding: 12px;
 		background: var(--ui-header-bg);
 		border-bottom: 1px solid var(--ui-border);
 	}
