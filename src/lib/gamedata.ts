@@ -26,7 +26,8 @@ export interface FighterProfile {
 	cost: number;
 	ability_preamble: string;
 	faction_ability_ids: string[];
-	default_equipment: string[];
+	/** Absent on 15 of the 42 profiles and empty on 12 more – only fixed gear. */
+	default_equipment?: string[];
 	race: string[];
 	faction: string;
 	keywords: string[];

@@ -184,6 +184,41 @@ function statSources(equipment: string[], custom: CustomWeapon[]): StatSources {
 	return sources;
 }
 
+/**
+ * A weapon as the table prints it. Its rules go behind the name instead of into
+ * the card's text: five of them account for every rule the fixtures carry, and
+ * printing each one again under every weapon that has it fills the card with
+ * the same paragraphs over and over.
+ */
+function weaponRow(weapon: WeaponProfile): CardWeapon {
+	const range = `${weapon.range}"`;
+	const attacks = String(weapon.attacks);
+	const damage = `${weapon.hit}/${weapon.crit}`;
+	const rules = weapon.special_rules
+		.map((ruleId) => WEAPON_RULES.get(ruleId))
+		.filter((rule): rule is NonNullable<typeof rule> => rule !== undefined)
+		.sort((a, b) => a.name.localeCompare(b.name))
+		.map((rule) => ({ label: rule.name, text: rule.description }));
+
+	return {
+		name: weapon.name,
+		range,
+		attacks,
+		damage,
+		explanation: rules.length
+			? {
+					title: weapon.name,
+					facts: [
+						{ label: 'Range', value: range },
+						{ label: 'Attacks', value: attacks },
+						{ label: 'Damage', value: damage }
+					],
+					rules
+				}
+			: undefined
+	};
+}
+
 interface Ability {
 	name: string;
 	type: string;
@@ -300,6 +335,14 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	});
 
 	const weapons: CardWeapon[] = [];
+	/* Whether anything in the table can be swung – what decides Unarmed below. */
+	let melee = false;
+	/*
+	 * The table reads melee first, then ranged, whatever order the equipment is
+	 * stored in. A weapon the warband typed in itself has no kind to read and
+	 * goes with the melee ones, the same assumption Unarmed is decided on.
+	 */
+	const ranged = new Set<CardWeapon>();
 	const equipmentEntries: CardEntry[] = [];
 	/* Whatever the game data cannot account for, plus the fighter's own notes. */
 	const otherEntries: CardEntry[] = [];
@@ -310,36 +353,10 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 
 		const weapon = WEAPONS.get(id);
 		if (weapon) {
-			const range = `${weapon.range}"`;
-			const attacks = String(weapon.attacks);
-			const damage = `${weapon.hit}/${weapon.crit}`;
-			const rules = weapon.special_rules
-				.map((ruleId) => WEAPON_RULES.get(ruleId))
-				.filter((rule): rule is NonNullable<typeof rule> => rule !== undefined)
-				.sort((a, b) => a.name.localeCompare(b.name))
-				.map((rule) => ({ label: rule.name, text: rule.description }));
-
-			weapons.push({
-				name: weapon.name,
-				range,
-				attacks,
-				damage,
-				/* The rules sit behind the weapon rather than in the card's text: five
-				   of them account for every rule the fixtures carry, and printing each
-				   one again under every weapon that has it fills the card with the
-				   same paragraphs over and over. */
-				explanation: rules.length
-					? {
-							title: weapon.name,
-							facts: [
-								{ label: 'Range', value: range },
-								{ label: 'Attacks', value: attacks },
-								{ label: 'Damage', value: damage }
-							],
-							rules
-						}
-					: undefined
-			});
+			const row = weaponRow(weapon);
+			weapons.push(row);
+			if (weapon.type === 'melee') melee = true;
+			else ranged.add(row);
 			continue;
 		}
 		const item = ITEMS.get(id);
@@ -369,6 +386,66 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 		}
 		otherEntries.push({ label: id, text: 'Not found in the game data.' });
 	}
+
+	/*
+	 * Gear the fighter cannot be without: a beast's natural weapons, a Troll
+	 * Slayer's axes, the Freelance Knight's armour. It sits on the profile as
+	 * `default_equipment` and never in the instance – the builder reads it from
+	 * the profile each time it draws a row, so the card has to as well.
+	 *
+	 * It carries a `weapon:` or `item:` prefix there, which nothing else in the
+	 * data does.
+	 */
+	for (const prefixed of profile.default_equipment ?? []) {
+		const id = prefixed.replace(/^(weapon|item):/, '');
+		if (instance.equipment.includes(id)) continue;
+
+		const weapon = WEAPONS.get(id);
+		if (weapon) {
+			const row = weaponRow(weapon);
+			weapons.push(row);
+			if (weapon.type === 'melee') melee = true;
+			else ranged.add(row);
+			continue;
+		}
+		const item = ITEMS.get(id);
+		if (!item) continue;
+		/* No cost: the profile's own cost covers what it cannot take off. And no
+		   layer either – the Freelance Knight's Defense 6 is the value with his
+		   armour on, where 32 of 42 profiles stand at 3. Counting it again would
+		   put him at 9, which is also why the note below still holds: the bonus is
+		   in the figure, it just arrived there with the profile. */
+		const inProfile = item.effect !== undefined || CURATED_ITEM_EFFECTS.has(id);
+		equipmentEntries.push({
+			label: item.name,
+			text: item.description,
+			note: inProfile ? 'Already in the characteristics above.' : undefined
+		});
+	}
+
+	/*
+	 * "A fighter that isn't equipped with any melee weapon is considered to be
+	 * unarmed, and uses the Unarmed weapon profile" – the profile itself is in
+	 * the game data, so the card only has to notice the case.
+	 *
+	 * Beasts and thralls are out of it: neither can be equipped at all, and what
+	 * they fight with is on their profile above. A weapon the warband typed in
+	 * itself has no kind to read, so its presence is taken as a melee weapon
+	 * rather than putting Unarmed next to it.
+	 */
+	const natural = profile.race.includes('BEAST') || profile.race.includes('THRALL');
+	const armed =
+		melee ||
+		warband.customWeapons.some(
+			(w) => instance.equipment.includes(w.id) || instance.equipment.includes(w.name)
+		);
+	const unarmed = WEAPONS.get('unarmed');
+	if (!armed && !natural && unarmed) {
+		weapons.push(weaponRow(unarmed));
+	}
+
+	/* Stable, so the order within each half is still the order they are carried. */
+	weapons.sort((a, b) => Number(ranged.has(a)) - Number(ranged.has(b)));
 
 	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
 

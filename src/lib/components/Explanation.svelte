@@ -98,15 +98,26 @@
 {/if}
 
 <style>
+	/*
+	 * The backdrop is the scroller, not the sheet. Centring a flex child that
+	 * grows taller than its container pushes the top of it out of reach – the
+	 * overflow goes both ways and only one of them can be scrolled to. An auto
+	 * margin centres the sheet while it fits and lets it start at the top once
+	 * it does not, which is the case that has to keep working.
+	 */
 	.backdrop {
 		position: fixed;
 		inset: 0;
 		z-index: 30;
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: center;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		-webkit-overflow-scrolling: touch;
 		background: rgba(0, 0, 0, 0.72);
 		padding: 16px;
+		padding-top: calc(16px + env(safe-area-inset-top));
 		padding-bottom: calc(16px + env(safe-area-inset-bottom));
 	}
 
@@ -125,8 +136,7 @@
 	.sheet {
 		width: 100%;
 		max-width: 420px;
-		max-height: 100%;
-		overflow-y: auto;
+		margin: auto;
 		background: var(--card-paper);
 		color: var(--card-ink);
 		border: 1px solid var(--card-green);
