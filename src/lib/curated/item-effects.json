@@ -1,0 +1,8 @@
+[
+	{
+		"item": "heavy-armour",
+		"characteristic": "move",
+		"bonus": -1,
+		"expect": "decrease their Move characteristic by 1"
+	}
+]

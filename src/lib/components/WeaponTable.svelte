@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { explain } from '../explanation';
 	import { fitText } from '../fit-text';
 	import type { CardWeapon } from '../types/card';
 
@@ -14,7 +15,19 @@
 	</div>
 	{#each weapons as weapon, i (weapon.name + i)}
 		<div class="row">
-			<div class="col name" use:fitText><span data-fit>{weapon.name}</span></div>
+			{#if weapon.explanation}
+				<div class="col name" use:fitText>
+					<button
+						class="tagged"
+						onclick={() => weapon.explanation && explain(weapon.explanation)}
+						aria-label="{weapon.name}, its rules"
+					>
+						<span data-fit>{weapon.name}</span>
+					</button>
+				</div>
+			{:else}
+				<div class="col name" use:fitText><span data-fit>{weapon.name}</span></div>
+			{/if}
 			<div class="col">{weapon.range}</div>
 			<div class="col">{weapon.attacks}</div>
 			<div class="col">{weapon.damage}</div>
@@ -70,6 +83,21 @@
 	.col.name {
 		flex: 2 2 0;
 		overflow: hidden;
+	}
+
+	/* The weapon carries rules the card does not print; the link says so and opens
+	   them. Same mark as a value that explains itself. */
+	.tagged {
+		appearance: none;
+		border: 0;
+		max-width: 100%;
+		padding: 0;
+		background: none;
+		color: var(--card-link);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.14em;
+		cursor: pointer;
 	}
 
 	/* A name long enough to leave the cell is set smaller rather than wrapped, down

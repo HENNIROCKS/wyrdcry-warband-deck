@@ -114,7 +114,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: calc(14 * var(--u));
-		padding: calc(29 * var(--u)) calc(38 * var(--u)) calc(38 * var(--u));
+		padding: calc(29 * var(--u)) calc(30 * var(--u)) calc(38 * var(--u));
 	}
 
 	/* The tables read as one block: the parchment's gap between them, roughly

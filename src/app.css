@@ -25,11 +25,20 @@
 	--card-green: #16754a;
 	--card-paper: #faf6f3;
 	--card-ink: #000;
-	--card-ink-muted: rgba(0, 0, 0, 0.55);
+	/* 5.3:1 over the card texture, which the muted lines sit on – a 0.55 that
+	   looks the same on paper falls to 4.5:1 there. */
+	--card-ink-muted: rgba(0, 0, 0, 0.6);
 	--card-wash: rgba(255, 255, 255, 0.25);
 	/* Denser than the wash, for a surface that has to carry body copy. */
 	--card-wash-strong: rgba(255, 255, 255, 0.55);
 	--card-wash-2: rgba(22, 117, 74, 0.12);
+	/*
+	 * A value that explains itself when tapped, and the weapon that carries
+	 * rules. The one signal colour on a green and paper card, dark enough to
+	 * hold on every row it lands on: 6.4:1 on the values row, 5.1:1 on the
+	 * weapon table's stripes.
+	 */
+	--card-link: #9c2b14;
 
 	/* Design width of the printed card. Sizes inside a card are written as
 	   multiples of --u so the whole thing scales with the container. */

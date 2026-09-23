@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { explain } from '../explanation';
 	import { fitText } from '../fit-text';
 	import type { CardValue } from '../types/card';
 
@@ -15,7 +16,17 @@
 	</div>
 	<div class="row values" use:fitText>
 		{#each rows as row (row.key)}
-			<div class="col value" class:modified={row.modified}><span data-fit>{row.value}</span></div>
+			{#if row.explanation}
+				<button
+					class="col value explained"
+					onclick={() => row.explanation && explain(row.explanation)}
+					aria-label="{row.label} {row.value}, how it adds up"
+				>
+					<span data-fit>{row.value}</span>
+				</button>
+			{:else}
+				<div class="col value" class:modified={row.modified}><span data-fit>{row.value}</span></div>
+			{/if}
 		{/each}
 	</div>
 </div>
@@ -95,5 +106,29 @@
 	.modified {
 		color: var(--card-green);
 		box-shadow: inset 0 calc(-3 * var(--u)) 0 calc(-1 * var(--u)) var(--card-green);
+	}
+
+	/* The cell stays the target a thumb aims at; the mark sits on the figure.
+	   Type, size and alignment come from `.col` and `.value`, which a button
+	   obeys like any other element. */
+	.explained {
+		appearance: none;
+		border: 0;
+		background: none;
+		cursor: pointer;
+	}
+
+	/*
+	 * A value that does not stand in the profile the way it reads here, tagged
+	 * the way the keywords above are tagged. The tag belongs to the figure – a
+	 * filled cell would read as a state of the table instead.
+	 */
+	/* A link, not a surface: six marked cells side by side read as a state of the
+	   table, while an underlined figure stays a figure that offers something. */
+	.explained span {
+		color: var(--card-link);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.14em;
 	}
 </style>

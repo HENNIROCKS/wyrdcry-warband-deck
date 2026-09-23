@@ -75,6 +75,14 @@ export interface WeaponRule {
 	id: string;
 	name: string;
 	description: string;
+	/**
+	 * `characteristic` is `fight_shoot` where the rule raises the weapon's own
+	 * attack characteristic – Fight for a melee weapon, Shoot for a ranged one,
+	 * never both. `conditional` is unreliable: Parry carries `false` while its
+	 * own description names the situation it needs, so the card reads the
+	 * description instead.
+	 */
+	effect?: { characteristic: string; bonus: number; conditional?: boolean };
 }
 
 /**

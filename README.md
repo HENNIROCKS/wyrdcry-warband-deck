@@ -15,6 +15,8 @@ Workshop.
 - Show the warband itself as the first card: faction, standing, favour,
   reputation, gold, value, stash and the warband notes
 - Show fighters as cards and swipe through them
+- Tap a worked-out value or a weapon to see where it comes from: which
+  modifiers went into it, and which rules apply only in the right situation
 - Mark fighters as activated during a battle, count the rounds and clear the
   activations for the next one – one step of that is undoable
 - Export through the system share sheet, either as the current state or as a

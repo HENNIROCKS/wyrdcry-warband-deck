@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
+	import Explanation from './Explanation.svelte';
+	import { explanation } from '../explanation';
 	import FighterCard from './FighterCard.svelte';
 	import WarbandCard from './WarbandCard.svelte';
 	import { isActivated } from '../battle';
@@ -112,6 +114,18 @@
 		dx = 0;
 	}
 
+	/**
+	 * A drag that springs back still ends in a click on whatever lies under the
+	 * finger. On a card of six value cells that would open an explanation nobody
+	 * asked for, so a gesture that got as far as a drag swallows its click.
+	 */
+	function onClickCapture(event: MouseEvent) {
+		if (!captured) return;
+		event.stopPropagation();
+		event.preventDefault();
+		captured = false;
+	}
+
 	function fly(direction: -1 | 1) {
 		if (leaving) return;
 		/* Without a drag (keyboard) the sign `beneath` reads the direction from is missing. */
@@ -147,6 +161,7 @@
 			{#key cards[beneath].instanceId}
 				<div
 					class="pane under"
+					class:locked={explanation() !== null}
 					style:transform="scale({0.94 + 0.06 * progress})"
 					style:opacity={0.55 + 0.45 * progress}
 					aria-hidden="true"
@@ -159,6 +174,7 @@
 		{#key cards[current].instanceId}
 			<div
 				class="pane top"
+				class:locked={explanation() !== null}
 				role="group"
 				aria-roledescription="Card, swipe horizontally"
 				style:transform
@@ -170,6 +186,7 @@
 				onpointermove={onPointerMove}
 				onpointerup={onPointerUp}
 				onpointercancel={onPointerCancel}
+				onclickcapture={onClickCapture}
 			>
 				{@render card(cards[current])}
 			</div>
@@ -191,6 +208,10 @@
 
 	<p class="position">{current + 1} / {cards.length}</p>
 </div>
+
+<!-- Outside the stack: inside a pane, the transform would become the frame a
+     fixed overlay is placed against. -->
+<Explanation />
 
 {#snippet card(data: DeckCard)}
 	{#if data.kind === 'warband'}
@@ -229,9 +250,15 @@
 		inset: 0;
 		padding: 0 10px;
 		overflow-y: auto;
+		/* The card is what scrolls here, not the page – so this is where an open
+		   explanation has to hold it still. */
 		/* Vertical scrolling stays inside the card and does not drag the page along. */
 		overscroll-behavior: contain;
 		-webkit-overflow-scrolling: touch;
+	}
+
+	.pane.locked {
+		overflow-y: hidden;
 	}
 
 	.top {

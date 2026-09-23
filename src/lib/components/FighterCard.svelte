@@ -22,12 +22,24 @@
 		return String(stat.value);
 	}
 
+	/* A value carries an explanation once it is more than the profile value, or
+	   once a rule hangs on it that only applies in the right situation. */
 	const characteristics = $derived(
 		card.stats.map((stat) => ({
 			key: stat.key,
 			label: stat.label,
-			value: format(stat),
-			modified: stat.modified
+			/* The star says the figure can still rise – the tag alone would say only
+			   that it was worked out, and those are two different promises. */
+			value: format(stat) + (stat.conditions.length ? '*' : ''),
+			explanation:
+				stat.layers.length > 1 || stat.conditions.length
+					? {
+							title: stat.label,
+							result: format(stat),
+							layers: stat.layers,
+							conditions: stat.conditions
+						}
+					: undefined
 		}))
 	);
 
@@ -129,7 +141,7 @@
      template would end up on the card. -->
 {#snippet paragraphs(entries: CardEntry[])}
 	{#each entries as entry, i (entry.label + i)}
-		<p class="entry"><strong>{entry.label}</strong>: {#each tokenize(entry.text) as token, j (j)}{#if token.kind === 'bold'}<strong>{token.value}</strong>{:else if token.kind === 'keyword'}<span class="keyword">{token.value}</span>{:else}{token.value}{/if}{/each}</p>
+		<p class="entry"><strong>{entry.label}</strong>: {#each tokenize(entry.text) as token, j (j)}{#if token.kind === 'bold'}<strong>{token.value}</strong>{:else if token.kind === 'keyword'}<span class="keyword">{token.value}</span>{:else}{token.value}{/if}{/each}{#if entry.note}{' '}<span class="note">{entry.note}</span>{/if}</p>
 	{/each}
 {/snippet}
 
@@ -195,7 +207,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: calc(14 * var(--u));
-		padding: calc(24 * var(--u)) calc(38 * var(--u)) calc(26 * var(--u));
+		padding: calc(24 * var(--u)) calc(30 * var(--u)) calc(26 * var(--u));
+	}
+
+	/* The app speaking, not the rulebook – set apart so it is not read as part of
+	   the rule above it. */
+	.note {
+		color: var(--card-ink-muted);
+		font-style: italic;
 	}
 
 	.keywords {
