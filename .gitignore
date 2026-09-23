@@ -11,3 +11,7 @@ node_modules/
 
 # Arbeitsmaterial: Referenz-Screenshots, Exporte, Notizen
 /_work/
+
+# Lokale Claude-Code-Einstellungen und -Anweisungen
+/.claude
+/CLAUDE.md
