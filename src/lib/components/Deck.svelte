@@ -233,10 +233,18 @@
 		flex: 1;
 	}
 
+	/*
+	 * The width lives here rather than on the card, because the stack is also
+	 * what the swipe measures itself against: a card held narrower than its
+	 * stack would ask for a drag far wider than the card itself.
+	 */
 	.stack {
 		position: relative;
 		flex: 1;
 		min-height: 0;
+		width: 100%;
+		max-width: calc(var(--deck-max-width) + 2 * var(--deck-gutter));
+		margin-inline: auto;
 	}
 
 	/* A drag with the mouse moves the card without selecting any text. */
@@ -248,7 +256,7 @@
 	.pane {
 		position: absolute;
 		inset: 0;
-		padding: 0 10px;
+		padding: 0 var(--deck-gutter);
 		overflow-y: auto;
 		/* The card is what scrolls here, not the page – so this is where an open
 		   explanation has to hold it still. */

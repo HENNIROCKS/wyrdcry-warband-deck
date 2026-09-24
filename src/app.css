@@ -41,8 +41,29 @@
 	--card-link: #9c2b14;
 
 	/* Design width of the printed card. Sizes inside a card are written as
-	   multiples of --u so the whole thing scales with the container. */
+	   multiples of --u so the whole thing scales with the container, down to
+	   the floor. */
 	--card-design-width: 588;
+	--card-unit-floor: 0.72px;
+
+	/*
+	 * The widest the deck gets. Wider than the printed card – a tablet still
+	 * shows a large card – but narrow enough that a rules text keeps a readable
+	 * line length. The gutter is the strip of background beside the card; the
+	 * inset, in card units, is how far the sheet that explains a value stays
+	 * clear of the card's edge.
+	 */
+	--deck-max-width: 768px;
+	--deck-gutter: 10px;
+	--deck-inset: 39.1837;
+
+	/* The card's own --u, worked out from the viewport instead of the container,
+	   for everything that sits outside a card and still has to match its
+	   spacing. */
+	--deck-unit: max(
+		var(--card-unit-floor),
+		calc(min(100vw - 2 * var(--deck-gutter), var(--deck-max-width)) / var(--card-design-width))
+	);
 }
 
 /*
@@ -123,7 +144,7 @@ button {
  */
 .card {
 	container-type: inline-size;
-	--u: max(0.72px, calc(100cqw / var(--card-design-width)));
+	--u: max(var(--card-unit-floor), calc(100cqw / var(--card-design-width)));
 	--t: max(0.9px, calc(100cqw / var(--card-design-width)));
 	display: flex;
 	flex-direction: column;

@@ -116,7 +116,7 @@
 		overscroll-behavior: contain;
 		-webkit-overflow-scrolling: touch;
 		background: rgba(0, 0, 0, 0.72);
-		padding: 16px;
+		padding: 16px var(--deck-gutter);
 		padding-top: calc(16px + env(safe-area-inset-top));
 		padding-bottom: calc(16px + env(safe-area-inset-bottom));
 	}
@@ -127,7 +127,11 @@
 	 * carries one, and two of them lose the edge between the two surfaces.
 	 *
 	 * Sizes are in pixels, not in card units. Those scale with the card's
-	 * container, and this sheet stands outside it.
+	 * container, and this sheet stands outside it. The width is the exception:
+	 * it follows the deck's, kept clear of the card's edge by --deck-inset, so
+	 * the card stays visible beside what explains it. While the screen leaves
+	 * less room than that width, both are as wide as the screen allows and run
+	 * to the same edge.
 	 */
 	.sheet:focus {
 		outline: none;
@@ -135,7 +139,7 @@
 
 	.sheet {
 		width: 100%;
-		max-width: 420px;
+		max-width: calc(var(--deck-max-width) - 2 * var(--deck-inset) * var(--deck-unit));
 		margin: auto;
 		background: var(--card-paper);
 		color: var(--card-ink);

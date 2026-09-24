@@ -151,7 +151,7 @@
 	.image-section {
 		display: flex;
 		gap: calc(12 * var(--u));
-		margin: calc(16 * var(--u)) calc(38 * var(--u)) 0;
+		margin: calc(16 * var(--u)) calc(38 * var(--u)) 0 calc(var(--deck-inset) * var(--u));
 	}
 
 	.image-box {
