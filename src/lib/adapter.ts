@@ -185,29 +185,46 @@ function statSources(equipment: string[], custom: CustomWeapon[]): StatSources {
 }
 
 /**
- * A weapon as the table prints it. Its rules go behind the name instead of into
- * the card's text: five of them account for every rule the fixtures carry, and
- * printing each one again under every weapon that has it fills the card with
- * the same paragraphs over and over.
+ * Dual wielding stands in the equipment chapter rather than among the weapon
+ * rules, so the game data carries no entry for it and the text is kept here.
  */
-function weaponRow(weapon: WeaponProfile): CardWeapon {
+const DUAL_WIELDING = {
+	label: 'Dual Wielding',
+	text: 'If a fighter is equipped with two melee weapons of the same type (for example, two swords), they are considered to be dual wielding. While a fighter is dual wielding, improve the Attack characteristic of the weapon they are using by 1.'
+};
+
+/**
+ * A weapon as the table prints it, `count` of them carried. Its rules go behind
+ * the name instead of into the card's text: five of them account for every rule
+ * the fixtures carry, and printing each one again under every weapon that has it
+ * fills the card with the same paragraphs over and over.
+ *
+ * Several of the same weapon share one row: two identical rows say nothing the
+ * count does not.
+ */
+function weaponRow(weapon: WeaponProfile, count = 1): CardWeapon {
 	const range = `${weapon.range}"`;
-	const attacks = String(weapon.attacks);
+	/* The extra attack belongs to the weapon in hand, so it is the row's own
+	   number rather than a bonus on the fighter. */
+	const dual = count > 1 && weapon.type === 'melee';
+	const attacks = String(weapon.attacks + (dual ? 1 : 0));
 	const damage = `${weapon.hit}/${weapon.crit}`;
+	const name = count > 1 ? `${weapon.name} ×${count}` : weapon.name;
 	const rules = weapon.special_rules
 		.map((ruleId) => WEAPON_RULES.get(ruleId))
 		.filter((rule): rule is NonNullable<typeof rule> => rule !== undefined)
-		.sort((a, b) => a.name.localeCompare(b.name))
-		.map((rule) => ({ label: rule.name, text: rule.description }));
+		.map((rule) => ({ label: rule.name, text: rule.description }))
+		.concat(dual ? [DUAL_WIELDING] : [])
+		.sort((a, b) => a.label.localeCompare(b.label));
 
 	return {
-		name: weapon.name,
+		name,
 		range,
 		attacks,
 		damage,
 		explanation: rules.length
 			? {
-					title: weapon.name,
+					title: name,
 					facts: [
 						{ label: 'Range', value: range },
 						{ label: 'Attacks', value: attacks },
@@ -343,6 +360,22 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	 * goes with the melee ones, the same assumption Unarmed is decided on.
 	 */
 	const ranged = new Set<CardWeapon>();
+	/* The row each weapon already has, so a second copy raises its count instead
+	   of printing the same line again. */
+	const carried = new Map<string, { row: CardWeapon; count: number }>();
+	const addWeapon = (id: string, weapon: WeaponProfile) => {
+		const seen = carried.get(id);
+		if (seen) {
+			seen.count++;
+			Object.assign(seen.row, weaponRow(weapon, seen.count));
+			return;
+		}
+		const row = weaponRow(weapon);
+		carried.set(id, { row, count: 1 });
+		weapons.push(row);
+		if (weapon.type === 'melee') melee = true;
+		else ranged.add(row);
+	};
 	const equipmentEntries: CardEntry[] = [];
 	/* Whatever the game data cannot account for, plus the fighter's own notes. */
 	const otherEntries: CardEntry[] = [];
@@ -353,10 +386,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 
 		const weapon = WEAPONS.get(id);
 		if (weapon) {
-			const row = weaponRow(weapon);
-			weapons.push(row);
-			if (weapon.type === 'melee') melee = true;
-			else ranged.add(row);
+			addWeapon(id, weapon);
 			continue;
 		}
 		const item = ITEMS.get(id);
@@ -402,10 +432,7 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 
 		const weapon = WEAPONS.get(id);
 		if (weapon) {
-			const row = weaponRow(weapon);
-			weapons.push(row);
-			if (weapon.type === 'melee') melee = true;
-			else ranged.add(row);
+			addWeapon(id, weapon);
 			continue;
 		}
 		const item = ITEMS.get(id);

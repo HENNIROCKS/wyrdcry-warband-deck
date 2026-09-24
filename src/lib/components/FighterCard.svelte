@@ -123,7 +123,7 @@
 			{:else}
 				{#if i > 0}<hr />{/if}
 				<section>
-					{#if section.preamble}<p class="entry preamble">{section.preamble}</p>{/if}
+					{#if section.preamble}<p class="entry preamble"><RuleText text={section.preamble} /></p>{/if}
 					{@render paragraphs(section.entries)}
 				</section>
 			{/if}
