@@ -57,8 +57,10 @@
 			Warband Builder, swipe through the fighters, track a battle.
 		</p>
 		<p class="muted">
-			An independent fan project. No connection to the authors of Wyrdcry or to
-			Games Workshop.
+			An independent fan project. No connection to Games Workshop.
+		</p>
+		<p class="version">
+			Version {__APP_VERSION__} · Early{#if buildDate}{' '}· Build {buildDate}{/if}{#if ruleset}{' '}· Ruleset {ruleset}{/if}
 		</p>
 	</section>
 
@@ -91,12 +93,14 @@
 
 	<section>
 		<h2>Questions</h2>
-		<dl>
+		<div class="faq">
 			{#each faq as entry (entry.question)}
-				<dt>{entry.question}</dt>
-				<dd>{entry.answer}</dd>
+				<details>
+					<summary>{entry.question}</summary>
+					<p class="answer">{entry.answer}</p>
+				</details>
 			{/each}
-		</dl>
+		</div>
 	</section>
 
 	<section>
@@ -110,10 +114,6 @@
 	</section>
 
 	<footer>
-		<p class="version">
-			Version {__APP_VERSION__} · Early{#if buildDate} · Build {buildDate}{/if}{#if ruleset} ·
-				Ruleset {ruleset}{/if}
-		</p>
 		<p class="back"><a href="{base}/">Back to the deck</a></p>
 	</footer>
 </main>
@@ -181,49 +181,120 @@
 	}
 
 	.links {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 		padding-left: 0;
 		list-style: none;
 	}
 
+	/* The buttons keep their distance through the gap. */
+	.links li + li {
+		margin-top: 0;
+	}
+
+	/* The surface and border of the header's icon buttons, so a link that acts
+	   like a button looks like the ones already on screen. */
+	.links a,
+	.back a {
+		display: block;
+		padding: 11px 13px;
+		border: 1px solid var(--ui-border);
+		border-radius: 9px;
+		background: var(--ui-surface);
+		text-decoration: none;
+	}
+
 	.links a {
 		color: var(--ui-accent-text);
+		text-align: center;
 	}
 
-	dl {
-		margin: 0;
+	.links a:hover,
+	.back a:hover,
+	.links a:focus-visible,
+	.back a:focus-visible {
+		background: var(--ui-surface-2);
+	}
+
+	/* Rules, not boxes: the links below are the buttons on this page, and two
+	   stacks of the same shape read as one list of the same kind of thing. */
+	.faq {
+		display: flex;
+		flex-direction: column;
+		border-top: 1px solid var(--ui-border);
+	}
+
+	details {
+		border-bottom: 1px solid var(--ui-border);
+	}
+
+	summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 11px 1px;
 		font-size: 14px;
-		line-height: 1.55;
-	}
-
-	dt {
 		font-weight: 600;
+		cursor: pointer;
+		/* The chevron below stands in for the marker. */
+		list-style: none;
 	}
 
-	dd {
-		margin: 4px 0 0;
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	/* Closed points down, open points up. Nothing animates, so there is nothing
+	   a reduced-motion setting would have to switch off. */
+	summary::after {
+		content: '';
+		flex: none;
+		width: 7px;
+		height: 7px;
+		margin-bottom: 3px;
+		border-right: 1.5px solid var(--ui-text-subtle);
+		border-bottom: 1.5px solid var(--ui-text-subtle);
+		transform: rotate(45deg);
+	}
+
+	details[open] summary::after {
+		margin: 3px 0 0;
+		transform: rotate(-135deg);
+	}
+
+	summary:focus-visible {
+		outline: 2px solid var(--ui-accent-text);
+		outline-offset: 1px;
+	}
+
+	.answer {
+		padding: 0 1px 12px;
 		color: var(--ui-text-muted);
 	}
 
-	dd + dt {
-		margin-top: 14px;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-
+	/* Smaller than the notice above it, not fainter: at this size the subtle
+	   grey falls to 3.5:1 on the page, where the muted one holds 6.6:1. */
 	.version {
 		font-size: 12px;
-		color: var(--ui-text-subtle);
+		color: var(--ui-text-muted);
+	}
+
+	/* Set apart from the links above, which it would otherwise read as the last
+	   of – the way back is not a fifth destination. */
+	footer {
+		margin-top: 14px;
 	}
 
 	.back {
 		font-size: 13px;
 	}
 
+	/* The way back, not a destination of its own – same shape as the links
+	   above, without their colour. */
 	.back a {
 		color: var(--ui-text-muted);
+		text-align: center;
 	}
 </style>

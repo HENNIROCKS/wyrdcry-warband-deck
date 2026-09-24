@@ -4,8 +4,7 @@ Your own [Wyrdcry](https://wyrdcry.net) warband as a deck of cards on your phone
 Export the warband from the Warband Builder, import it here, swipe through the
 fighters.
 
-Unofficial fan project. No connection to the authors of Wyrdcry or to Games
-Workshop.
+Unofficial fan project. No connection to Games Workshop.
 
 **Status: early.** The app tracks a battle; it does not edit the warband.
 
