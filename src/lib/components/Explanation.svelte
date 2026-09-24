@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { dismiss, explanation } from '../explanation';
+	import RuleText from './RuleText.svelte';
 	import type { StatLayer } from '../types/card';
 
 	const open = $derived(explanation());
@@ -72,7 +73,7 @@
 			{#each open.rules ?? [] as rule, i (rule.label + i)}
 				<div class="condition">
 					<p class="name">{rule.label}</p>
-					<p class="text">{rule.text}</p>
+					<p class="text"><RuleText text={rule.text} /></p>
 				</div>
 			{/each}
 
@@ -87,7 +88,7 @@
 								<span class="amount">+{condition.amount}</span>
 							{/if}
 						</p>
-						<p class="text">{condition.text}</p>
+						<p class="text"><RuleText text={condition.text} /></p>
 					</div>
 				{/each}
 			{/if}

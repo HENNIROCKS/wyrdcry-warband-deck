@@ -67,6 +67,28 @@
 }
 
 /*
+ * A keyword the rules text names, which the game data marks with backticks.
+ * Sized in em so the one rule serves the card, where the text scales with the
+ * container, and the explanation overlay, which is set in pixels.
+ *
+ * The border is what makes the shape: 5:1 over the card's texture, 4.5:1 on the
+ * overlay's flat paper. The fill is the wash the keyword chips under the name
+ * carry, and like theirs it only lightens what it sits on, at about 1.05:1 –
+ * far too little to hold the shape on its own.
+ */
+.keyword {
+	display: inline-block;
+	font-size: 0.78em;
+	line-height: 1;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding: 0.15em 0.45em;
+	border: 1px solid var(--card-green);
+	border-radius: 999px;
+	background: var(--card-wash);
+}
+
+/*
  * Fonts – SIL Open Font License 1.1, see static/fonts/*-OFL.txt
  * Grenze Gotisch: https://fonts.google.com/specimen/Grenze+Gotisch
  * Alegreya: copyright 2011 The Alegreya Project Authors

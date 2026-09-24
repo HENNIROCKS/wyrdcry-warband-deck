@@ -2,7 +2,7 @@
 	import runemarkShape from '../runemark-shape.svg?raw';
 	import ValueTable from './ValueTable.svelte';
 	import WeaponTable from './WeaponTable.svelte';
-	import { tokenize } from '../markup';
+	import RuleText from './RuleText.svelte';
 	import type { CardEntry, CardSection, CardStat, FighterCardData } from '../types/card';
 
 	let {
@@ -141,7 +141,7 @@
      template would end up on the card. -->
 {#snippet paragraphs(entries: CardEntry[])}
 	{#each entries as entry, i (entry.label + i)}
-		<p class="entry"><strong>{entry.label}</strong>: {#each tokenize(entry.text) as token, j (j)}{#if token.kind === 'bold'}<strong>{token.value}</strong>{:else if token.kind === 'keyword'}<span class="keyword">{token.value}</span>{:else}{token.value}{/if}{/each}{#if entry.note}{' '}<span class="note">{entry.note}</span>{/if}</p>
+		<p class="entry"><strong>{entry.label}</strong>: <RuleText text={entry.text} />{#if entry.note}{' '}<span class="note">{entry.note}</span>{/if}</p>
 	{/each}
 {/snippet}
 
@@ -262,12 +262,6 @@
 	/* A blank line, as on the printed card. */
 	.entry + .entry {
 		margin-top: 1em;
-	}
-
-	/* On the rules pages these sit in backticks, on the site they are chips. */
-	.keyword {
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
 	}
 
 	/* The surface sets the player's own text off from the rules above it, so it

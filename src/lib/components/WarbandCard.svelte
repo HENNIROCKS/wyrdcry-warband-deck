@@ -1,7 +1,7 @@
 <script lang="ts">
 	import imageMask from '../image-mask.svg?raw';
 	import ValueTable from './ValueTable.svelte';
-	import { tokenize } from '../markup';
+	import RuleText from './RuleText.svelte';
 	import type { WarbandCardData } from '../types/card';
 
 	let { card }: { card: WarbandCardData } = $props();
@@ -45,7 +45,7 @@
 <!-- Written on one line: the paragraphs are pre-wrap, so a line break in the
      template would end up on the card. -->
 {#snippet note(text: string)}
-	<p class="entry">{#each tokenize(text) as token, i (i)}{#if token.kind === 'bold'}<strong>{token.value}</strong>{:else if token.kind === 'keyword'}<span class="keyword">{token.value}</span>{:else}{token.value}{/if}{/each}</p>
+	<p class="entry"><RuleText text={text} /></p>
 {/snippet}
 
 <style>
@@ -133,12 +133,6 @@
 		font-size: calc(18 * var(--t));
 		line-height: 1.4;
 		white-space: pre-wrap;
-	}
-
-	/* On the rules pages these sit in backticks, on the site they are chips. */
-	.keyword {
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
 	}
 
 	/* The surface sets stash and notes off from the numbers above them, so neither
