@@ -127,7 +127,11 @@ export function toStored(candidate: ImportCandidate): StoredWarband {
 		importedAt: candidate.existing?.importedAt ?? now,
 		updatedAt: now,
 		origin: candidate.meta ? { device: candidate.meta.device, exportedAt: candidate.meta.exportedAt } : null,
-		battle: candidate.existing?.battle ?? null
+		battle: candidate.existing?.battle ?? null,
+		/* Whatever the file carries, and nothing else. Keeping the stored ones would
+		   describe a warband that is being replaced: the modifiers hang on
+		   instanceIds the incoming roster need not have. */
+		selections: candidate.meta?.selections ?? null
 	};
 }
 
@@ -146,7 +150,8 @@ export async function buildExport(entry: StoredWarband): Promise<ExportedWarband
 			revision: entry.revision,
 			device: await deviceId(),
 			exportedAt: new Date().toISOString(),
-			ruleset: entry.ruleset || RULESET_VERSION
+			ruleset: entry.ruleset || RULESET_VERSION,
+			selections: entry.selections
 		}
 	};
 }

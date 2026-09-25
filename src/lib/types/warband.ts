@@ -53,6 +53,16 @@ export interface Warband {
 	customAbilities: CustomAbility[];
 }
 
+/** What the wizard decided, in the words the player saw. */
+export interface Selections {
+	/** Faction rule id to the option ids picked under it. */
+	rules: Record<string, string[]>;
+	/** Fighter instanceId to what was picked for its own choice. */
+	fighters: Record<string, string[]>;
+	/** Every characteristic the wizard raised, and what raised it. */
+	modifiers: { instanceId: string; characteristic: StatKey; bonus: number; source: string }[];
+}
+
 /** Metadata of this app. The builder ignores unknown keys and hands them back. */
 export interface DeckMeta {
 	format: 'wyrdcry-warband-deck';
@@ -60,6 +70,8 @@ export interface DeckMeta {
 	device: string;
 	exportedAt: string;
 	ruleset: string;
+	/** Absent on every warband that did not come out of the wizard. */
+	selections?: Selections | null;
 }
 
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
@@ -96,4 +108,17 @@ export interface StoredWarband {
 	/** Which export this state came from. Null for files straight out of the builder. */
 	origin: { device: string; exportedAt: string } | null;
 	battle: BattleState | null;
+	/**
+	 * What the wizard picked while building this warband: the faction rules in
+	 * play, each fighter's own choice, and which characteristic each of them
+	 * raised. The builder's model has no field for any of it, and
+	 * `statOverrides` holds the resulting figure without its reason, so it is
+	 * kept here and written into `_deck` on export. Null for a warband that came
+	 * out of the builder.
+	 *
+	 * Optional, because every record written before the wizard existed lacks the
+	 * field altogether – a required one here would be a promise the database does
+	 * not keep.
+	 */
+	selections?: Selections | null;
 }
