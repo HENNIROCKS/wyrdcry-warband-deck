@@ -89,7 +89,7 @@
 		border: 0;
 		border-radius: 7px;
 		background: none;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		font-weight: 600;
 		text-align: left;
 		text-decoration: none;
@@ -99,6 +99,12 @@
 	.menu :global(button:hover),
 	.menu :global(a:hover) {
 		background: var(--ui-surface-2);
+	}
+
+	/* An entry that loses something. It reads differently from the rest before it
+	   is tapped, not only in the question that follows. */
+	.menu :global(button.danger) {
+		color: #fca5a5;
 	}
 
 	.menu :global(hr) {
@@ -111,7 +117,7 @@
 	.menu :global(p) {
 		margin: 0;
 		padding: 8px 11px 6px;
-		font-size: 12px;
+		font-size: var(--ui-t-sm);
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;

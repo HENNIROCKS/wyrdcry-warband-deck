@@ -57,6 +57,17 @@ export async function putWarband(entry: StoredWarband): Promise<void> {
 }
 
 /**
+ * Removes a warband and the battle it was in the middle of.
+ *
+ * Nothing about it survives this: the campaign lives on the device and in
+ * whatever was exported, and there is no copy anywhere else. Whoever calls this
+ * asks first.
+ */
+export async function deleteWarband(id: string): Promise<void> {
+	await run(STORE, 'readwrite', (s) => s.delete(id));
+}
+
+/**
  * Writes the battle state and nothing else.
  *
  * Separate from `putWarband` because a battle must not raise `revision` or

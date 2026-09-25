@@ -9,13 +9,15 @@
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import { toCards } from '$lib/adapter';
 	import { nextRound, remaining, start, toggle, undoRound } from '$lib/battle';
-	import { allWarbands, putBattle, putWarband, requestPersistence } from '$lib/storage';
+	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
 	import type { BattleState, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
 	let candidate = $state<ImportCandidate | null>(null);
+	/* The warband a delete has been asked for, held until it is confirmed. */
+	let condemned = $state<StoredWarband | null>(null);
 	let message = $state<string | null>(null);
 	let fileInput: HTMLInputElement | undefined = $state();
 
@@ -80,6 +82,27 @@
 		if (result === 'downloaded') message = 'Downloaded as a file.';
 		else if (result === 'shared') message = 'Shared.';
 	}
+
+	/**
+	 * The campaign lives here and in whatever was exported, so this is the one
+	 * action in the app that loses data for good. Hence the name in the question
+	 * and the export within reach of it.
+	 */
+	async function confirmDelete() {
+		if (!condemned) return;
+		const gone = condemned.warband.name;
+		await deleteWarband(condemned.warband.id);
+		condemned = null;
+		await refresh();
+		message = `${gone} deleted.`;
+	}
+
+	async function exportCondemned() {
+		if (!condemned) return;
+		const result = await exportWarband(condemned, false);
+		if (result === 'downloaded') message = 'Downloaded as a file.';
+		else if (result === 'shared') message = 'Shared.';
+	}
 </script>
 
 <header class="bar">
@@ -115,6 +138,8 @@
 					<button onclick={() => doExport(true)} title="Dated copy, never overwritten">
 						Snapshot
 					</button>
+					<hr />
+					<button class="danger" onclick={() => (condemned = active)}>Delete…</button>
 				{/if}
 				{#if dev}
 					<hr />
@@ -196,6 +221,26 @@
 	/>
 {/if}
 
+{#if condemned}
+	<div class="backdrop">
+		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+			<h2 id="delete-title">Delete {condemned.warband.name}?</h2>
+			<p class="count">
+				{condemned.warband.fighters.length} fighters · Revision {condemned.revision}
+			</p>
+			<p class="note danger">
+				<strong>This cannot be undone.</strong> The warband and the battle it is in the
+				middle of are on this device only. Export it first if the campaign is to be kept.
+			</p>
+			<div class="actions">
+				<button class="ghost" onclick={() => (condemned = null)}>Cancel</button>
+				<button class="ghost" onclick={exportCondemned}>Export</button>
+				<button class="danger" onclick={confirmDelete}>Delete</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
 <style>
 	.bar {
 		display: flex;
@@ -214,7 +259,7 @@
 
 	h1 {
 		margin: 0;
-		font-size: 17px;
+		font-size: var(--ui-t-xl);
 		font-weight: 600;
 		/* Single line: the name must not eat into the card area. */
 		white-space: nowrap;
@@ -229,7 +274,7 @@
 		border: 1px solid var(--ui-border);
 		border-radius: 8px;
 		padding: 5px 8px;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		font-weight: 600;
 	}
 
@@ -242,7 +287,7 @@
 	.message {
 		margin: 0;
 		padding: 9px 12px;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		background: var(--ui-surface);
 		border-bottom: 1px solid var(--ui-border);
 	}
@@ -260,13 +305,13 @@
 
 	.empty h2 {
 		margin: 0;
-		font-size: 19px;
+		font-size: var(--ui-t-2xl);
 	}
 
 	.empty p {
 		margin: 0;
 		max-width: 34ch;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		line-height: 1.5;
 		color: var(--ui-text-muted);
 	}
@@ -277,16 +322,91 @@
 		border-radius: 10px;
 		background: var(--ui-accent);
 		color: #fff;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		font-weight: 600;
 	}
 
 	.empty button {
 		padding: 10px 18px;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		color: var(--ui-text);
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
 		border-radius: 10px;
+	}
+
+	/* The same sheet the import asks from, because both are a question about a
+	   warband that is about to be overwritten or lost. */
+	.backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 20;
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		background: rgba(0, 0, 0, 0.6);
+		padding: 12px;
+		padding-bottom: calc(12px + env(safe-area-inset-bottom));
+	}
+
+	.sheet {
+		width: 100%;
+		max-width: 420px;
+		padding: 16px;
+		background: var(--ui-surface);
+		border: 1px solid var(--ui-border);
+		border-radius: 14px;
+	}
+
+	.sheet h2 {
+		margin: 0;
+		font-size: var(--ui-t-xl);
+		overflow-wrap: anywhere;
+	}
+
+	.count {
+		margin: 3px 0 12px;
+		font-size: var(--ui-t-base);
+		color: var(--ui-text-muted);
+	}
+
+	.note {
+		margin: 0;
+		padding: 10px 12px;
+		font-size: var(--ui-t-md);
+		line-height: 1.45;
+		border-radius: 10px;
+		background: var(--ui-surface-2);
+	}
+
+	.note.danger {
+		background: rgba(185, 28, 28, 0.18);
+		color: #fca5a5;
+	}
+
+	.actions {
+		display: flex;
+		gap: 8px;
+		margin-top: 14px;
+	}
+
+	.actions button {
+		flex: 1;
+		padding: 12px;
+		font-size: var(--ui-t-lg);
+		font-weight: 600;
+		color: #fff;
+		background: var(--ui-accent);
+		border: 0;
+		border-radius: 10px;
+	}
+
+	.actions .ghost {
+		color: var(--ui-text);
+		background: var(--ui-surface-2);
+	}
+
+	.actions .danger {
+		background: var(--ui-danger);
 	}
 </style>
