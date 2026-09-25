@@ -36,6 +36,12 @@ export interface Item {
 	id: string;
 	name: string;
 	type: string;
+	/**
+	 * Which place on the fighter a piece of armour takes. A shield needs a hand
+	 * and so competes with the weapons; body armour has its own place and only
+	 * competes with other body armour.
+	 */
+	slot?: 'hand' | 'body';
 	text: string;
 	/** A list, because Heavy Armour changes two characteristics at once. */
 	effects: Effect[];

@@ -1,6 +1,7 @@
 [
 	{
 		"id": "shield",
+		"slot": "hand",
 		"name": "Shield",
 		"type": "armour",
 		"text": "Increase the Defense characteristic of the bearer by 1.",
@@ -9,6 +10,7 @@
 	},
 	{
 		"id": "light-armour",
+		"slot": "body",
 		"name": "Light Armour",
 		"type": "armour",
 		"text": "Increase the Defense characteristic of the bearer by 1.",
@@ -17,6 +19,7 @@
 	},
 	{
 		"id": "heavy-armour",
+		"slot": "body",
 		"name": "Heavy Armour",
 		"type": "armour",
 		"text": "Increase the Defense characteristic of the bearer by 2, and decrease their Move characteristic by 1.",

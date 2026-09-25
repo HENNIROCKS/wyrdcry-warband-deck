@@ -87,6 +87,11 @@ for (const item of items) {
 			problem(shared.items, `"${item.id}" changes "${effect.characteristic}", which is not a characteristic`);
 		}
 	}
+	/* Armour without a slot would take no place at all: the wizard would let a
+	   fighter wear a shield in a full hand, or two suits of armour at once. */
+	if (item.type === 'armour' && !['hand', 'body'].includes(item.slot)) {
+		problem(shared.items, `"${item.id}" is armour but takes the slot "${item.slot}"`);
+	}
 }
 
 for (const rule of weaponRules) {
