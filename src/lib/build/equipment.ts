@@ -31,6 +31,15 @@ export function isBeast(fighter: Fighter): boolean {
 	return fighter.keywords.includes('beast');
 }
 
+/**
+ * A THRALL cannot be given anything either, for a different reason: it is
+ * bound to the VAMPIRE leading the warband rather than fighting bare-handed.
+ * Same treatment as `isBeast` – the sheet asks first, `refuse` backs it up.
+ */
+export function isThrall(fighter: Fighter): boolean {
+	return fighter.keywords.includes('thrall');
+}
+
 export function slotsUsed(equipment: string[]): Slots {
 	let melee = 0;
 	let ranged = 0;
@@ -94,6 +103,7 @@ export function allows(faction: Faction, fighter: Fighter, id: string): boolean 
  */
 export function refuse(faction: Faction, fighter: Fighter, equipment: string[], id: string): string | null {
 	if (isBeast(fighter)) return 'A BEAST fights with what is on its profile and cannot be given equipment';
+	if (isThrall(fighter)) return 'A THRALL cannot be equipped with any weapons, armour or equipment';
 	if (!allows(faction, fighter, id)) {
 		const sold = faction.equipment.some((entry) => entry.id.endsWith(`:${id}`));
 		return sold ? 'HERO only' : `The ${faction.name} do not sell this`;

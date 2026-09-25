@@ -5,7 +5,7 @@
 	 * lists and a phone has no room beside them.
 	 */
 	import { ITEMS, WEAPONS, type Faction, type Fighter } from '$lib/rules';
-	import { equipmentCost, gearOf, isBeast, offers, type Offer } from '$lib/build/equipment';
+	import { equipmentCost, gearOf, isBeast, isThrall, offers, type Offer } from '$lib/build/equipment';
 	import { profileOf } from '$lib/build/profile';
 	import { recruitmentFee } from '$lib/build/roster';
 	import type { Draft, DraftFighter } from '$lib/build/types';
@@ -33,6 +33,7 @@
 	const ability = $derived(faction.abilities.find((a) => a.id === choice?.source));
 	const brought = $derived(gearOf(fighter));
 	const beast = $derived(isBeast(fighter));
+	const thrall = $derived(isThrall(fighter));
 	const offered = $derived(
 		choice?.kind === 'stat' ? (choice.characteristics ?? []) : (choice?.abilities ?? [])
 	);
@@ -175,6 +176,11 @@
 			<section>
 				<h3>Equipment</h3>
 				<p class="hint">A BEAST fights with what is on its profile.</p>
+			</section>
+		{:else if thrall}
+			<section>
+				<h3>Equipment</h3>
+				<p class="hint">A THRALL cannot be given weapons, armour or equipment.</p>
 			</section>
 		{:else}
 			{#each [['Melee', groups.melee], ['Ranged', groups.ranged], ['Armour', groups.armour]] as const as [title, list] (title)}
