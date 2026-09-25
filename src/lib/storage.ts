@@ -4,6 +4,7 @@
  */
 
 import { browser } from '$app/environment';
+import { newId } from './id';
 import type { BattleState, StoredWarband } from './types/warband';
 
 const DB_NAME = 'wyrdcry-warband-deck';
@@ -76,7 +77,7 @@ export async function putBattle(id: string, battle: BattleState | null): Promise
 export async function deviceId(): Promise<string> {
 	const stored = await run<string | undefined>(META, 'readonly', (s) => s.get('device'));
 	if (stored) return stored;
-	const fresh = crypto.randomUUID().slice(0, 8);
+	const fresh = newId().slice(0, 8);
 	await run(META, 'readwrite', (s) => s.put(fresh, 'device'));
 	return fresh;
 }
