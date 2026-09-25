@@ -3,7 +3,7 @@
     "id": "blessed-with-filth",
     "name": "Blessed with Filth",
     "phase": "battle",
-    "text": "All CLAN PESTILENS fighters have this trait. The apprentices and deacons of the clan perfected a pox that melts the lungs of manthing and elfthing alike but leaves the faithful untouched. This fighter is not affected by Corruption, by the Plague Vapour rule of the Plague Censer, or by the Infecting rule of the Foetid Blade.",
+    "text": "[Trait] All CLAN PESTILENS fighters have this trait. The apprentices and deacons of the clan perfected a pox that melts the lungs of manthing and elfthing alike but leaves the faithful untouched. This fighter is not affected by Corruption, by the Plague Vapour rule of the Plague Censer, or by the Infecting rule of the Foetid Blade.",
     "pick": null,
     "options": [],
     "effect": null

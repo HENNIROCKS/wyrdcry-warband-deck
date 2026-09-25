@@ -3,7 +3,7 @@
     "id": "black-fury",
     "name": "Black Fury",
     "type": "double",
-    "text": "Magical Ability. Until the end of the battle round, add 1 to this fighter's Fight characteristic. This fighter may immediately make a free move action followed by a free melee attack action."
+    "text": "Magical ability. Until the end of the battle round, add 1 to this fighter's Fight characteristic. This fighter may immediately make a free move action followed by a free melee attack action."
   },
   {
     "id": "frenzy",
@@ -27,6 +27,6 @@
     "id": "warpfire",
     "name": "Warpfire",
     "type": "triple",
-    "text": "Magical Ability. Allocate (X) damage points to the closest visible enemy fighter within 8\" of this fighter, and 1 damage point to each other fighter within 2\" of it."
+    "text": "Magical ability. Allocate (X) damage points to the closest visible enemy fighter within 8\" of this fighter, and 1 damage point to each other fighter within 2\" of it."
   }
 ]

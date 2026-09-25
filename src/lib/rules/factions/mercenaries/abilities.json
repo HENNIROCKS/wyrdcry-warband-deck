@@ -3,7 +3,7 @@
 		"id": "command",
 		"name": "Command",
 		"type": "triple",
-		"text": "Place a command token within 12\" of this fighter and select one of the effects below:\n\n- Seize: Until the end of the battleround, friendly fighters may increase their Fight or Shoot characteristic by 1 when attacking a target within 3\" of the token.\n- Hold: Until the end of the battleround, friendly fighters within 3\" of that token may increase their Defense and Bravery characteristics by 1."
+		"text": "Place a command token within 12\" of this fighter and select one of the effects below:\n\n- **Seize:** Until the end of the battleround, friendly fighters may increase their Fight or Shoot characteristic by 1 when attacking a target within 3\" of the token.\n- **Hold:** Until the end of the battleround, friendly fighters within 3\" of that token may increase their Defense and Bravery characteristics by 1."
 	},
 	{
 		"id": "strategize",
