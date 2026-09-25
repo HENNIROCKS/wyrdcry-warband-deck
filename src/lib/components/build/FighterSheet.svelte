@@ -5,7 +5,7 @@
 	 * lists and a phone has no room beside them.
 	 */
 	import { ITEMS, WEAPONS, type Faction, type Fighter } from '$lib/rules';
-	import { equipmentCost, gearOf, offers, type Offer } from '$lib/build/equipment';
+	import { equipmentCost, gearOf, isBeast, offers, type Offer } from '$lib/build/equipment';
 	import { profileOf } from '$lib/build/profile';
 	import { recruitmentFee } from '$lib/build/roster';
 	import type { Draft, DraftFighter } from '$lib/build/types';
@@ -32,6 +32,7 @@
 	const choice = $derived(fighter.choose);
 	const ability = $derived(faction.abilities.find((a) => a.id === choice?.source));
 	const brought = $derived(gearOf(fighter));
+	const beast = $derived(isBeast(fighter));
 	const offered = $derived(
 		choice?.kind === 'stat' ? (choice.characteristics ?? []) : (choice?.abilities ?? [])
 	);
@@ -167,24 +168,34 @@
 			{/if}
 		</section>
 
-		{#each [['Melee', groups.melee], ['Ranged', groups.ranged], ['Armour', groups.armour]] as const as [title, list] (title)}
-			{#if list.length}
-				<section>
-					<h3>{title}</h3>
-					<ul class="offers">
-						{#each list as offer (offer.id)}
-							<li>
-								<button disabled={Boolean(offer.refused)} onclick={() => take(offer)}>
-									<span class="name">{offer.name}</span>
-									<span class="cost">{offer.cost} gc</span>
-									{#if offer.refused}<span class="why">{offer.refused}</span>{/if}
-								</button>
-							</li>
-						{/each}
-					</ul>
-				</section>
-			{/if}
-		{/each}
+		{#if beast}
+			<!-- Three lists in which every row refuses for the same reason are three
+			     lists nobody reads. The reason is said once, where the lists would
+			     have been, so the empty section is not a puzzle. -->
+			<section>
+				<h3>Equipment</h3>
+				<p class="hint">A BEAST fights with what is on its profile.</p>
+			</section>
+		{:else}
+			{#each [['Melee', groups.melee], ['Ranged', groups.ranged], ['Armour', groups.armour]] as const as [title, list] (title)}
+				{#if list.length}
+					<section>
+						<h3>{title}</h3>
+						<ul class="offers">
+							{#each list as offer (offer.id)}
+								<li>
+									<button disabled={Boolean(offer.refused)} onclick={() => take(offer)}>
+										<span class="name">{offer.name}</span>
+										<span class="cost">{offer.cost} gc</span>
+										{#if offer.refused}<span class="why">{offer.refused}</span>{/if}
+									</button>
+								</li>
+							{/each}
+						</ul>
+					</section>
+				{/if}
+			{/each}
+		{/if}
 
 		<button class="remove" onclick={onremove}>Dismiss this fighter</button>
 	</div>
@@ -415,7 +426,11 @@
 	}
 
 	.offers .why {
-		flex: none;
+		/* Allowed to shrink and wrap. Held at its intrinsic width it pushed the
+		   row past the container as soon as a refusal ran long. */
+		flex: 0 1 auto;
+		min-width: 0;
+		text-align: right;
 		font-size: var(--ui-t-xs);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;

@@ -22,7 +22,12 @@ function isWizard(fighter: Fighter): boolean {
 	return fighter.keywords.includes('wizard');
 }
 
-function isBeast(fighter: Fighter): boolean {
+/**
+ * A BEAST buys nothing at all, which is a fact about the fighter rather than
+ * about any one row. The sheet asks first and leaves the lists out entirely;
+ * `refuse` still answers for it, so nothing can be taken by another route.
+ */
+export function isBeast(fighter: Fighter): boolean {
 	return fighter.keywords.includes('beast');
 }
 
