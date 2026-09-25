@@ -4,8 +4,8 @@
 	 * what it carries. A full screen rather than a row, because equipment is three
 	 * lists and a phone has no room beside them.
 	 */
-	import type { Faction, Fighter } from '$lib/rules';
-	import { equipmentCost, offers, type Offer } from '$lib/build/equipment';
+	import { ITEMS, WEAPONS, type Faction, type Fighter } from '$lib/rules';
+	import { equipmentCost, gearOf, offers, type Offer } from '$lib/build/equipment';
 	import { profileOf } from '$lib/build/profile';
 	import { recruitmentFee } from '$lib/build/roster';
 	import type { Draft, DraftFighter } from '$lib/build/types';
@@ -28,9 +28,10 @@
 	const groups = $derived(offers(faction, fighter, entry.equipment));
 	const profile = $derived(profileOf(faction, draft, entry, fighter));
 	const fee = $derived(recruitmentFee(faction, draft, entry.fighterId));
-	const gear = $derived(equipmentCost(entry.equipment));
+	const spent = $derived(equipmentCost(entry.equipment));
 	const choice = $derived(fighter.choose);
 	const ability = $derived(faction.abilities.find((a) => a.id === choice?.source));
+	const brought = $derived(gearOf(fighter));
 	const offered = $derived(
 		choice?.kind === 'stat' ? (choice.characteristics ?? []) : (choice?.abilities ?? [])
 	);
@@ -60,11 +61,15 @@
 		entry.equipment = entry.equipment.filter((_, at) => at !== index);
 	}
 
+	/* The offers first, then the two tables: fixed gear is never on offer, so a
+	   Giant Rat's teeth would otherwise read as "vicious-teeth". */
 	function label(id: string): string {
 		return (
 			groups.melee.find((o) => o.id === id)?.name ??
 			groups.ranged.find((o) => o.id === id)?.name ??
 			groups.armour.find((o) => o.id === id)?.name ??
+			WEAPONS.get(id)?.name ??
+			ITEMS.get(id)?.name ??
 			id
 		);
 	}
@@ -100,7 +105,7 @@
 			</button>
 		{/if}
 		<h2>{fighter.name}</h2>
-		<span class="fee">{fee + gear} gc</span>
+		<span class="fee">{fee + spent} gc</span>
 	</header>
 
 	<div class="body">
@@ -120,7 +125,7 @@
 		{#if choice}
 			<section class="choice" class:needs={missing}>
 				<h3>{ability?.name ?? 'Choose'}</h3>
-				<p class="hint">{ability?.text}</p>
+				<p class="hint">{ability?.text ?? choice.prompt}</p>
 				<div class="chips" bind:this={chips}>
 					{#each offered as option (option)}
 						{@const on = entry.choice.includes(option)}
@@ -137,8 +142,15 @@
 
 		<section>
 			<h3>Carried</h3>
-			{#if entry.equipment.length}
+			{#if brought.length || entry.equipment.length}
 				<ul class="carried">
+					<!-- What the fighter was recruited with stands first and has no way off:
+					     a Giant Rat cannot put down its teeth. -->
+					{#each brought as id, index (`${id}-${index}`)}
+						<li class="brought">
+							<span>{label(id)}</span>
+						</li>
+					{/each}
 					{#each entry.equipment as id, index (`${id}-${index}`)}
 						<li>
 							<span>{label(id)}</span>
@@ -353,6 +365,14 @@
 
 	.carried li span {
 		flex: 1;
+	}
+
+	/* No button to take it off, so the row holds the height its neighbours get
+	   from theirs. */
+	.carried li.brought {
+		min-height: 44px;
+		padding-right: 12px;
+		color: var(--ui-text-muted);
 	}
 
 	.drop {

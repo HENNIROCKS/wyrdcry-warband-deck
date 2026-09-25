@@ -8,6 +8,7 @@
 		"profile": { "move": 5, "fight": 4, "shoot": 4, "defense": 3, "health": 14, "bravery": 4 },
 		"keywords": ["human", "mercenaries", "hero", "leader"],
 		"abilities": ["command", "strategize"],
+		"gear": [],
 		"choose": null
 	},
 	{
@@ -19,6 +20,7 @@
 		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 14, "bravery": 4 },
 		"keywords": ["human", "mercenaries", "hero"],
 		"abilities": ["martial-discipline", "lead-by-example"],
+		"gear": [],
 		"choose": {
 			"source": "martial-discipline",
 			"kind": "stat",
@@ -36,6 +38,7 @@
 		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
 		"keywords": ["human", "mercenaries", "henchman"],
 		"abilities": ["hunters-eye"],
+		"gear": [],
 		"choose": null
 	},
 	{
@@ -47,6 +50,7 @@
 		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
 		"keywords": ["human", "mercenaries", "henchman"],
 		"abilities": ["driven-by-greed"],
+		"gear": [],
 		"choose": null
 	},
 	{
@@ -58,6 +62,7 @@
 		"profile": { "move": 5, "fight": 2, "shoot": 2, "defense": 3, "health": 10, "bravery": 5 },
 		"keywords": ["human", "mercenaries", "henchman"],
 		"abilities": [],
+		"gear": [],
 		"choose": null
 	}
 ]

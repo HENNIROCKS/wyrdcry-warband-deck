@@ -63,6 +63,15 @@ export function slotsFree(equipment: string[]): Slots {
 	return { melee: MELEE_SLOTS - used.melee, ranged: RANGED_SLOTS - used.ranged };
 }
 
+/**
+ * What the fighter brings without buying it, as bare ids. The ruleset writes
+ * them prefixed, the way an allowance is written; everything downstream works
+ * in bare ids.
+ */
+export function gearOf(fighter: Fighter): string[] {
+	return fighter.gear.map((prefixed) => prefixed.replace(/^(weapon|item):/, ''));
+}
+
 /** Whether the faction sells this at all, and whether to this fighter. */
 export function allows(faction: Faction, fighter: Fighter, id: string): boolean {
 	const allowance =
@@ -87,14 +96,17 @@ export function refuse(faction: Faction, fighter: Fighter, equipment: string[], 
 
 	const weapon = WEAPONS.get(id);
 	const item = ITEMS.get(id);
-	const free = slotsFree(equipment);
-	const carried = equipment.filter((held) => held === id).length;
+	/* Fixed gear fills its hands like anything else – an Elf Ranger holds a bow
+	   and a sword before a single coin is spent. */
+	const held = [...gearOf(fighter), ...equipment];
+	const free = slotsFree(held);
+	const carried = held.filter((entry) => entry === id).length;
 
 	if (item && item.type === 'armour') {
 		if (isWizard(fighter)) return 'A WIZARD cannot wear armour';
 		if (carried) return 'Already worn';
 		/* One piece of body armour at a time – light or heavy, not both. */
-		if (item.slot === 'body' && equipment.some((held) => ITEMS.get(held)?.slot === 'body')) {
+		if (item.slot === 'body' && held.some((worn) => ITEMS.get(worn)?.slot === 'body')) {
 			return 'Already wearing armour';
 		}
 		if (item.slot === 'hand' && free.melee < 1) return 'No hand free';

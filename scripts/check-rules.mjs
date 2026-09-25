@@ -20,14 +20,32 @@ const ROOT = resolve(HERE, '..');
 const RULES = resolve(ROOT, 'src/lib/rules');
 
 const problems = [];
+/* Folders that are waiting for their faction. Kept apart from the problems: a
+   gate that is red for six sessions in a row stops being read. */
+const waiting = [];
 
 /** Every message carries the file, so a run points straight at the line to fix. */
 function problem(file, message) {
 	problems.push(`${relative(ROOT, file)}: ${message}`);
 }
 
+/**
+ * Reports a file that cannot be read rather than throwing: a placeholder for a
+ * faction still to be written would otherwise end the run before the factions
+ * that are finished are looked at.
+ */
 async function read(file) {
-	return JSON.parse(await readFile(file, 'utf8'));
+	const text = await readFile(file, 'utf8');
+	if (!text.trim()) {
+		problem(file, 'is empty');
+		return null;
+	}
+	try {
+		return JSON.parse(text);
+	} catch (error) {
+		problem(file, `is not JSON – ${error.message}`);
+		return null;
+	}
 }
 
 const STATS = ['move', 'fight', 'shoot', 'defense', 'health', 'bravery'];
@@ -42,12 +60,12 @@ const shared = {
 	universal: join(RULES, 'universal-abilities.json')
 };
 
-const campaign = await read(shared.campaign);
-const keywords = await read(shared.keywords);
-const weapons = await read(shared.weapons);
-const items = await read(shared.items);
-const weaponRules = await read(shared.weaponRules);
-const universal = await read(shared.universal);
+const campaign = (await read(shared.campaign)) ?? {};
+const keywords = (await read(shared.keywords)) ?? [];
+const weapons = (await read(shared.weapons)) ?? [];
+const items = (await read(shared.items)) ?? [];
+const weaponRules = (await read(shared.weaponRules)) ?? [];
+const universal = (await read(shared.universal)) ?? [];
 
 const ids = (list) => new Set(list.map((entry) => entry.id));
 const keywordIds = ids(keywords);
@@ -132,9 +150,19 @@ for (const folder of folders) {
 
 	const faction = await read(file('faction'));
 	const fighters = await read(file('fighters'));
-	const equipment = present.has('equipment.json') ? await read(file('equipment')) : [];
-	const rules = present.has('rules.json') ? await read(file('rules')) : [];
-	const abilities = present.has('abilities.json') ? await read(file('abilities')) : [];
+	/* Without these two there is nothing to resolve against; `read` has already
+	   said why, so the folder is left at that. */
+	if (!faction || !fighters) continue;
+	/* A folder waiting for its faction to be transcribed: an empty object where
+	   the faction goes. Named at the end rather than complained about per
+	   missing field. */
+	if (!Object.keys(faction).length) {
+		waiting.push(folder);
+		continue;
+	}
+	const equipment = (present.has('equipment.json') ? await read(file('equipment')) : []) ?? [];
+	const rules = (present.has('rules.json') ? await read(file('rules')) : []) ?? [];
+	const abilities = (present.has('abilities.json') ? await read(file('abilities')) : []) ?? [];
 
 	duplicates(file('fighters'), fighters);
 	duplicates(file('abilities'), abilities);
@@ -169,6 +197,23 @@ for (const folder of folders) {
 				problem(file('fighters'), `"${fighter.id}" names the ability "${ability}", abilities.json has none`);
 			}
 		}
+		/* Fixed gear is never sold, so it is not in equipment.json and only this
+		   resolves it. A typo there leaves a beast unarmed. An empty list is the
+		   answer for most fighters, and it is written out: a missing field reads
+		   as a question nobody asked. */
+		if (!Array.isArray(fighter.gear)) {
+			problem(file('fighters'), `"${fighter.id}" has no gear list – write [] where the fighter brings nothing`);
+		}
+		for (const prefixed of fighter.gear ?? []) {
+			const [kind, id] = prefixed.split(':');
+			if (kind === 'weapon') {
+				if (!weaponIds.has(id)) problem(file('fighters'), `"${fighter.id}" is born with "${prefixed}" – weapons.json has no "${id}"`);
+			} else if (kind === 'item') {
+				if (!itemIds.has(id)) problem(file('fighters'), `"${fighter.id}" is born with "${prefixed}" – items.json has no "${id}"`);
+			} else {
+				problem(file('fighters'), `"${fighter.id}" is born with "${prefixed}", which needs a "weapon:" or "item:" prefix`);
+			}
+		}
 
 		const { min, max } = fighter.limit ?? {};
 		if (typeof min !== 'number' || (max !== null && typeof max !== 'number')) {
@@ -180,8 +225,13 @@ for (const folder of folders) {
 
 		const choice = fighter.choose;
 		if (!choice) continue;
-		if (!abilityIds.has(choice.source)) {
+		/* Null where the profile asks for the choice itself; the sentence then comes
+		   from `prompt`, and there is no ability to resolve. */
+		if (choice.source !== null && !abilityIds.has(choice.source)) {
 			problem(file('fighters'), `the choice of "${fighter.id}" comes from "${choice.source}", abilities.json has none`);
+		}
+		if (choice.source === null && !choice.prompt) {
+			problem(file('fighters'), `the choice of "${fighter.id}" comes from no ability and carries no prompt, so it shows without a sentence`);
 		}
 		if (choice.kind === 'stat') {
 			const offered = choice.characteristics ?? [];
@@ -319,12 +369,15 @@ for (const [name, tiers] of Object.entries({
 
 /* --- Report -------------------------------------------------------------- */
 
-const counted = `${folders.length} faction(s), ${weapons.length} weapons, ${items.length} items, ${keywords.length} keywords`;
+const written = folders.length - waiting.length;
+const counted = `${written} faction(s), ${weapons.length} weapons, ${items.length} items, ${keywords.length} keywords`;
+const pending = waiting.length ? `\n${waiting.length} folder(s) still to transcribe: ${waiting.join(', ')}` : '';
 
 if (problems.length) {
 	console.error(`${problems.length} problem(s) in src/lib/rules/ – ${counted}\n`);
 	for (const line of problems) console.error(`  ${line}`);
+	console.error(pending.trimStart());
 	process.exit(1);
 }
 
-console.log(`src/lib/rules/ resolves – ${counted}`);
+console.log(`src/lib/rules/ resolves – ${counted}${pending}`);

@@ -89,7 +89,12 @@ export interface UniversalAbility extends Ability {
 /** A choice the fighter brings along, made once while recruiting it. */
 export interface FighterChoice {
 	/** The ability this choice comes out of, for the sentence next to it. */
-	source: string;
+	source: string | null;
+	/**
+	 * The sentence above the choice where the profile asks for it itself and
+	 * there is no ability to take the wording from.
+	 */
+	prompt?: string;
 	kind: 'stat' | 'ability';
 	pick: number;
 	/** With `kind: 'stat'`: which characteristics are on offer, and by how much. */
@@ -109,6 +114,13 @@ export interface Fighter {
 	profile: Record<StatKey, number>;
 	keywords: string[];
 	abilities: string[];
+	/**
+	 * Gear the fighter cannot be without: a beast's natural weapons, a Troll
+	 * Slayer's axes. It costs nothing – the fighter's own cost covers it – but it
+	 * fills the slots it would fill if bought. Prefixed `weapon:` or `item:` like
+	 * an `Allowance`, because both sides have a `sword`.
+	 */
+	gear: string[];
 	choose: FighterChoice | null;
 }
 
