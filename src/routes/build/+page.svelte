@@ -35,6 +35,16 @@
 
 	const factions = [...FACTIONS.values()];
 
+	/* Homebrew stands under its own heading rather than mixed into the list. At
+	   the table it decides whether the opponent can look the faction up, and a
+	   row that only differs by a version number does not say so. */
+	const groups = [
+		{ origin: 'official', title: 'Official' },
+		{ origin: 'homebrew', title: 'Homebrew' }
+	]
+		.map((group) => ({ ...group, entries: factions.filter((e) => e.origin === group.origin) }))
+		.filter((group) => group.entries.length);
+
 	let saving = $state(false);
 	let failed = $state<string | null>(null);
 
@@ -107,6 +117,13 @@
 	function problemFor(key: string): string | null {
 		return found.find((problem) => problem.key === key)?.text ?? null;
 	}
+
+	/* The name is the one field on the first step, so its complaint belongs at
+	   the field rather than in a list further down. */
+	const named = $derived(Boolean(draft.name.trim()));
+	const nameProblem = $derived(
+		found.find((problem) => problem.step === 'faction')?.text ?? 'The warband needs a name'
+	);
 
 	/* The index, not the entry: the sheet writes into it, so it has to be bound. */
 	const sheetAt = $derived(draft.fighters.findIndex((entry) => entry.key === openFighter));
@@ -214,37 +231,47 @@
 
 <div class="body">
 	{#if step === 'warband'}
-		<label class="named">
+		<label class="named" class:missing={!named}>
 			<span>Name</span>
-			<input bind:value={draft.name} placeholder="The Ostermark Free Company" maxlength="40" />
+			<input
+				bind:value={draft.name}
+				placeholder="The Ostermark Free Company"
+				maxlength="40"
+				aria-invalid={!named}
+				aria-describedby={named ? undefined : 'name-open'}
+			/>
+			{#if !named}
+				<!-- The wording comes from `problems`, so the field and the finish step
+				     cannot say it differently. -->
+				<p class="open" id="name-open">{nameProblem}</p>
+			{/if}
 		</label>
 
 		<section>
 			<h2>Faction</h2>
-			<ul class="cards">
-				{#each factions as entry (entry.id)}
-					<li>
-						<button
-							class:on={entry.id === draft.factionId}
-							onclick={() => {
-								draft.factionId = entry.id;
-								draft.ruleChoices = {};
-								draft.fighters = [];
-							}}
-						>
-							<span class="name">{entry.name}</span>
-							<span class="meta">
-								{entry.warband_size.min}–{entry.warband_size.max} fighters ·
-								{entry.fighters.length} profiles
-							</span>
-						</button>
-					</li>
-				{/each}
-			</ul>
-			<p class="hint">
-				{factions.length} factions so far. The rest are transcribed one at a time, and
-				each brings rules of its own shape.
-			</p>
+			{#each groups as group (group.origin)}
+				<h3>{group.title}</h3>
+				<ul class="cards">
+					{#each group.entries as entry (entry.id)}
+						<li>
+							<button
+								class:on={entry.id === draft.factionId}
+								onclick={() => {
+									draft.factionId = entry.id;
+									draft.ruleChoices = {};
+									draft.fighters = [];
+								}}
+							>
+								<span class="name">{entry.name}</span>
+								<span class="meta">
+									{entry.warband_size.min}–{entry.warband_size.max} fighters ·
+									{entry.fighters.length} profiles · v{entry.version}
+								</span>
+							</button>
+						</li>
+					{/each}
+				</ul>
+			{/each}
 		</section>
 	{:else if step === 'rules' && faction}
 		{#each faction.rules as rule (rule.id)}
@@ -423,7 +450,7 @@
 	h1 {
 		flex: 1;
 		margin: 0;
-		font-size: 17px;
+		font-size: var(--ui-t-xl);
 		font-weight: 600;
 	}
 
@@ -439,7 +466,7 @@
 
 	.gold {
 		flex: none;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 		color: var(--ui-accent-text);
@@ -488,18 +515,31 @@
 
 	h2 {
 		margin: 0;
-		font-size: 12px;
+		font-size: var(--ui-t-sm);
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--ui-text-subtle);
 	}
 
+	/* Under the section heading, which is already uppercase and subtle – so this
+	   one separates by weight and colour instead of by another size step. */
+	h3 {
+		margin: 4px 0 0;
+		font-size: var(--ui-t-base);
+		font-weight: 600;
+		color: var(--ui-text);
+	}
+
+	h3:first-of-type {
+		margin-top: 0;
+	}
+
 	.named {
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
-		font-size: 12px;
+		font-size: var(--ui-t-sm);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--ui-text-subtle);
@@ -507,7 +547,7 @@
 
 	input {
 		padding: 11px 12px;
-		font-size: 16px;
+		font-size: var(--ui-t-md);
 		letter-spacing: normal;
 		text-transform: none;
 		color: var(--ui-text);
@@ -516,10 +556,21 @@
 		border-radius: 9px;
 	}
 
+	/* The border carries it as well as the message, so the state survives the
+	   message being read and ignored. */
+	.named.missing input {
+		border-color: var(--ui-warn);
+	}
+
+	.named .open {
+		text-transform: none;
+		letter-spacing: normal;
+	}
+
 	.hint,
 	.count {
 		margin: 0;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		line-height: 1.5;
 		color: var(--ui-text-muted);
 	}
@@ -535,7 +586,7 @@
 	.open {
 		margin: 0;
 		padding: 7px 10px;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		line-height: 1.45;
 		color: var(--ui-text);
 		background: var(--ui-warn-bg);
@@ -594,13 +645,13 @@
 	}
 
 	.name {
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		font-weight: 600;
 	}
 
 	.held {
 		margin-left: 5px;
-		font-size: 12px;
+		font-size: var(--ui-t-sm);
 		font-weight: 400;
 		font-variant-numeric: tabular-nums;
 		/* 5.8:1 on the row's surface; the subtle grey reaches 3.1:1 and misses AA
@@ -611,7 +662,7 @@
 	.text,
 	.meta {
 		grid-column: 1 / -1;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		line-height: 1.45;
 		color: var(--ui-text-muted);
 	}
@@ -619,14 +670,14 @@
 	.cost {
 		grid-row: 1;
 		grid-column: 2;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		font-variant-numeric: tabular-nums;
 		color: var(--ui-text-muted);
 	}
 
 	.phase {
 		grid-column: 1 / -1;
-		font-size: 11px;
+		font-size: var(--ui-t-xs);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 		/* Says where a rule takes hold, or why a row cannot be picked – an aside
@@ -636,7 +687,7 @@
 
 	.plain li {
 		padding: 3px 0;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		color: var(--ui-text-muted);
 	}
 
@@ -653,7 +704,7 @@
 	.foot button {
 		flex: 1;
 		padding: 13px;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		font-weight: 600;
 		border: 0;
 		border-radius: 10px;
