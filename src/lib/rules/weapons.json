@@ -99,6 +99,39 @@
 		"cost": 55
 	},
 	{
+		"id": "fighting-claws",
+		"name": "Fighting Claws",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 4,
+		"hit": 2,
+		"crit": 4,
+		"rules": ["parry", "two-handed"],
+		"cost": 40
+	},
+	{
+		"id": "weeping-blades",
+		"name": "Weeping Blades",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 4,
+		"hit": 3,
+		"crit": 5,
+		"rules": ["parry", "two-handed"],
+		"cost": 55
+	},
+	{
+		"id": "vicious-teeth",
+		"name": "Vicious Teeth",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 1,
+		"crit": 3,
+		"rules": [],
+		"cost": 0
+	},
+	{
 		"id": "bow",
 		"name": "Bow",
 		"type": "ranged",
@@ -152,5 +185,38 @@
 		"crit": 8,
 		"rules": ["mighty-2", "reload", "unreliable"],
 		"cost": 60
+	},
+	{
+		"id": "sling",
+		"name": "Sling",
+		"type": "ranged",
+		"range": { "min": 3, "max": 12 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": [],
+		"cost": 15
+	},
+	{
+		"id": "throwing-stars",
+		"name": "Throwing Stars",
+		"type": "ranged",
+		"range": { "min": 0, "max": 6 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 4,
+		"rules": [],
+		"cost": 15
+	},
+	{
+		"id": "warplock-pistol",
+		"name": "Warplock Pistol",
+		"type": "ranged",
+		"range": { "min": 0, "max": 6 },
+		"attacks": 2,
+		"hit": 4,
+		"crit": 7,
+		"rules": ["mighty-2", "reload", "unreliable", "brace"],
+		"cost": 40
 	}
 ]

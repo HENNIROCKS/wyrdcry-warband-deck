@@ -1,0 +1,103 @@
+[
+  {
+    "id": "assassin-adept",
+    "name": "Assassin Adept",
+    "cost": 130,
+    "limit": { "min": 1, "max": 1 },
+    "description": "Steeped in the ancient arts of far Cathay, the Assassin Adepts of clan Eshin command from the shadows and only strikes when the moment is right.",
+    "profile": {
+      "move": 6,
+      "fight": 4,
+      "shoot": 4,
+      "defense": 3,
+      "health": 12,
+      "bravery": 5
+    },
+    "keywords": ["skaven", "clan-eshin", "hero", "leader"],
+    "abilities": ["murder-stab", "one-with-the-shadows"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "black-skaven",
+    "name": "Black Skaven",
+    "cost": 100,
+    "limit": { "min": 0, "max": 3 },
+    "description": "Bred for strength, size and cruelty, the Black Skaven serve as the hulking bodyguards and executioners of Clan Eshin.",
+    "profile": {
+      "move": 6,
+      "fight": 4,
+      "shoot": 3,
+      "defense": 3,
+      "health": 14,
+      "bravery": 5
+    },
+    "keywords": ["skaven", "clan-eshin", "hero"],
+    "abilities": [],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "eshin-sorcerer",
+    "name": "Eshin Sorcerer",
+    "cost": 105,
+    "limit": { "min": 0, "max": 1 },
+    "description": "These wiry, hooded warlocks combine martial discipline with black magic that bend shadows and wither the flesh.",
+    "profile": {
+      "move": 6,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 12,
+      "bravery": 5
+    },
+    "keywords": ["skaven", "clan-eshin", "hero", "wizard"],
+    "abilities": [],
+    "gear": [],
+    "choose": {
+      "source": null,
+      "prompt": "When recruiting this fighter, you must select one of the following abilities:",
+      "kind": "ability",
+      "pick": 1,
+      "abilities": ["enshrouding-darkness", "gnawdoom", "skitterleap"]
+    }
+  },
+  {
+    "id": "giant-rat",
+    "name": "Giant Rat",
+    "cost": 40,
+    "limit": { "min": 0, "max": null },
+    "description": "Giant Rats are creations of the twisted genius of the Skaven. They are mutated monstrosities the size of dogs.",
+    "profile": {
+      "move": 8,
+      "fight": 2,
+      "shoot": 2,
+      "defense": 2,
+      "health": 6,
+      "bravery": 6
+    },
+    "keywords": ["beast", "clan-eshin", "henchman"],
+    "abilities": [],
+    "gear": ["weapon:vicious-teeth"],
+    "choose": null
+  },
+  {
+    "id": "night-runner",
+    "name": "Night Runner",
+    "cost": 55,
+    "limit": { "min": 0, "max": null },
+    "description": "Nimble, swift, and fanatical in their pursuit of recognition, Night Runners throw themselves into danger with reckless abandon.",
+    "profile": {
+      "move": 6,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 8,
+      "bravery": 6
+    },
+    "keywords": ["skaven", "clan-eshin", "henchman"],
+    "abilities": ["pack-tactics"],
+    "gear": [],
+    "choose": null
+  }
+]

@@ -15,7 +15,7 @@
 	import FighterSheet from '$lib/components/build/FighterSheet.svelte';
 	import { toWarband, selectionsOf } from '$lib/build/export';
 	import { rulesInPlay } from '$lib/build/effects';
-	import { equipmentCost } from '$lib/build/equipment';
+	import { equipmentCost, gearOf } from '$lib/build/equipment';
 	import { budget, goldLeft, problems, recruitable, value } from '$lib/build/roster';
 	import type { Draft, DraftFighter } from '$lib/build/types';
 	import { RULESET_VERSION } from '$lib/gamedata';
@@ -155,6 +155,11 @@
 		const fighter = faction?.fighters.find((row) => row.id === entry.fighterId);
 		return entry.name.trim() || fighter?.name || entry.fighterId;
 	}
+	/** What the fighter holds, bought or brought – a Giant Rat is not unarmed. */
+	function carriedBy(entry: DraftFighter): number {
+		const fighter = faction?.fighters.find((row) => row.id === entry.fighterId);
+		return entry.equipment.length + (fighter ? gearOf(fighter).length : 0);
+	}
 
 	function costOf(entry: DraftFighter): number {
 		const row = roster.find((candidate) => candidate.fighter.id === entry.fighterId);
@@ -237,8 +242,8 @@
 				{/each}
 			</ul>
 			<p class="hint">
-				One faction so far. The other six are transcribed one at a time, and each
-				brings rules of its own shape.
+				{factions.length} factions so far. The rest are transcribed one at a time, and
+				each brings rules of its own shape.
 			</p>
 		</section>
 	{:else if step === 'rules' && faction}
@@ -286,7 +291,7 @@
 							<button class:flagged={open} onclick={() => openSheet(entry.key)}>
 								<span class="name">{nameOf(entry)}</span>
 								<span class="meta">
-									{entry.equipment.length} carried
+									{carriedBy(entry)} carried
 								</span>
 								<span class="cost">{costOf(entry)} gc</span>
 								{#if open}<span class="open">{open}</span>{/if}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "enshrouding-darkness",
+    "name": "Enshrouding Darkness",
+    "type": "triple",
+    "text": "Magical ability. Until the end of the battleround, fighters within (X/2)\" of this fighter are not visible to fighters more than 1\" away from them."
+  },
+  {
+    "id": "gnawdoom",
+    "name": "Gnawdoom",
+    "type": "triple",
+    "text": "Magical ability. Select an enemy fighter within 6\" and roll (X) d6. For each roll that exceeds the target’s Defense characteristic, allocate 2 damage points to that enemy fighter."
+  },
+  {
+    "id": "murder-stab",
+    "name": "Murder-Stab",
+    "type": "triple",
+    "text": "Add (X/2) to the damage points allocated to enemy fighters by each hit and critical hit from the next melee attack action made by this fighter in this activation."
+  },
+  {
+    "id": "one-with-the-shadows",
+    "name": "One With The Shadows",
+    "type": "triple",
+    "text": "A fighter cannot use this ability when visible to enemy fighters or when carrying treasure tokens. Remove this fighter from the battlefield. This fighter is now hidden."
+  },
+  {
+    "id": "pack-tactics",
+    "name": "Pack Tactics",
+    "type": "double",
+    "text": "Select a visible friendly Henchman within 3\" of this fighter. That fighter makes a free move action or a free attack action."
+  },
+  {
+    "id": "skitterleap",
+    "name": "Skitterleap",
+    "type": "triple",
+    "text": "Magical ability. A fighter cannot use this ability while within 1” of an enemy fighter or when carrying a treasure token. Remove this fighter from the battlefield, then set it up on the battlefield floor or on a platform, more than 6\" from all enemy warriors, objective markers and treasure tokens."
+  }
+]
