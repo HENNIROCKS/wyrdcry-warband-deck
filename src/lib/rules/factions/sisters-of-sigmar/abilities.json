@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "id": "armour-of-faith",
+    "name": "Armour of Faith",
+    "type": "trait",
+    "text": "This fighter refuses to wear any armour, and is always considered to be in Cover."
+  },
+  {
+    "id": "blessed-sight",
+    "name": "Blessed Sight",
+    "type": "double",
+    "text": "Roll a die for each visible enemy fighter within (X)\" of this fighter. For each result of 4+, add 1 wyrd dice to your saved wyrd dice."
+  },
+  {
+    "id": "hammer-of-sigmar",
+    "name": "Hammer of Sigmar",
+    "type": "triple",
+    "text": "A fighter can only use this ability if equipped with a Warhammer or Sigmarite Hammer. Add (X/2) to the damage points allocated to enemy fighters by each hit and critical hit from the next melee attack action made by this fighter in this activation."
+  },
+  {
+    "id": "lead-by-example",
+    "name": "Lead By Example",
+    "type": "triple",
+    "text": "A fighter can use this ability after taking an enemy fighter out of action. Select up to two visible friendly fighters with the HENCHMAN keyword within 6” of this fighter. Each of those fighters can make a free move or a free attack action."
+  },
+  {
+    "id": "soulfire",
+    "name": "Soulfire",
+    "type": "quad",
+    "text": "Allocate (X/2) damage points to each visible enemy fighter within 6” of this fighter. If the enemy fighter is a VAMPIRE, DAEMON or THRALL, allocate (X) damage points instead."
+  },
+  {
+    "id": "words-of-healing",
+    "name": "Words of Healing",
+    "type": "triple",
+    "text": "Remove (X/2) damage points allocated to each friendly fighter within 6\" of this fighter. If you discard a saved wyrd dice, remove (X) damage points instead."
+  }
+]

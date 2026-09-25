@@ -6,6 +6,12 @@
 		"effect": null
 	},
 	{
+		"id": "blessed",
+		"name": "BLESSED",
+		"text": "Increase the Fight characteristic of the wielder by 1 when making attack actions against fighters with the VAMPIRE, DAEMON or THRALL keyword.",
+		"effect": null
+	},
+	{
 		"id": "brace",
 		"name": "BRACE",
 		"text": "When determining how many ranged weapons a fighter is equipped with, two weapons with this special rule count as one.",
@@ -51,6 +57,12 @@
 		"id": "unreliable",
 		"name": "UNRELIABLE",
 		"text": "When making an attack action with this weapon, if any hit rolls result in a 1, all hit rolls are discarded and the attack action ends.",
+		"effect": null
+	},
+	{
+		"id": "whipcrack",
+		"name": "WHIPCRACK",
+		"text": "When making melee attack actions with this weapon, the target cannot make reactions.",
 		"effect": null
 	}
 ]

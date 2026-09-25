@@ -1,1 +1,6 @@
-{}
+{
+  "id": "sisters-of-sigmar",
+  "name": "Sisters of Sigmar",
+  "keyword": "SISTERS OF SIGMAR",
+  "warband_size": { "min": 3, "max": 15 }
+}

@@ -1,1 +1,103 @@
-[]
+[
+  {
+    "id": "matriarch",
+    "name": "Matriarch",
+    "cost": 120,
+    "limit": { "min": 1, "max": 1 },
+    "description": "",
+    "profile": {
+      "move": 5,
+      "fight": 4,
+      "shoot": 3,
+      "defense": 3,
+      "health": 14,
+      "bravery": 3
+    },
+    "keywords": ["human", "sisters-of-sigmar", "hero", "leader"],
+    "abilities": [],
+    "gear": [],
+    "choose": {
+      "source": null,
+      "prompt": "When recruiting this fighter, you must select one of the following abilities:",
+      "kind": "ability",
+      "pick": 1,
+      "abilities": ["hammer-of-sigmar", "soulfire", "words-of-healing"]
+    }
+  },
+  {
+    "id": "augur",
+    "name": "Augur",
+    "cost": 80,
+    "limit": { "min": 0, "max": 1 },
+    "description": "",
+    "profile": {
+      "move": 5,
+      "fight": 2,
+      "shoot": 2,
+      "defense": 3,
+      "health": 10,
+      "bravery": 3
+    },
+    "keywords": ["human", "sisters-of-sigmar", "hero"],
+    "abilities": ["armour-of-faith", "blessed-sight"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "sister-superior",
+    "name": "Sister Superior",
+    "cost": 105,
+    "limit": { "min": 0, "max": 3 },
+    "description": "",
+    "profile": {
+      "move": 5,
+      "fight": 4,
+      "shoot": 3,
+      "defense": 3,
+      "health": 14,
+      "bravery": 4
+    },
+    "keywords": ["human", "sisters-of-sigmar", "hero"],
+    "abilities": ["lead-by-example"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "novice",
+    "name": "Novice",
+    "cost": 50,
+    "limit": { "min": 0, "max": null },
+    "description": "",
+    "profile": {
+      "move": 5,
+      "fight": 2,
+      "shoot": 2,
+      "defense": 3,
+      "health": 8,
+      "bravery": 4
+    },
+    "keywords": ["human", "sisters-of-sigmar", "henchman"],
+    "abilities": [],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "sister",
+    "name": "Sister",
+    "cost": 65,
+    "limit": { "min": 0, "max": null },
+    "description": "",
+    "profile": {
+      "move": 5,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 10,
+      "bravery": 4
+    },
+    "keywords": ["human", "sisters-of-sigmar", "henchman"],
+    "abilities": [],
+    "gear": [],
+    "choose": null
+  }
+]
