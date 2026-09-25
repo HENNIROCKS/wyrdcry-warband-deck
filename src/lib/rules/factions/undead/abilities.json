@@ -27,6 +27,6 @@
     "id": "shambling-horde",
     "name": "Shambling Horde",
     "type": "double",
-    "text": "Select up to 3 visible friendly fighters with the Zombie keyword. Those fighters can each immediately make a bonus move action of up to 3\", as long as they end that move action closer to this fighter."
+    "text": "Select up to 3 visible friendly fighters with the ZOMBIE keyword. Those fighters can each immediately make a bonus move action of up to 3\", as long as they end that move action closer to this fighter."
   }
 ]
