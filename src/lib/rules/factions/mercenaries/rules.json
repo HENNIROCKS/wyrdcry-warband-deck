@@ -1,0 +1,100 @@
+[
+	{
+		"id": "state-pride",
+		"name": "State Pride",
+		"phase": "recruitment",
+		"text": "When creating a MERCENARIES warband, you must select two of the following rules to represent your warband's home province:",
+		"pick": 2,
+		"options": [
+			{
+				"id": "huntsmen",
+				"name": "Huntsmen",
+				"text": "Increase the Shoot characteristic of all Marksmen by 1.",
+				"phase": "recruitment",
+				"effect": {
+					"kind": "stat",
+					"characteristic": "shoot",
+					"bonus": 1,
+					"fighters": ["marksman"]
+				}
+			},
+			{
+				"id": "hardy",
+				"name": "Hardy",
+				"text": "Increase the Health characteristic of all Warriors and Champions by 2.",
+				"phase": "recruitment",
+				"effect": {
+					"kind": "stat",
+					"characteristic": "health",
+					"bonus": 2,
+					"fighters": ["warrior", "champion"]
+				}
+			},
+			{
+				"id": "state-troopers",
+				"name": "State Troopers",
+				"text": "Increase the Fight characteristic of all Warriors by 1.",
+				"phase": "recruitment",
+				"effect": {
+					"kind": "stat",
+					"characteristic": "fight",
+					"bonus": 1,
+					"fighters": ["warrior"]
+				}
+			},
+			{
+				"id": "unyielding",
+				"name": "Unyielding",
+				"text": "Increase the Bravery characteristic of all fighters by 1.",
+				"phase": "recruitment",
+				"effect": {
+					"kind": "stat",
+					"characteristic": "bravery",
+					"bonus": 1,
+					"fighters": "all"
+				}
+			},
+			{
+				"id": "desperate",
+				"name": "Desperate",
+				"text": "You cannot recruit Warriors or Marksmen, but may recruit Youngbloods for 50% of their recruitment fee.",
+				"phase": "recruitment",
+				"effect": {
+					"kind": "recruit",
+					"forbid": ["warrior", "marksman"],
+					"discount": [{ "fighter": "youngblood", "factor": 0.5 }]
+				}
+			},
+			{
+				"id": "well-drilled",
+				"name": "Well Drilled",
+				"text": "At the end of each Aftermath Sequence, select one Henchman to earn 1 Renown.",
+				"phase": "aftermath",
+				"effect": null
+			},
+			{
+				"id": "wealthy-patrons",
+				"name": "Wealthy Patrons",
+				"text": "Gain an additional 30gc when collecting income in the aftermath sequence.",
+				"phase": "aftermath",
+				"effect": null
+			},
+			{
+				"id": "deeply-religious",
+				"name": "Deeply Religious",
+				"text": "Roll 7 initiative dice in each initiative phase instead of 6.",
+				"phase": "battle",
+				"effect": null
+			}
+		]
+	},
+	{
+		"id": "well-connected",
+		"name": "Well-connected",
+		"phase": "battle",
+		"text": "MERCENARIES warbands maintain vast networks of contacts. When setting up a battle, a MERCENARIES warband may recruit one Hired Sword for half its normal hiring fee.",
+		"pick": null,
+		"options": [],
+		"effect": null
+	}
+]

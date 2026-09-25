@@ -1,0 +1,45 @@
+[
+	{
+		"id": "mercenaries",
+		"name": "MERCENARIES",
+		"type": "faction",
+		"rules": []
+	},
+	{
+		"id": "human",
+		"name": "HUMAN",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "hero",
+		"name": "HERO",
+		"type": "fighter",
+		"rules": [
+			"Can use equipment marked as HERO only",
+			"Can make a Heroic Reaction once per battle",
+			"Can make a characteristics increase or select a trait when gaining renown",
+			"Can be sent to find items at the Trading Post",
+			"Must roll on the Hero Injury Table when taken out of action"
+		]
+	},
+	{
+		"id": "leader",
+		"name": "LEADER",
+		"type": "fighter",
+		"rules": [
+			"Friendly fighters within 6\" can use the Leader's Bravery characteristic when taking Panic tests",
+			"If killed, a new leader must be selected"
+		]
+	},
+	{
+		"id": "henchman",
+		"name": "HENCHMAN",
+		"type": "fighter",
+		"rules": [
+			"Can make a characteristics increase when gaining renown",
+			"Becomes a HERO when reaching 4 renown",
+			"Must roll on the Henchman Injury Table when taken out of action"
+		]
+	}
+]

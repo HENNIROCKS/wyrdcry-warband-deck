@@ -1,0 +1,6 @@
+{
+	"id": "mercenaries",
+	"name": "Mercenaries",
+	"keyword": "MERCENARIES",
+	"warband_size": { "min": 3, "max": 15 }
+}

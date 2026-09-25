@@ -1,0 +1,63 @@
+[
+	{
+		"id": "captain",
+		"name": "Captain",
+		"cost": 130,
+		"limit": { "min": 1, "max": 1 },
+		"description": "A seasoned warrior commanding respect and loyalty through a combination of charisma, strategic genius, and sheer ruthlessness.",
+		"profile": { "move": 5, "fight": 4, "shoot": 4, "defense": 3, "health": 14, "bravery": 4 },
+		"keywords": ["human", "mercenaries", "hero", "leader"],
+		"abilities": ["command", "strategize"],
+		"choose": null
+	},
+	{
+		"id": "champion",
+		"name": "Champion",
+		"cost": 105,
+		"limit": { "min": 0, "max": 3 },
+		"description": "These fighters are the heart and soul of the warband, inspiring their comrades both through martial prowess and friendly banter.",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 14, "bravery": 4 },
+		"keywords": ["human", "mercenaries", "hero"],
+		"abilities": ["martial-discipline", "lead-by-example"],
+		"choose": {
+			"source": "martial-discipline",
+			"kind": "stat",
+			"pick": 1,
+			"characteristics": ["fight", "shoot"],
+			"bonus": 1
+		}
+	},
+	{
+		"id": "marksman",
+		"name": "Marksman",
+		"cost": 65,
+		"limit": { "min": 0, "max": 5 },
+		"description": "Driven away from home by the civil war, these forest-born huntsmen now stalk targets with the patience they once reserved for prey.",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["human", "mercenaries", "henchman"],
+		"abilities": ["hunters-eye"],
+		"choose": null
+	},
+	{
+		"id": "warrior",
+		"name": "Warrior",
+		"cost": 65,
+		"limit": { "min": 0, "max": null },
+		"description": "Disgraced state troopers, murderers and treasure hunters make up the backbone of the warband, driven forwards by the promise of coin.",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["human", "mercenaries", "henchman"],
+		"abilities": ["driven-by-greed"],
+		"choose": null
+	},
+	{
+		"id": "youngblood",
+		"name": "Youngblood",
+		"cost": 50,
+		"limit": { "min": 0, "max": null },
+		"description": "With the civil war bleeding the Empire dry of seasoned fighters, the young must pick up arms to fight for their province.",
+		"profile": { "move": 5, "fight": 2, "shoot": 2, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["human", "mercenaries", "henchman"],
+		"abilities": [],
+		"choose": null
+	}
+]

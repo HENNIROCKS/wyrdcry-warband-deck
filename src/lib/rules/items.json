@@ -1,0 +1,29 @@
+[
+	{
+		"id": "shield",
+		"name": "Shield",
+		"type": "armour",
+		"text": "Increase the Defense characteristic of the bearer by 1.",
+		"effects": [{ "characteristic": "defense", "bonus": 1 }],
+		"cost": 20
+	},
+	{
+		"id": "light-armour",
+		"name": "Light Armour",
+		"type": "armour",
+		"text": "Increase the Defense characteristic of the bearer by 1.",
+		"effects": [{ "characteristic": "defense", "bonus": 1 }],
+		"cost": 30
+	},
+	{
+		"id": "heavy-armour",
+		"name": "Heavy Armour",
+		"type": "armour",
+		"text": "Increase the Defense characteristic of the bearer by 2, and decrease their Move characteristic by 1.",
+		"effects": [
+			{ "characteristic": "defense", "bonus": 2 },
+			{ "characteristic": "move", "bonus": -1 }
+		],
+		"cost": 70
+	}
+]

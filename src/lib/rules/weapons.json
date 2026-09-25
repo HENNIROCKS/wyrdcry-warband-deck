@@ -1,0 +1,156 @@
+[
+	{
+		"id": "dagger",
+		"name": "Dagger",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 1,
+		"crit": 3,
+		"rules": [],
+		"cost": 5
+	},
+	{
+		"id": "club",
+		"name": "Club",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": [],
+		"cost": 10
+	},
+	{
+		"id": "axe",
+		"name": "Axe",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 4,
+		"rules": [],
+		"cost": 15
+	},
+	{
+		"id": "spear",
+		"name": "Spear",
+		"type": "melee",
+		"range": { "min": 0, "max": 2 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": [],
+		"cost": 15
+	},
+	{
+		"id": "halberd",
+		"name": "Halberd",
+		"type": "melee",
+		"range": { "min": 0, "max": 2 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 4,
+		"rules": ["two-handed"],
+		"cost": 20
+	},
+	{
+		"id": "sword",
+		"name": "Sword",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": ["parry"],
+		"cost": 20
+	},
+	{
+		"id": "flail",
+		"name": "Flail",
+		"type": "melee",
+		"range": { "min": 0, "max": 2 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": ["mighty-1", "two-handed"],
+		"cost": 25
+	},
+	{
+		"id": "warhammer",
+		"name": "Warhammer",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 2,
+		"hit": 3,
+		"crit": 4,
+		"rules": ["mighty-2"],
+		"cost": 30
+	},
+	{
+		"id": "great-weapon",
+		"name": "Great Weapon",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 2,
+		"hit": 4,
+		"crit": 7,
+		"rules": ["mighty-2", "two-handed"],
+		"cost": 55
+	},
+	{
+		"id": "bow",
+		"name": "Bow",
+		"type": "ranged",
+		"range": { "min": 3, "max": 18 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": [],
+		"cost": 20
+	},
+	{
+		"id": "crossbow",
+		"name": "Crossbow",
+		"type": "ranged",
+		"range": { "min": 3, "max": 24 },
+		"attacks": 2,
+		"hit": 3,
+		"crit": 5,
+		"rules": ["mighty-1", "reload"],
+		"cost": 35
+	},
+	{
+		"id": "pistol",
+		"name": "Pistol",
+		"type": "ranged",
+		"range": { "min": 0, "max": 6 },
+		"attacks": 2,
+		"hit": 4,
+		"crit": 6,
+		"rules": ["mighty-2", "reload", "unreliable", "brace"],
+		"cost": 35
+	},
+	{
+		"id": "blunderbuss",
+		"name": "Blunderbuss",
+		"type": "ranged",
+		"range": { "min": 0, "max": 6 },
+		"attacks": 6,
+		"hit": 2,
+		"crit": 3,
+		"rules": ["blast", "one-use"],
+		"cost": 55
+	},
+	{
+		"id": "handgun",
+		"name": "Handgun",
+		"type": "ranged",
+		"range": { "min": 3, "max": 24 },
+		"attacks": 2,
+		"hit": 4,
+		"crit": 8,
+		"rules": ["mighty-2", "reload", "unreliable"],
+		"cost": 60
+	}
+]

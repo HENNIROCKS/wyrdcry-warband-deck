@@ -1,0 +1,72 @@
+[
+	{
+		"id": "careful-aim",
+		"name": "Careful Aim",
+		"type": "double",
+		"keyword": "any",
+		"text": "Add 1 to the Shoot characteristic of this fighter for its next Ranged Attack action this activation."
+	},
+	{
+		"id": "diving-charge",
+		"name": "Diving Charge",
+		"type": "double",
+		"keyword": "any",
+		"text": "A fighter can use this ability after making a move action where it fell more than 2\" vertically. Until the end of their activation, you may add 1 to their Fight characteristic for every full 2\" they fell."
+	},
+	{
+		"id": "respite",
+		"name": "Respite",
+		"type": "double",
+		"keyword": "any",
+		"text": "A fighter cannot use this ability while within 1\" of an enemy fighter. Remove (X) damage points from this fighter."
+	},
+	{
+		"id": "rush",
+		"name": "Rush",
+		"type": "double",
+		"keyword": "any",
+		"text": "Add 1 to the Move characteristic of this fighter until the end of their activation."
+	},
+	{
+		"id": "inspiring-presence",
+		"name": "Inspiring Presence",
+		"type": "triple",
+		"keyword": "hero",
+		"text": "Select a visible friendly fighter within 6\" of this fighter that has not activated yet this battle round. You can activate that fighter immediately after this fighter's activation ends."
+	},
+	{
+		"id": "onslaught",
+		"name": "Onslaught",
+		"type": "triple",
+		"keyword": "any",
+		"text": "Add 1 to the Attacks characteristic of melee attack actions made by this fighter until the end of their activation."
+	},
+	{
+		"id": "rampage",
+		"name": "Rampage",
+		"type": "quad",
+		"keyword": "any",
+		"text": "This fighter makes a bonus move action. Then, they can make a bonus attack action."
+	},
+	{
+		"id": "counter",
+		"name": "Counter",
+		"type": "reaction",
+		"keyword": "any",
+		"text": "Use this reaction when targeted by a melee attack action but before the hit rolls are made. If one or more hit rolls from that attack action misses, inflict 2 damage points to the attacking fighter. If any hit rolls from that attack action is a 1, inflict 3 damage to the attacking fighter instead."
+	},
+	{
+		"id": "hunker-down",
+		"name": "Hunker Down",
+		"type": "reaction",
+		"keyword": "any",
+		"text": "A fighter that is in cover can make this reaction after they are targeted by a ranged attack action but before the hit rolls are made. For that attack action, increase this fighter's Defense characteristic by 2 (on top of their cover bonus)."
+	},
+	{
+		"id": "strike-them-down",
+		"name": "Strike them down",
+		"type": "reaction",
+		"keyword": "any",
+		"text": "A fighter can make this reaction when a visible enemy fighter within 1\" of them makes a disengage action but before that fighter moves away. Roll a dice. On a 4+, allocate D6 damage points to that enemy fighter."
+	}
+]
