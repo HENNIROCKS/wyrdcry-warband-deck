@@ -107,6 +107,7 @@
 				</svg>
 			{/snippet}
 			{#snippet children()}
+				<a href="{base}/build">Build a warband…</a>
 				<button onclick={() => fileInput?.click()}>Import…</button>
 				{#if active}
 					<hr />
@@ -179,10 +180,11 @@
 	<div class="empty">
 		<h2>No warband yet</h2>
 		<p>
-			Export your warband from the Warband Builder as JSON and import it here.
-			The data stays on this device.
+			Build one here step by step, or export it from the Warband Builder as JSON
+			and import that. Either way the data stays on this device.
 		</p>
-		<button onclick={() => fileInput?.click()}>Choose file</button>
+		<a class="go" href="{base}/build">Build a warband</a>
+		<button onclick={() => fileInput?.click()}>Import a file</button>
 	</div>
 {/if}
 
@@ -269,14 +271,22 @@
 		color: var(--ui-text-muted);
 	}
 
-	.empty button {
+	.empty .go {
 		margin-top: 6px;
 		padding: 12px 20px;
-		border: 0;
 		border-radius: 10px;
 		background: var(--ui-accent);
 		color: #fff;
 		font-size: 15px;
 		font-weight: 600;
+	}
+
+	.empty button {
+		padding: 10px 18px;
+		font-size: 14px;
+		color: var(--ui-text);
+		background: var(--ui-surface);
+		border: 1px solid var(--ui-border);
+		border-radius: 10px;
 	}
 </style>

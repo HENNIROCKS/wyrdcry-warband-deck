@@ -6,10 +6,14 @@ fighters.
 
 Unofficial fan project. No connection to Games Workshop.
 
-**Status: early.** The app tracks a battle; it does not edit the warband.
+**Status: early.** The app builds a Mercenaries warband and tracks a battle;
+it does not yet edit a warband once it exists.
 
 ## What it does
 
+- Build a warband step by step: faction, its rules, then one fighter at a time,
+  with the budget, the roster limits and the equipment restrictions checked as
+  you go. Mercenaries so far
 - Import warband JSON from the builder
 - Show the warband itself as the first card: faction, standing, favour,
   reputation, gold, value, stash and the warband notes
@@ -25,6 +29,7 @@ Unofficial fan project. No connection to Games Workshop.
 ## Roadmap
 
 - [x] Import warband JSON, swipe through the deck, export it again
+- [x] Build a warband in the app, for one faction
 - [x] The warband itself as the first card
 - [x] Mark fighters as activated, count the rounds, undo one step
 - [ ] Wounds, and out of action derived from them
@@ -32,6 +37,8 @@ Unofficial fan project. No connection to Games Workshop.
 - [ ] The aftermath sequence – injuries, experience, exploration, buying
 - [ ] Reference cards for weapons, items, abilities and keywords in the same deck
 - [ ] Waiting as a third battle state, alongside activated
+- [ ] The remaining six factions in the ruleset, and editing a warband after it
+      has been built
 
 Further out and nothing promised: NFC tags under the model bases, a photo of the
 painted model as the card image, showing an opponent the warband over a
