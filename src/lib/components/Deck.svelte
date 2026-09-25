@@ -313,7 +313,7 @@
 		margin: 0;
 		padding-bottom: 8px;
 		text-align: center;
-		font-size: 11px;
+		font-size: var(--ui-t-xs);
 		font-variant-numeric: tabular-nums;
 		color: var(--ui-text-subtle);
 	}

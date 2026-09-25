@@ -86,13 +86,13 @@
 
 	h2 {
 		margin: 0;
-		font-size: 18px;
+		font-size: var(--ui-t-xl);
 		overflow-wrap: anywhere;
 	}
 
 	.count {
 		margin: 3px 0 12px;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		color: var(--ui-text-muted);
 	}
 
@@ -100,7 +100,7 @@
 		margin: 0 0 10px;
 		padding: 10px 12px;
 		border-radius: 10px;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		line-height: 1.45;
 		background: var(--ui-surface-2);
 	}
@@ -131,7 +131,7 @@
 		padding: 12px;
 		border: 0;
 		border-radius: 10px;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		font-weight: 600;
 		background: var(--ui-accent);
 		color: #fff;

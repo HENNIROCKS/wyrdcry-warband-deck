@@ -62,7 +62,7 @@
 
 	h1 {
 		margin: 0;
-		font-size: 19px;
+		font-size: var(--ui-t-2xl);
 		font-weight: 600;
 	}
 
@@ -82,7 +82,7 @@
 
 	.url a {
 		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		color: var(--ui-accent-text);
 	}
 
@@ -93,7 +93,7 @@
 	.hint {
 		margin: 0;
 		max-width: 40ch;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		line-height: 1.5;
 		color: var(--ui-text-muted);
 	}
@@ -106,7 +106,7 @@
 		text-align: left;
 		background: var(--ui-warn-bg);
 		border: 1px solid rgba(180, 83, 9, 0.4);
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		line-height: 1.5;
 	}
 
@@ -132,7 +132,7 @@
 
 	.back {
 		margin: 4px 0 0;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 	}
 
 	.back a {

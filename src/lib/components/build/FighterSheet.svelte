@@ -219,7 +219,7 @@
 		flex: 1;
 		min-width: 0;
 		margin: 0;
-		font-size: 17px;
+		font-size: var(--ui-t-xl);
 		font-weight: 600;
 		white-space: nowrap;
 		overflow: hidden;
@@ -228,7 +228,7 @@
 
 	.fee {
 		flex: none;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		font-weight: 600;
 		color: var(--ui-accent-text);
 	}
@@ -260,7 +260,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
-		font-size: 12px;
+		font-size: var(--ui-t-sm);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--ui-text-subtle);
@@ -268,7 +268,7 @@
 
 	input {
 		padding: 11px 12px;
-		font-size: 16px;
+		font-size: var(--ui-t-md);
 		letter-spacing: normal;
 		text-transform: none;
 		color: var(--ui-text);
@@ -286,7 +286,7 @@
 
 	.profile span {
 		padding: 5px 9px;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		font-variant-numeric: tabular-nums;
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
@@ -307,7 +307,7 @@
 
 	h3 {
 		margin: 0;
-		font-size: 12px;
+		font-size: var(--ui-t-sm);
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -316,7 +316,7 @@
 
 	.hint {
 		margin: 0;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		line-height: 1.5;
 		color: var(--ui-text-muted);
 	}
@@ -329,7 +329,7 @@
 
 	.chip {
 		padding: 9px 13px;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		text-transform: capitalize;
 		color: var(--ui-text);
 		background: var(--ui-surface);
@@ -357,7 +357,7 @@
 		align-items: center;
 		gap: 8px;
 		padding: 4px 4px 4px 12px;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
 		border-radius: 9px;
@@ -388,7 +388,7 @@
 		gap: 8px;
 		width: 100%;
 		padding: 11px 12px;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		text-align: left;
 		color: var(--ui-text);
 		background: var(--ui-surface);
@@ -409,14 +409,14 @@
 
 	.offers .cost {
 		flex: none;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		font-variant-numeric: tabular-nums;
 		color: var(--ui-text-muted);
 	}
 
 	.offers .why {
 		flex: none;
-		font-size: 11px;
+		font-size: var(--ui-t-xs);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 		/* A full hand is a state, not a warning, and on most rows at once: the
@@ -437,7 +437,7 @@
 
 	.open {
 		margin: 0;
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 		color: var(--ui-text);
 	}
 
@@ -453,7 +453,7 @@
 	.done {
 		flex: 1;
 		padding: 13px;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		font-weight: 600;
 		color: #fff;
 		background: var(--ui-accent);
@@ -469,7 +469,7 @@
 	.remove {
 		margin-top: 6px;
 		padding: 12px;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		color: var(--ui-text-muted);
 		background: none;
 		border: 1px solid var(--ui-border);

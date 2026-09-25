@@ -21,6 +21,27 @@
 	--ui-warn-bg: rgba(180, 83, 9, 0.15);
 	--ui-danger: #b91c1c;
 
+	/*
+	 * The interface's type scale. Every size outside a card names one of these
+	 * rather than a figure of its own, so the whole interface moves together –
+	 * the phone is read at arm's length over a table, and a body size that suits
+	 * a desktop browser is a size nobody leans in for twice.
+	 *
+	 * `--ui-t-md` is the floor for anything typed into: iOS zooms the page when
+	 * an input below 16px takes focus, and the zoom does not come back.
+	 *
+	 * A card sets its own sizes from --u instead. Those are the printed card's
+	 * proportions and belong to the Card Creator, not to this scale.
+	 */
+	--ui-t-xs: 12px;
+	--ui-t-sm: 14px;
+	--ui-t-base: 15px;
+	--ui-t-md: 16px;
+	--ui-t-lg: 17px;
+	--ui-t-xl: 19px;
+	--ui-t-2xl: 21px;
+	--ui-t-3xl: 24px;
+
 	/* Card surface – the same values the Card Creator prints with. */
 	--card-green: #16754a;
 	--card-paper: #faf6f3;

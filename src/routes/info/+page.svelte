@@ -133,13 +133,13 @@
 
 	h1 {
 		margin: 0;
-		font-size: 21px;
+		font-size: var(--ui-t-3xl);
 		font-weight: 600;
 	}
 
 	h2 {
 		margin: 0 0 8px;
-		font-size: 15px;
+		font-size: var(--ui-t-lg);
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
@@ -159,7 +159,7 @@
 
 	p {
 		margin: 0;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		line-height: 1.55;
 	}
 
@@ -172,7 +172,7 @@
 		padding-left: 18px;
 		/* Tailwind's preflight strips list markers. */
 		list-style: disc;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		line-height: 1.55;
 	}
 
@@ -235,7 +235,7 @@
 		justify-content: space-between;
 		gap: 12px;
 		padding: 11px 1px;
-		font-size: 14px;
+		font-size: var(--ui-t-md);
 		font-weight: 600;
 		cursor: pointer;
 		/* The chevron below stands in for the marker. */
@@ -277,7 +277,7 @@
 	/* Smaller than the notice above it, not fainter: at this size the subtle
 	   grey falls to 3.5:1 on the page, where the muted one holds 6.6:1. */
 	.version {
-		font-size: 12px;
+		font-size: var(--ui-t-sm);
 		color: var(--ui-text-muted);
 	}
 
@@ -288,7 +288,7 @@
 	}
 
 	.back {
-		font-size: 13px;
+		font-size: var(--ui-t-base);
 	}
 
 	/* The way back, not a destination of its own – same shape as the links
