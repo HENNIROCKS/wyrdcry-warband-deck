@@ -132,6 +132,28 @@
 		"cost": 0
 	},
 	{
+		"id": "direwolf-rotten-fangs",
+		"name": "Rotten Fangs",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 4,
+		"rules": [],
+		"cost": 0
+	},
+	{
+		"id": "zombie-infectious-bite",
+		"name": "Infectious Bite",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": [],
+		"cost": 0
+	},
+	{
 		"id": "steel-whip",
 		"name": "Steel Whip",
 		"type": "melee",

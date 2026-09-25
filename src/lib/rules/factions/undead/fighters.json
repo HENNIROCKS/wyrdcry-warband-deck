@@ -1,1 +1,62 @@
-[]
+[
+	{
+		"id": "vampire",
+		"name": "Vampire",
+		"cost": 195,
+		"limit": { "min": 1, "max": 1 },
+		"description": "",
+		"profile": { "move": 6, "fight": 4, "shoot": 4, "defense": 4, "health": 20, "bravery": 3 },
+		"keywords": ["vampire", "undead", "hero", "leader", "terrifying"],
+		"abilities": ["the-beast-within", "feed"],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "dreg",
+		"name": "Dreg",
+		"cost": 65,
+		"limit": { "min": 0, "max": 3 },
+		"description": "",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["human", "undead", "hero"],
+		"abilities": ["for-the-master"],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "ghoul",
+		"name": "Ghoul",
+		"cost": 80,
+		"limit": { "min": 0, "max": 5 },
+		"description": "",
+		"profile": { "move": 5, "fight": 4, "shoot": 3, "defense": 3, "health": 12, "bravery": 5 },
+		"keywords": ["ghoul", "undead", "henchman", "terrifying"],
+		"abilities": [],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "dire",
+		"name": "Dire Wolf",
+		"cost": 110,
+		"limit": { "min": 0, "max": 3 },
+		"description": "",
+		"profile": { "move": 8, "fight": 4, "shoot": 3, "defense": 3, "health": 12, "bravery": 5 },
+		"keywords": ["thrall", "undead", "henchman", "terrifying"],
+		"abilities": ["chilling-howl"],
+		"gear": ["weapon:direwolf-rotten-fangs"],
+		"choose": null
+	},
+	{
+		"id": "zombie",
+		"name": "Zombie",
+		"cost": 45,
+		"limit": { "min": 0, "max": null },
+		"description": "",
+		"profile": { "move": 4, "fight": 2, "shoot": 2, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["thrall", "undead", "henchman", "terrifying"],
+		"abilities": ["shambling-horde"],
+		"gear": ["weapon:zombie-infectious-bite"],
+		"choose": null
+	}
+]

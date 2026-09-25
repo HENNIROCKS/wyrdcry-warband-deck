@@ -1,1 +1,15 @@
-[]
+[
+	{ "id": "weapon:dagger", "allow": "all" },
+	{ "id": "weapon:club", "allow": "all" },
+	{ "id": "weapon:axe", "allow": "hero" },
+	{ "id": "weapon:spear", "allow": "hero" },
+	{ "id": "weapon:halberd", "allow": "hero" },
+	{ "id": "weapon:sword", "allow": "hero" },
+	{ "id": "weapon:flail", "allow": "hero" },
+	{ "id": "weapon:warhammer", "allow": "hero" },
+	{ "id": "weapon:great-weapon", "allow": "hero" },
+	{ "id": "weapon:bow", "allow": "hero" },
+	{ "id": "item:shield", "allow": "hero" },
+	{ "id": "item:light-armour", "allow": "hero" },
+	{ "id": "item:heavy-armour", "allow": "hero" }
+]

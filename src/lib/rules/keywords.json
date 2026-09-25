@@ -18,6 +18,12 @@
 		"rules": []
 	},
 	{
+		"id": "undead",
+		"name": "UNDEAD",
+		"type": "faction",
+		"rules": []
+	},
+	{
 		"id": "human",
 		"name": "HUMAN",
 		"type": "race",
@@ -26,6 +32,18 @@
 	{
 		"id": "skaven",
 		"name": "SKAVEN",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "vampire",
+		"name": "VAMPIRE",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "ghoul",
+		"name": "GHOUL",
 		"type": "race",
 		"rules": []
 	},
@@ -78,6 +96,26 @@
 			"Never gain experience or renown",
 			"Cannot make scenario actions",
 			"Cannot be given equipment, but uses natural weapons"
+		]
+	},
+	{
+		"id": "thrall",
+		"name": "THRALL",
+		"type": "fighter",
+		"rules": [
+			"Bound to the VAMPIRE leading the warband",
+			"Cannot be equipped with any weapons, armour or equipment",
+			"Never earn experience or gain renown",
+			"Cannot carry treasure tokens",
+			"Automatically pass any Bravery test they are required to take"
+		]
+	},
+	{
+		"id": "terrifying",
+		"name": "TERRIFYING",
+		"type": "fighter",
+		"rules": [
+			"A fighter making an attack action against a TERRIFYING enemy must take a Bravery test or become Panicked. On a passed test, that fighter ignores further Bravery tests caused by TERRIFYING enemies for the remainder of their activation."
 		]
 	}
 ]
