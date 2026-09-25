@@ -12,6 +12,12 @@ import weaponRules from './data/weapon-rules.json';
 import universalAbilities from './data/universal-abilities.json';
 import ruleset from './data/ruleset.json';
 import campaignRules from './data/campaign-rules.json';
+import {
+	RULE_ABILITIES,
+	RULE_FACTIONS,
+	RULE_FIGHTERS,
+	RULE_WEAPONS
+} from './rules-bridge';
 
 export interface FighterProfile {
 	id: string;
@@ -130,15 +136,35 @@ function withText<T extends { id: string; description: string }>(list: T[], what
 	return kept;
 }
 
-export const FIGHTERS = byId(fighters as FighterProfile[], 'fighters');
-export const WEAPONS = byId(weapons as WeaponProfile[], 'weapons');
+/**
+ * Fills in what the game data does not have from this app's own ruleset, so a
+ * homebrew faction resolves like any other. An id the game data knows is never
+ * touched: what is printed is what a card shows, and the ruleset beside it is a
+ * transcription that may differ. See `rules-bridge.ts`.
+ */
+function filledFrom<T extends { id: string }>(map: Map<string, T>, extra: T[]): Map<string, T> {
+	for (const entry of extra) {
+		if (!map.has(entry.id)) map.set(entry.id, entry);
+	}
+	return map;
+}
+
+export const FIGHTERS = filledFrom(byId(fighters as FighterProfile[], 'fighters'), RULE_FIGHTERS);
+export const WEAPONS = filledFrom(byId(weapons as WeaponProfile[], 'weapons'), RULE_WEAPONS);
 export const ITEMS = byId(items as ItemProfile[], 'items');
-export const FACTIONS = byId(factions as FactionProfile[], 'factions');
+export const FACTIONS = filledFrom(byId(factions as FactionProfile[], 'factions'), RULE_FACTIONS);
 export const WEAPON_RULES = byId(weaponRules as WeaponRule[], 'weapon rules');
 
 /* A rule without text is nothing a card can show, and dropping those settles
    ids the data carries more than once where only one side has a description. */
-export const ABILITIES = byId(withText(abilities as AbilityProfile[], 'abilities'), 'abilities');
+/* `martial-discipline` comes across here as well, because this ruleset corrects
+   an id the game data spells `martial-exemplar`. Nothing looks it up: an
+   official faction's profile comes from the game data and names the game data's
+   id. Measured – the Mercenaries Champion's card is the same either way. */
+export const ABILITIES = filledFrom(
+	byId(withText(abilities as AbilityProfile[], 'abilities'), 'abilities'),
+	RULE_ABILITIES
+);
 
 export const UNIVERSAL_ABILITIES = universalAbilities as UniversalAbility[];
 
