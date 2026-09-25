@@ -15,7 +15,7 @@
 
 import { newId } from '../id';
 import type { Faction } from '../rules';
-import type { Selections, StatKey, Warband } from '../types/warband';
+import type { CustomAbility, Selections, StatKey, Warband } from '../types/warband';
 import { rulesInPlay } from './effects';
 import { layers } from './profile';
 import { budget, fighterOf, recruitmentFee } from './roster';
@@ -64,23 +64,27 @@ export function toWarband(faction: Faction, draft: Draft, id = newId()): Warband
 		gold: budget(),
 		fighters,
 		stash: [],
-		factionNotes: factionNotes(faction, draft),
+		/* The player's own shelf – a to-do, a battle history. The rules the warband
+		   plays under are not notes and belong on the fighter cards. */
+		factionNotes: '',
 		customWeapons: [],
-		customAbilities: []
+		customAbilities: factionAbilities(faction, draft)
 	};
 }
 
 /**
- * The rules in play as prose, in the field the builder shows them in. It has no
- * structure for them, and a player opening the warband over there would
- * otherwise find no trace of the two rules they chose.
+ * The rules in play, one ability each, carried by the faction's name. That name
+ * is what puts them in the "Faction Rules" section of every fighter card, beside
+ * the universal abilities and reactions – the rules apply to the whole warband,
+ * and at the table you read them off the card in your hand. The builder has no
+ * structure for them either and lists them in its Ability Reference.
  *
  * A rule that moved a characteristic says so in its own sentence. Half of what
  * State Pride offers takes hold in the aftermath or the battle and changes no
  * figure at all, so one line under the whole list would be read as covering the
  * rule it happens to stand under.
  */
-function factionNotes(faction: Faction, draft: Draft): string {
+function factionAbilities(faction: Faction, draft: Draft): CustomAbility[] {
 	return rulesInPlay(faction, draft)
 		.map(({ rule, option }) => {
 			const picked = option ? rule.options.find((entry) => entry.id === option) : null;
@@ -91,9 +95,19 @@ function factionNotes(faction: Faction, draft: Draft): string {
 					? ' The characteristics on the fighter cards already include this.'
 					: '';
 
-			return `${head}: ${carrier.text}${counted}`;
-		})
-		.join('\n\n');
+			/* Some faction rules are abilities a fighter spends an activation on and
+			   open with their type: "[Trait] When this fighter…". The card puts the
+			   type in front of the name, as it does for every other ability, so it
+			   is lifted out of the sentence rather than left standing in it. */
+			const marked = carrier.text.match(/^\s*\[([^\]]+)\]\s*/);
+			const type = marked ? marked[1].trim() : '';
+			const text = marked ? carrier.text.slice(marked[0].length) : carrier.text;
+			const label = type ? `[${type}] ${head}` : head;
+
+			/* "[Type] Name: Description" is the spelling the card reads back
+			   (`adapter.ts`, `customAbilities`). */
+			return { id: newId(), fighter: faction.name, type, ability: `${label}: ${text}${counted}` };
+		});
 }
 
 export function selectionsOf(faction: Faction, draft: Draft, warband: Warband): Selections {
