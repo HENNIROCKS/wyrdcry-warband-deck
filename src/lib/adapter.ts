@@ -37,6 +37,7 @@ import {
 	STAT_KEYS,
 	type CustomWeapon,
 	type FighterInstance,
+	type Selections,
 	type StatKey,
 	type Warband
 } from './types/warband';
@@ -304,7 +305,16 @@ function universalFor(keywords: string[]): Ability[] {
 	).map((rule) => ({ name: rule.name, type: rule.ability_type, description: rule.description }));
 }
 
-export function toCard(instance: FighterInstance, warband: Warband, factionName: string): FighterCardData {
+/**
+ * `chosen` is what the wizard picked for this fighter, where it had a choice to
+ * make. Absent for a warband out of the builder, which records no such thing.
+ */
+export function toCard(
+	instance: FighterInstance,
+	warband: Warband,
+	factionName: string,
+	chosen?: string[] | null
+): FighterCardData {
 	const profile = FIGHTERS.get(instance.fighterId);
 	const name = instance.customName.trim();
 	const notes: CardEntry[] = instance.notes ? [{ label: 'Notes', text: instance.notes }] : [];
@@ -486,10 +496,24 @@ export function toCard(instance: FighterInstance, warband: Warband, factionName:
 	/* What holds for this one fighter comes first, the general reference last.
 	   Despite its name, the profile's list holds the fighter's own abilities –
 	   two fighters of one faction carry different ones. */
+	/*
+	 * A preamble turns the profile's list into a menu: "you must select one of
+	 * the following abilities". Once the pick is known the card carries that one
+	 * and drops the sentence – the choice was made at recruitment, and a card
+	 * listing all three reads as three abilities the fighter has.
+	 *
+	 * Without a pick the whole list stands, preamble and all. That is a warband
+	 * from the builder, and the list is everything its file says.
+	 */
+	const offers = Boolean(profile.ability_preamble?.trim());
+	const picked = offers && chosen?.length ? chosen : null;
 	push(
 		'fighter',
-		abilityEntries(profile.faction_ability_ids, customAbilities(warband, name, profile.name)),
-		profile.ability_preamble
+		abilityEntries(
+			picked ? profile.faction_ability_ids.filter((id) => picked.includes(id)) : profile.faction_ability_ids,
+			customAbilities(warband, name, profile.name)
+		),
+		picked ? '' : profile.ability_preamble
 	);
 	push('equipment', equipmentEntries);
 	push('faction', abilityEntries(faction?.faction_ability_ids ?? [], customAbilities(warband, factionName)));
@@ -603,8 +627,11 @@ export function toWarbandCard(warband: Warband, cards: FighterCardData[]): Warba
 	};
 }
 
-/** The whole deck: the warband itself first, then its fighters. */
-export function toCards(warband: Warband): DeckCard[] {
+/**
+ * The whole deck: the warband itself first, then its fighters. `selections` is
+ * what the wizard here decided; a warband imported from the builder has none.
+ */
+export function toCards(warband: Warband, selections?: Selections | null): DeckCard[] {
 	/* The builder writes the faction's display name into `customAbilities.fighter`,
 	   while the warband stores its id. */
 	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
@@ -615,7 +642,9 @@ export function toCards(warband: Warband): DeckCard[] {
 		console.warn(`adapter: no faction "${warband.factionId}" in the game data, its rules stay off the card`);
 	}
 
-	const fighters = warband.fighters.map((f) => toCard(f, warband, faction?.name ?? ''));
+	const fighters = warband.fighters.map((f) =>
+		toCard(f, warband, faction?.name ?? '', selections?.fighters[f.instanceId])
+	);
 
 	return [toWarbandCard(warband, fighters), ...fighters];
 }

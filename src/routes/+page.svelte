@@ -20,7 +20,7 @@
 	let fileInput: HTMLInputElement | undefined = $state();
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
-	const cards = $derived(active ? toCards(active.warband) : []);
+	const cards = $derived(active ? toCards(active.warband, active.selections) : []);
 	const battle = $derived(active?.battle ?? null);
 	const left = $derived(
 		remaining(battle, active?.warband.fighters.map((f) => f.instanceId) ?? [])
