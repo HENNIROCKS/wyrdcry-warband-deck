@@ -1,1 +1,12 @@
-[]
+[
+  { "id": "weapon:dagger", "allow": "all" },
+  { "id": "weapon:club", "allow": "all" },
+  { "id": "weapon:foetid-blade", "allow": "all" },
+  { "id": "weapon:woe-stave", "allow": "all" },
+  { "id": "weapon:sword", "allow": "all" },
+  { "id": "weapon:great-weapon", "allow": "all" },
+  { "id": "weapon:plague-censer", "allow": "hero" },
+  { "id": "weapon:sling", "allow": "all" },
+  { "id": "item:shield", "allow": "all" },
+  { "id": "item:light-armour", "allow": "all" }
+]

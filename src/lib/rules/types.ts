@@ -176,10 +176,42 @@ export interface Faction {
 	name: string;
 	keyword: string;
 	warband_size: Span;
+	/**
+	 * Whether the faction comes out of the game's own rules or is written here.
+	 * A homebrew faction may bring `homebrew.json`, an official one may not:
+	 * what an official faction needs belongs in the shared lists beside this
+	 * directory, where every faction can reach it.
+	 */
+	origin: 'official' | 'homebrew';
+	/**
+	 * Which version of this entry the deck holds, `major.minor.patch`. It is the
+	 * transcription's, not the game's: the deck versions no ruleset, and what a
+	 * player compares at the table is this faction against the sheet or the PDF
+	 * in front of them. Raised by hand whenever a value here changes.
+	 */
+	version: string;
 	rules: FactionRule[];
 	fighters: Fighter[];
 	equipment: Allowance[];
 	abilities: Ability[];
+}
+
+/**
+ * What a homebrew faction adds to the shared lists: a weapon nobody else
+ * carries, the rule that weapon names, the faction's own keyword. Kept in the
+ * faction's directory rather than in `weapons.json` beside it, so the shared
+ * lists stay what the game prints and a homebrew faction can be deleted by
+ * deleting its folder.
+ *
+ * The pools are merged into the shared ones, not held apart per faction: a
+ * faction can only sell what its own `equipment.json` lists, and the checker
+ * refuses an id that already exists, which is the collision that would matter.
+ */
+export interface Homebrew {
+	keywords?: Keyword[];
+	weapons?: Weapon[];
+	items?: Item[];
+	'weapon-rules'?: WeaponRule[];
 }
 
 export interface Campaign {

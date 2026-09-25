@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": "black-fury",
+    "name": "Black Fury",
+    "type": "double",
+    "text": "Magical Ability. Until the end of the battle round, add 1 to this fighter's Fight characteristic. This fighter may immediately make a free move action followed by a free melee attack action."
+  },
+  {
+    "id": "frenzy",
+    "name": "Frenzy",
+    "type": "trait",
+    "text": "When this fighter is activated, if there is a visible enemy fighter within a distance equal to its Move characteristic plus 3\", it must make a move action that ends as close as possible to the nearest such fighter and then a melee attack action if it is able to. This fighter cannot make retreat actions."
+  },
+  {
+    "id": "liturgus-infecticus",
+    "name": "Liturgus Infecticus",
+    "type": "trait",
+    "text": "While this fighter has not been taken out of action, friendly CLAN PESTILENS fighters may re-roll failed Bravery tests."
+  },
+  {
+    "id": "manifestation-of-the-final-pandemic",
+    "name": "Manifestation of the Final Pandemic",
+    "type": "double",
+    "text": "Select up to (X/2) enemy fighters, each visible and within 6\" of this fighter or within 3\" of a corrupted objective marker. Allocate 2 damage points to each of them."
+  },
+  {
+    "id": "warpfire",
+    "name": "Warpfire",
+    "type": "triple",
+    "text": "Magical Ability. Allocate (X) damage points to the closest visible enemy fighter within 8\" of this fighter, and 1 damage point to each other fighter within 2\" of it."
+  }
+]

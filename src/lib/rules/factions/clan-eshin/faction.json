@@ -2,5 +2,7 @@
   "id": "clan-eshin",
   "name": "Clan Eshin",
   "keyword": "CLAN ESHIN",
-  "warband_size": { "min": 3, "max": 20 }
+  "warband_size": { "min": 3, "max": 20 },
+  "origin": "official",
+  "version": "1.0.0"
 }

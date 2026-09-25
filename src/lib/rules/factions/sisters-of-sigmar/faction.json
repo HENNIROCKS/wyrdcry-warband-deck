@@ -2,5 +2,7 @@
   "id": "sisters-of-sigmar",
   "name": "Sisters of Sigmar",
   "keyword": "SISTERS OF SIGMAR",
-  "warband_size": { "min": 3, "max": 15 }
+  "warband_size": { "min": 3, "max": 15 },
+  "origin": "official",
+  "version": "1.0.0"
 }

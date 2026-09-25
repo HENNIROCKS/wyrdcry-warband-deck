@@ -14,7 +14,15 @@
  */
 
 import { assembleFrom } from './assemble';
-import type { Campaign, Item, Keyword, UniversalAbility, Weapon, WeaponRule } from './types';
+import type {
+	Campaign,
+	Homebrew,
+	Item,
+	Keyword,
+	UniversalAbility,
+	Weapon,
+	WeaponRule
+} from './types';
 import campaign from './campaign.json';
 import keywords from './keywords.json';
 import weapons from './weapons.json';
@@ -28,11 +36,30 @@ function byId<T extends { id: string }>(list: T[]): Map<string, T> {
 	return new Map(list.map((entry) => [entry.id, entry]));
 }
 
+/**
+ * A homebrew faction brings its own weapons and the keyword under which it
+ * fights, and they go into the same lists as the printed ones – everything
+ * downstream resolves an id against one map, and a second one for the homebrew
+ * would have to be threaded through all of it.
+ *
+ * Its own directory is where they live, so the shared lists stay what the game
+ * prints. `npm run check:rules` refuses an id that is already taken, which is
+ * what keeps the merge from redefining a Sword for every faction at once.
+ */
+const homebrew = Object.values(
+	import.meta.glob<{ default: Homebrew }>('./factions/*/homebrew.json', { eager: true })
+).map((module) => module.default);
+
+function pooled<T extends { id: string }>(shared: unknown, key: keyof Homebrew): Map<string, T> {
+	const added = homebrew.flatMap((entry) => (entry[key] ?? []) as unknown as T[]);
+	return byId([...(shared as T[]), ...added]);
+}
+
 export const CAMPAIGN = campaign as Campaign;
-export const KEYWORDS = byId(keywords as Keyword[]);
-export const WEAPONS = byId(weapons as Weapon[]);
-export const ITEMS = byId(items as Item[]);
-export const WEAPON_RULES = byId(weaponRules as WeaponRule[]);
+export const KEYWORDS = pooled<Keyword>(keywords, 'keywords');
+export const WEAPONS = pooled<Weapon>(weapons, 'weapons');
+export const ITEMS = pooled<Item>(items, 'items');
+export const WEAPON_RULES = pooled<WeaponRule>(weaponRules, 'weapon-rules');
 export const UNIVERSAL_ABILITIES = universalAbilities as UniversalAbility[];
 
 /**

@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "blessed-with-filth",
+    "name": "Blessed with Filth",
+    "phase": "battle",
+    "text": "All CLAN PESTILENS fighters have this trait. The apprentices and deacons of the clan perfected a pox that melts the lungs of manthing and elfthing alike but leaves the faithful untouched. This fighter is not affected by Corruption, by the Plague Vapour rule of the Plague Censer, or by the Infecting rule of the Foetid Blade.",
+    "pick": null,
+    "options": [],
+    "effect": null
+  },
+  {
+    "id": "corruption",
+    "name": "Corruption",
+    "phase": "battle",
+    "text": "While a friendly CLAN PESTILENS fighter is within 1\" of an objective marker, that marker becomes **corrupted**. It remains corrupted for the rest of the battle, even after that fighter moves away or is taken out of action. At the end of each battle round, roll a die for each enemy fighter within 3\" of a corrupted objective marker. On a 3+, allocate 2 damage points to that fighter. Fighters with the CLAN PESTILENS keyword are never affected by a corrupted objective marker (see Blessed with Filth).",
+    "pick": null,
+    "options": [],
+    "effect": null
+  },
+  {
+    "id": "doomed",
+    "name": "Doomed",
+    "phase": "battle",
+    "text": "The clan spends its novices as freely as it spends its rats, and a deacon who comes back with half his flock has still come back. When counting how many friendly fighters have been taken out of action to determine whether your warband is wavering, each Plague Novice counts as half a fighter. The size of your warband is unaffected, and the resulting count may be a fraction; compare it to the threshold as it stands.",
+    "pick": null,
+    "options": [],
+    "effect": null
+  }
+]

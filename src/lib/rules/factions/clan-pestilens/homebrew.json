@@ -1,0 +1,59 @@
+{
+  "keywords": [
+    {
+      "id": "clan-pestilens",
+      "name": "CLAN PESTILENS",
+      "type": "faction",
+      "rules": []
+    }
+  ],
+  "weapon-rules": [
+    {
+      "id": "plague-vapour",
+      "name": "PLAGUE VAPOUR",
+      "text": "After this weapon's attack action is resolved, allocate 1 damage point to each other fighter within 1\" of the target that does not have the CLAN PESTILENS keyword.",
+      "effect": null
+    },
+    {
+      "id": "infecting",
+      "name": "INFECTING",
+      "text": "On a critical hit, allocate 1 additional damage point to the target unless it has the CLAN PESTILENS keyword.",
+      "effect": null
+    }
+  ],
+  "weapons": [
+    {
+      "id": "plague-censer",
+      "name": "Plague Censer",
+      "type": "melee",
+      "range": { "min": 0, "max": 2 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 4,
+      "rules": ["mighty-1", "two-handed", "unreliable", "plague-vapour"],
+      "cost": 35
+    },
+    {
+      "id": "foetid-blade",
+      "name": "Foetid Blade",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 3,
+      "hit": 1,
+      "crit": 3,
+      "rules": ["infecting"],
+      "cost": 15
+    },
+    {
+      "id": "woe-stave",
+      "name": "Woe-stave",
+      "type": "melee",
+      "range": { "min": 0, "max": 2 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 3,
+      "rules": [],
+      "cost": 15
+    }
+  ]
+}

@@ -1,1 +1,97 @@
-[]
+[
+  {
+    "id": "plague-priest",
+    "name": "Plague Priest",
+    "cost": 120,
+    "limit": { "min": 1, "max": 1 },
+    "description": "A Plague Priest leads by rite and by fear, chanting the Liturgus Infecticus over his flock until the words mean nothing and the sickness means everything. Raw sorcery he leaves to his deacons — a true priest does not stoop to it.",
+    "profile": {
+      "move": 5,
+      "fight": 4,
+      "shoot": 3,
+      "defense": 3,
+      "health": 16,
+      "bravery": 5
+    },
+    "keywords": ["skaven", "clan-pestilens", "hero", "leader"],
+    "abilities": ["liturgus-infecticus", "manifestation-of-the-final-pandemic"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "plague-deacon",
+    "name": "Plague Deacon",
+    "cost": 95,
+    "limit": { "min": 0, "max": 1 },
+    "description": "A Plague Deacon is the ratman who dirties his own paws with warp-sorcery — a lesser art in the eyes of the priesthood, and the reason the priesthood keeps him around. He conjures the Horned Rat's flame by his own means and answers for it himself.",
+    "profile": {
+      "move": 5,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 12,
+      "bravery": 5
+    },
+    "keywords": ["skaven", "clan-pestilens", "hero", "wizard"],
+    "abilities": ["black-fury", "warpfire"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "plague-monk",
+    "name": "Plague Monk",
+    "cost": 95,
+    "limit": { "min": 0, "max": 3 },
+    "description": "The Plague Monks enter a fight blind to everything but its end. They chant, they swing, and the red veil does the rest.",
+    "profile": {
+      "move": 5,
+      "fight": 4,
+      "shoot": 3,
+      "defense": 3,
+      "health": 14,
+      "bravery": 5
+    },
+    "keywords": ["skaven", "clan-pestilens", "hero"],
+    "abilities": ["frenzy"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "plague-novice",
+    "name": "Plague Novice",
+    "cost": 55,
+    "limit": { "min": 0, "max": null },
+    "description": "The lowest rank of the clan, sent ahead of the Monks to fill the streets and the arrow-paths. Every one of them dreams of the day he is lowered into a cauldron and comes back out a Monk.",
+    "profile": {
+      "move": 5,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 10,
+      "bravery": 6
+    },
+    "keywords": ["skaven", "clan-pestilens", "henchman"],
+    "abilities": [],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "plague-rat",
+    "name": "Plague Rat",
+    "cost": 40,
+    "limit": { "min": 0, "max": null },
+    "description": "Contagious rats the size of dogs, driven ahead of the clan in a chittering carpet.",
+    "profile": {
+      "move": 8,
+      "fight": 2,
+      "shoot": 2,
+      "defense": 2,
+      "health": 6,
+      "bravery": 6
+    },
+    "keywords": ["beast", "clan-pestilens", "henchman"],
+    "abilities": [],
+    "gear": ["weapon:vicious-teeth"],
+    "choose": null
+  }
+]

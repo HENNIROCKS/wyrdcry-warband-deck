@@ -73,6 +73,51 @@ const weaponIds = ids(weapons);
 const itemIds = ids(items);
 const weaponRuleIds = ids(weaponRules);
 
+/* --- What the homebrew factions add to the shared lists ------------------- */
+
+const factionsDir = join(RULES, 'factions');
+const folders = (await readdir(factionsDir, { withFileTypes: true }))
+	.filter((entry) => entry.isDirectory())
+	.map((entry) => entry.name);
+
+/** The folders that brought a homebrew.json, checked against `origin` below. */
+const brought = new Set();
+
+/*
+ * Merged into the shared lists rather than held beside them, the way the app
+ * loads them: everything downstream resolves an id against one list. They are
+ * merged before the shape is checked, so a homebrew weapon is held to the same
+ * rules as a printed one.
+ *
+ * An id that already exists is refused instead of merged. Two factions each
+ * with their own `sword` would leave the map with whichever came last, and the
+ * other faction would quietly sell the wrong weapon.
+ */
+for (const folder of folders) {
+	const file = join(factionsDir, folder, 'homebrew.json');
+	const added = (await readdir(join(factionsDir, folder))).includes('homebrew.json')
+		? await read(file)
+		: null;
+	if (!added) continue;
+	brought.add(folder);
+
+	for (const [key, list, taken] of [
+		['keywords', keywords, keywordIds],
+		['weapons', weapons, weaponIds],
+		['items', items, itemIds],
+		['weapon-rules', weaponRules, weaponRuleIds]
+	]) {
+		for (const entry of added[key] ?? []) {
+			if (taken.has(entry.id)) {
+				problem(file, `"${entry.id}" is already in ${key}.json – a homebrew id has to be its own`);
+				continue;
+			}
+			list.push(entry);
+			taken.add(entry.id);
+		}
+	}
+}
+
 /** Ids have to be unique per file, or the loader's map silently keeps one. */
 function duplicates(file, list) {
 	const seen = new Set();
@@ -131,11 +176,6 @@ for (const ability of universal) {
 
 /* --- One faction per directory ------------------------------------------- */
 
-const factionsDir = join(RULES, 'factions');
-const folders = (await readdir(factionsDir, { withFileTypes: true }))
-	.filter((entry) => entry.isDirectory())
-	.map((entry) => entry.name);
-
 if (!folders.length) problem(factionsDir, 'no faction directory at all');
 
 for (const folder of folders) {
@@ -172,7 +212,22 @@ for (const folder of folders) {
 		problem(file('faction'), `id is "${faction.id}" but the directory is "${folder}"`);
 	}
 	if (!keywordIds.has(faction.id)) {
-		problem(file('faction'), `no keyword "${faction.id}" in keywords.json – a fighter of this faction carries it`);
+		problem(file('faction'), `no keyword "${faction.id}" – a fighter of this faction carries it`);
+	}
+
+	/* What an official faction needs belongs in the shared lists, where every
+	   faction can reach it; a homebrew.json beside one would hide it in a folder
+	   that has no reason to own it. */
+	if (!['official', 'homebrew'].includes(faction.origin)) {
+		problem(file('faction'), `origin is "${faction.origin}" – write "official" or "homebrew"`);
+	} else if (brought.has(folder) && faction.origin !== 'homebrew') {
+		problem(file('homebrew'), `this faction is "${faction.origin}" – only a homebrew faction brings one`);
+	}
+
+	/* The shape only. What the number should be is a judgement about how much of
+	   the entry moved, and no check can make it. */
+	if (!/^\d+\.\d+\.\d+$/.test(faction.version ?? '')) {
+		problem(file('faction'), `version is "${faction.version}" – write it as major.minor.patch`);
 	}
 
 	const abilityIds = ids(abilities);
