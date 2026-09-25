@@ -516,7 +516,23 @@ export function toCard(
 		picked ? '' : profile.ability_preamble
 	);
 	push('equipment', equipmentEntries);
-	push('faction', abilityEntries(faction?.faction_ability_ids ?? [], customAbilities(warband, factionName)));
+	/*
+	 * A warband built here carries its faction's rules as `customAbilities`, out
+	 * of this app's own ruleset. Where it does, the game data's list for the same
+	 * faction is the same rules a second time and is left out: Sisters of Sigmar
+	 * is the one faction whose `faction_ability_ids` is not empty, and its two
+	 * versions of Sigmar's Blessing disagree – "Heart of Steel" and a panic test
+	 * against the rulebook's "Hearts of Steel" and a Bravery test.
+	 *
+	 * Matching by name would not catch it: the two spell the apostrophe
+	 * differently. A warband out of the builder brings no such rules, so for it
+	 * the game data's list is still the only one there is.
+	 */
+	const ownFactionRules = customAbilities(warband, factionName);
+	push(
+		'faction',
+		abilityEntries(ownFactionRules.length ? [] : (faction?.faction_ability_ids ?? []), ownFactionRules)
+	);
 	/* Two headings out of one list: an ability is spent on your own activation, a
 	   reaction during the enemy's, and at the table you look for one or the other. */
 	const universal = universalFor(keywords);
