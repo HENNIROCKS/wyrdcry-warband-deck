@@ -1,32 +1,32 @@
 [
-	{
-		"id": "for-the-master",
-		"name": "For the Master",
-		"type": "reaction",
-		"text": "A fighter can make this reaction when a Vampire within 3\" of them is targeted by an attack action, after the damage is totalled but before it is allocated, if it is enough for that Vampire to be taken out of action. Allocate those damage points, one at a time, to this fighter instead. If this fighter is taken out of action, allocate any remaining damage points to that friendly Vampire."
-	},
-	{
-		"id": "the-beast-within",
-		"name": "The Beast Within",
-		"type": "trait",
-		"text": "When a Vampire is deployed to the battlefield, roll a die: on a 1-5, the vampire is ravenous, on a 6 the Vampire is empowered.\n\nOnce per battle round, when a ravenous vampire is activated, it can perform a free move action. However, while ravenous, a vampire cannot use reactions or abilities, except Feed (see below).\n\nAn empowered vampire can use multiple abilities in each activation. The same ability can be used more than once, but abilities that grant free actions must be fully resolved before another ability can be used. In addition, once per battle round when an empowered vampire uses an ability, you can either add a double with a value of 3, treat a double as a triple, or a triple as a quad. After the ability is resolved, this fighter's activation ends and it becomes ravenous."
-	},
-	{
-		"id": "feed",
-		"name": "Feed",
-		"type": "double",
-		"text": "Allocate X/2 damage points to a visible fighter within 1\" of this fighter. Then, remove X/2 damage points from this fighter. If this fighter is ravenous, it becomes empowered instead."
-	},
-	{
-		"id": "chilling-howl",
-		"name": "Chilling Howl",
-		"type": "triple",
-		"text": "Until the end of the battle round, enemy fighters within 6\" of this fighter must pass a Bravery test to make reactions or use abilities."
-	},
-	{
-		"id": "shambling-horde",
-		"name": "Shambling Horde",
-		"type": "double",
-		"text": "Select up to 3 visible friendly fighters with the Zombie keyword. Those fighters can each immediately make a bonus move action of up to 3\", as long as they end that move action closer to this fighter."
-	}
+  {
+    "id": "for-the-master",
+    "name": "For the Master",
+    "type": "reaction",
+    "text": "A fighter can make this reaction when a VAMPIRE within 3\" of them is targeted by an attack action, after the damage is totalled but before it is allocated, if it is enough for that VAMPIRE to be taken out of action. Allocate those damage points, one at a time, to this fighter instead. If this fighter is taken out of action, allocate any remaining damage points to that friendly VAMPIRE."
+  },
+  {
+    "id": "the-beast-within",
+    "name": "The Beast Within",
+    "type": "trait",
+    "text": "When a VAMPIRE is deployed to the battlefield, roll a die: on a 1-5, the vampire is ravenous, on a 6 the VAMPIRE is empowered.\n\nOnce per battle round, when a ravenous vampire is activated, it can perform a free move action. However, while ravenous, a vampire cannot use reactions or abilities, except Feed (see below).\n\nAn empowered vampire can use multiple abilities in each activation. The same ability can be used more than once, but abilities that grant free actions must be fully resolved before another ability can be used. In addition, once per battle round when an empowered vampire uses an ability, you can either add a double with a value of 3, treat a double as a triple, or a triple as a quad. After the ability is resolved, this fighter's activation ends and it becomes ravenous."
+  },
+  {
+    "id": "feed",
+    "name": "Feed",
+    "type": "double",
+    "text": "Allocate X/2 damage points to a visible fighter within 1\" of this fighter. Then, remove X/2 damage points from this fighter. If this fighter is ravenous, it becomes empowered instead."
+  },
+  {
+    "id": "chilling-howl",
+    "name": "Chilling Howl",
+    "type": "triple",
+    "text": "Until the end of the battle round, enemy fighters within 6\" of this fighter must pass a Bravery test to make reactions or use abilities."
+  },
+  {
+    "id": "shambling-horde",
+    "name": "Shambling Horde",
+    "type": "double",
+    "text": "Select up to 3 visible friendly fighters with the Zombie keyword. Those fighters can each immediately make a bonus move action of up to 3\", as long as they end that move action closer to this fighter."
+  }
 ]
