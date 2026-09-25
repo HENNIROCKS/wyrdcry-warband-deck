@@ -11,7 +11,8 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"sync:data": "node scripts/sync-data.mjs",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:rules": "node scripts/check-rules.mjs"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
