@@ -30,6 +30,12 @@
 		"rules": []
 	},
 	{
+		"id": "possessed",
+		"name": "POSSESSED",
+		"type": "faction",
+		"rules": []
+	},
+	{
 		"id": "human",
 		"name": "HUMAN",
 		"type": "race",
@@ -50,6 +56,12 @@
 	{
 		"id": "ghoul",
 		"name": "GHOUL",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "daemon",
+		"name": "DAEMON",
 		"type": "race",
 		"rules": []
 	},
@@ -114,6 +126,14 @@
 			"Never earn experience or gain renown",
 			"Cannot carry treasure tokens",
 			"Automatically pass any Bravery test they are required to take"
+		]
+	},
+	{
+		"id": "mutant",
+		"name": "MUTANT",
+		"type": "fighter",
+		"rules": [
+			"Must make a Stability test when gaining renown, before making a characteristics increase or selecting a talent"
 		]
 	},
 	{

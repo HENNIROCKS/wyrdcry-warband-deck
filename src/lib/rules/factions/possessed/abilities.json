@@ -1,1 +1,44 @@
-[]
+[
+	{
+		"id": "ascended",
+		"name": "Ascended",
+		"type": "trait",
+		"text": "When this fighter is recruited to the warband, it must make a roll on the mutation table. It refuses to be equipped with any equipment, weapons or armour."
+	},
+	{
+		"id": "anointed",
+		"name": "Anointed",
+		"type": "trait",
+		"text": "When this fighter is recruited to the warband, it must make a roll on the mutation table."
+	},
+	{
+		"id": "hollowed",
+		"name": "Hollowed",
+		"type": "trait",
+		"text": "This fighter automatically passes any Bravery tests it is required to take."
+	},
+	{
+		"id": "display-of-brutality",
+		"name": "Display of Brutality",
+		"type": "triple",
+		"text": "A fighter can use this ability only if an enemy fighter has been taken down by an attack action made by them this activation. Until the end of the battle round, add 1 to the Attacks characteristic of melee attack action made by friendly fighters while they are within 6\" of this fighter."
+	},
+	{
+		"id": "puppet-master",
+		"name": "Puppet Master",
+		"type": "triple",
+		"text": "*Magical ability*. Select a visible fighter within 6\" of this fighter. That fighter must pass a Bravery test or immediately make a free Move, Retreat, or Attack action of your choice (a friendly fighter can choose to automatically fail the Bravery test)."
+	},
+	{
+		"id": "curse-of-agony",
+		"name": "Curse of Agony",
+		"type": "double",
+		"text": "*Magical ability*. Select a visible fighter within 12\" of this fighter and roll (X) dice. For each result of 2+, allocate 1 damage point to that fighter."
+	},
+	{
+		"id": "touch-of-chaos",
+		"name": "Touch of Chaos",
+		"type": "quad",
+		"text": "*Magical ability*. Select a visible fighter within 1\" of this fighter. That fighter must take a Bravery test. If the test fails, the fighter is immediately removed from the battlefield. The fighter does not count as taken out of action, but gains the `MUTANT` keyword."
+	}
+]

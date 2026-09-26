@@ -1,1 +1,68 @@
-[]
+[
+	{
+		"id": "brethren",
+		"name": "Brethren",
+		"cost": 65,
+		"limit": { "min": 0, "max": null },
+		"description": "Brethren are the crazed human followers of the cults of the dark gods, eager to descend into damnation.",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["human", "possessed", "henchman"],
+		"abilities": [],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "darksoul",
+		"name": "Darksoul",
+		"cost": 110,
+		"limit": { "min": 0, "max": 3 },
+		"description": "Hollowed out by daemonic possession, these revered warriors serve as the holy enforcers of the cult, carrying out their bloody craft without fear.",
+		"profile": { "move": 5, "fight": 4, "shoot": 3, "defense": 3, "health": 14, "bravery": 4 },
+		"keywords": ["human", "possessed", "hero"],
+		"abilities": ["hollowed", "display-of-brutality"],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "magister",
+		"name": "Magister",
+		"cost": 110,
+		"limit": { "min": 1, "max": 1 },
+		"description": "The cult magister is a charismatic and brilliant individual, who bends lesser souls to their will through dark pacts and a silver tongue.",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 12, "bravery": 4 },
+		"keywords": ["human", "possessed", "hero", "leader", "wizard"],
+		"abilities": [],
+		"gear": [],
+		"choose": {
+			"source": null,
+			"prompt": "When recruiting this fighter, you must select one of the following abilities:",
+			"kind": "ability",
+			"pick": 1,
+			"abilities": ["puppet-master", "curse-of-agony", "touch-of-chaos"]
+		}
+	},
+	{
+		"id": "mutant",
+		"name": "Mutant",
+		"cost": 75,
+		"limit": { "min": 0, "max": null },
+		"description": "Hollowed out by daemonic possession, these revered warriors have become instruments of violence, free from fear or mercy.",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["human", "possessed", "henchman", "mutant"],
+		"abilities": ["anointed"],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "possessed",
+		"name": "Possessed",
+		"cost": 180,
+		"limit": { "min": 0, "max": 1 },
+		"description": "The Possessed have committed the greatest of sins: they have given their bodies to Daemons. They are nightmarish creatures made of flesh and black magic.",
+		"profile": { "move": 6, "fight": 4, "shoot": 3, "defense": 4, "health": 18, "bravery": 4 },
+		"keywords": ["daemon", "possessed", "hero", "mutant"],
+		"abilities": ["ascended"],
+		"gear": ["weapon:possessed-daemonic-appendage"],
+		"choose": null
+	}
+]

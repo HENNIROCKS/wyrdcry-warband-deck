@@ -176,6 +176,17 @@
 		"cost": 25
 	},
 	{
+		"id": "possessed-daemonic-appendage",
+		"name": "Daemonic Appendage",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 3,
+		"crit": 4,
+		"rules": [],
+		"cost": 25
+	},
+	{
 		"id": "sigmarite-warhammer",
 		"name": "Sigmarite Warhammer",
 		"type": "melee",
