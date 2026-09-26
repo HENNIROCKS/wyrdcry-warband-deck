@@ -1,1 +1,38 @@
-[]
+[
+	{
+		"id": "zeal-grim",
+		"name": "Zeal 0: Grim",
+		"phase": "battle",
+		"text": "Over the course of a battle, track the warband's Zeal. As Zeal passes each threshold below, the effect applies to all friendly fighters with the `WITCH HUNTERS` keyword in addition to any threshold already passed. At 0 Zeal: when a friendly fighter makes an attack action against a fighter with an accusation token, you may increase their Fight or Shoot characteristic by 1.",
+		"pick": null,
+		"options": [],
+		"effect": null
+	},
+	{
+		"id": "zeal-wrathful",
+		"name": "Zeal 5: Wrathful",
+		"phase": "battle",
+		"text": "At 5 Zeal: when a friendly fighter makes an attack action against a fighter with an accusation token, you may turn 1 hit into a critical hit.",
+		"pick": null,
+		"options": [],
+		"effect": null
+	},
+	{
+		"id": "zeal-frenzied",
+		"name": "Zeal 10: Frenzied",
+		"phase": "battle",
+		"text": "At 10 Zeal: when a friendly fighter is targeted by an attack action, you may turn 1 critical hit into a hit.",
+		"pick": null,
+		"options": [],
+		"effect": null
+	},
+	{
+		"id": "zeal-maddened",
+		"name": "Zeal 15: Maddened",
+		"phase": "battle",
+		"text": "At 15+ Zeal: all friendly fighters must decrease their Defense characteristic by 1, but will pass any Bravery test they are required to take.",
+		"pick": null,
+		"options": [],
+		"effect": null
+	}
+]

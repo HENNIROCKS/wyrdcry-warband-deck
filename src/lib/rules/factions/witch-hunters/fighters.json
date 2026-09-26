@@ -1,1 +1,62 @@
-[]
+[
+	{
+		"id": "witch-hunter-captain",
+		"name": "Witch Hunter Captain",
+		"cost": 120,
+		"limit": { "min": 1, "max": 1 },
+		"description": "",
+		"profile": { "move": 5, "fight": 4, "shoot": 4, "defense": 3, "health": 14, "bravery": 4 },
+		"keywords": ["human", "witch-hunters", "hero", "leader"],
+		"abilities": ["condemn", "sudden-accusation"],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "witch-hunter",
+		"name": "Witch Hunter",
+		"cost": 90,
+		"limit": { "min": 0, "max": 3 },
+		"description": "",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 12, "bravery": 4 },
+		"keywords": ["human", "witch-hunters", "hero"],
+		"abilities": ["sudden-accusation"],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "flagellant",
+		"name": "Flagellant",
+		"cost": 100,
+		"limit": { "min": 0, "max": 5 },
+		"description": "",
+		"profile": { "move": 5, "fight": 4, "shoot": 3, "defense": 3, "health": 14, "bravery": 4 },
+		"keywords": ["human", "witch-hunters", "henchman"],
+		"abilities": ["self-flagellation", "unshakeable", "penitent"],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "zealot",
+		"name": "Zealot",
+		"cost": 65,
+		"limit": { "min": 0, "max": null },
+		"description": "",
+		"profile": { "move": 5, "fight": 3, "shoot": 3, "defense": 3, "health": 10, "bravery": 5 },
+		"keywords": ["human", "witch-hunters", "henchman"],
+		"abilities": [],
+		"gear": [],
+		"choose": null
+	},
+	{
+		"id": "war-hound",
+		"name": "War Hound",
+		"cost": 65,
+		"limit": { "min": 0, "max": null },
+		"description": "",
+		"profile": { "move": 6, "fight": 4, "shoot": 3, "defense": 3, "health": 8, "bravery": 5 },
+		"keywords": ["beast", "witch-hunters", "henchman"],
+		"abilities": ["death-grip"],
+		"gear": ["weapon:warhound-savage-bite"],
+		"choose": null
+	}
+]

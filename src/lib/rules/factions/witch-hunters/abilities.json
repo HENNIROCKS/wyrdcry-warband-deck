@@ -1,1 +1,38 @@
-[]
+[
+	{
+		"id": "condemn",
+		"name": "Condemn",
+		"type": "triple",
+		"text": "Select up to (X/2) visible enemy fighters without an Accused token and assign each one an Accused token. Increase Zeal by 1 for each token assigned this way, or by 3 if that fighter has the `WIZARD`, `DAEMON`, or `VAMPIRE` keyword."
+	},
+	{
+		"id": "sudden-accusation",
+		"name": "Sudden Accusation",
+		"type": "reaction",
+		"text": "Make this reaction when a visible friendly fighter is taken out of action by a visible enemy fighter. That enemy fighter gains an accused token. Increase Zeal by 1."
+	},
+	{
+		"id": "self-flagellation",
+		"name": "Self-Flagellation",
+		"type": "double",
+		"text": "Allocate (X/2) damage points to this fighter and increase Zeal by 1. Then, this fighter makes a free attack action."
+	},
+	{
+		"id": "unshakeable",
+		"name": "Unshakeable",
+		"type": "trait",
+		"text": "This fighter automatically passes any Panic tests it is required to take."
+	},
+	{
+		"id": "penitent",
+		"name": "Penitent",
+		"type": "trait",
+		"text": "This fighter cannot be equipped with ranged weapons or wear any armour."
+	},
+	{
+		"id": "death-grip",
+		"name": "Death Grip",
+		"type": "double",
+		"text": "After this fighter's next melee attack action in this activation, if at least 1 hit roll from that attack action results in a hit, the target forfeits 1 of their actions in this battle round. If the target has already activated or if they have no more actions to forfeit, allocate 3 damage points to the target instead."
+	}
+]

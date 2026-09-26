@@ -154,6 +154,17 @@
 		"cost": 0
 	},
 	{
+		"id": "warhound-savage-bite",
+		"name": "Savage Bite",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 4,
+		"rules": [],
+		"cost": 0
+	},
+	{
 		"id": "steel-whip",
 		"name": "Steel Whip",
 		"type": "melee",
@@ -207,6 +218,17 @@
 		"crit": 6,
 		"rules": ["mighty-2", "reload", "unreliable", "brace"],
 		"cost": 35
+	},
+	{
+		"id": "crossbow-pistol",
+		"name": "Crossbow Pistol",
+		"type": "ranged",
+		"range": { "min": 0, "max": 6 },
+		"attacks": 2,
+		"hit": 3,
+		"crit": 5,
+		"rules": ["mighty-1", "reload", "brace"],
+		"cost": 20
 	},
 	{
 		"id": "blunderbuss",

@@ -24,6 +24,12 @@
 		"rules": []
 	},
 	{
+		"id": "witch-hunters",
+		"name": "WITCH HUNTERS",
+		"type": "faction",
+		"rules": []
+	},
+	{
 		"id": "human",
 		"name": "HUMAN",
 		"type": "race",
