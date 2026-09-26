@@ -105,16 +105,20 @@ clears the data of sites that are not installed after seven days without use.
 
 ## Development
 
-Node 20 or newer.
+Node 20 or newer. Go through the `Makefile` rather than calling npm directly –
+it carries the environment the toolchain needs, and `make dev` in particular is
+not `npm run dev`: it serves on the local network and opens the QR page, because
+the phone is where a card height and a swipe are actually confirmed.
 
 ```sh
 npm install
-npm run sync:data     # copy the game data from the site repo
-npm run dev
+make sync     # copy the game data from the site repo
+make dev
 ```
 
-`npm run sync:data` expects the repo [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry)
-as a sibling directory. If it lives elsewhere:
+`make sync` expects the repo [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry)
+as a sibling directory. If it lives elsewhere, call the script directly – the
+make target passes no arguments through:
 
 ```sh
 npm run sync:data -- --from /path/to/wyrdcry/src/data
@@ -141,10 +145,11 @@ gitignored.
 
 | Command | Purpose |
 | --- | --- |
-| `npm run dev` | development server |
-| `npm run build` | static site into `build/` |
-| `npm run check` | type check |
-| `npm run sync:data` | fetch the game data |
+| `make dev` | development server on the local network, opening the QR page |
+| `make build` | static site into `build/` |
+| `make check` | type check **and** the ids in the hand-kept ruleset |
+| `make check-rules` | the ruleset alone, without the type check |
+| `make sync` | fetch the game data |
 
 ## Deployment
 
