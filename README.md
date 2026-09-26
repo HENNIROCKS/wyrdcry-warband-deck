@@ -87,7 +87,8 @@ the result of everything above.
 - [ ] Warband Builder compatibility, measured rather than assumed
 
 Not sorted into that order and not dropped: working offline at the table –
-cached game data, screen kept awake.
+cached game data, screen kept awake – and Witch Hunters' zeal, tracked through
+a battle the way wounds already are.
 
 Further out and nothing promised: NFC tags under the model bases, a photo of the
 painted model as the card image, showing an opponent the warband over a
