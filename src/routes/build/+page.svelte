@@ -236,29 +236,23 @@
 	{#if step === 'warband'}
 		<section>
 			<h2>Faction</h2>
-			{#each groups as group (group.origin)}
-				<h3>{group.title}</h3>
-				<ul class="cards">
-					{#each group.entries as entry (entry.id)}
-						<li>
-							<button
-								class:on={entry.id === draft.factionId}
-								onclick={() => {
-									draft.factionId = entry.id;
-									draft.ruleChoices = {};
-									draft.fighters = [];
-								}}
-							>
-								<span class="name">{entry.name}</span>
-								<span class="meta">
-									{entry.warband_size.min}–{entry.warband_size.max} fighters ·
-									{entry.fighters.length} profiles · v{entry.version}
-								</span>
-							</button>
-						</li>
-					{/each}
-				</ul>
-			{/each}
+			<select
+				class="faction-select"
+				value={draft.factionId}
+				onchange={(event) => {
+					draft.factionId = event.currentTarget.value;
+					draft.ruleChoices = {};
+					draft.fighters = [];
+				}}
+			>
+				{#each groups as group (group.origin)}
+					<optgroup label={group.title}>
+						{#each group.entries as entry (entry.id)}
+							<option value={entry.id}>{entry.name} v{entry.version}</option>
+						{/each}
+					</optgroup>
+				{/each}
+			</select>
 		</section>
 	{:else if step === 'rules' && faction}
 		<label class="named" class:missing={!named}>
@@ -525,17 +519,13 @@
 		color: var(--ui-text-subtle);
 	}
 
-	/* Under the section heading, which is already uppercase and subtle – so this
-	   one separates by weight and colour instead of by another size step. */
-	h3 {
-		margin: 4px 0 0;
-		font-size: var(--ui-t-base);
-		font-weight: 600;
+	.faction-select {
+		padding: 11px 12px;
+		font-size: var(--ui-t-md);
 		color: var(--ui-text);
-	}
-
-	h3:first-of-type {
-		margin-top: 0;
+		background: var(--ui-surface);
+		border: 1px solid var(--ui-border);
+		border-radius: 9px;
 	}
 
 	.named {
@@ -627,7 +617,6 @@
 		gap: 6px;
 	}
 
-	.cards button,
 	.options button,
 	.recruited button {
 		display: grid;
