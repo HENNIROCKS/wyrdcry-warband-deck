@@ -1,19 +1,23 @@
 # Wyrdcry Warband Deck
 
 Your own [Wyrdcry](https://wyrdcry.net) warband as a deck of cards on your phone.
-Export the warband from the Warband Builder, import it here, swipe through the
-fighters.
+Build the warband here, or import one from the Warband Builder, then swipe
+through the fighters.
 
 Unofficial fan project. No connection to Games Workshop.
 
-**Status: early.** The app builds a Mercenaries warband and tracks a battle;
-it does not yet edit a warband once it exists.
+**Status: early.** The app builds a warband of any of the eight factions and
+tracks a battle; it does not yet edit a warband once it exists, and the way back
+to the Warband Builder is not currently assured – see
+[Warband Builder compatibility](#warband-builder-compatibility).
 
 ## What it does
 
 - Build a warband step by step: faction, its rules, then one fighter at a time,
   with the budget, the roster limits and the equipment restrictions checked as
-  you go. Mercenaries so far
+  you go. Eight factions: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead,
+  Witch Hunters and the Possessed out of the rulebook, plus Clan Pestilens and
+  the Greenskin Marauders as homebrew
 - Import warband JSON from the builder
 - Show the warband itself as the first card: faction, standing, favour,
   reputation, gold, value, stash and the warband notes
@@ -26,19 +30,66 @@ it does not yet edit a warband once it exists.
   dated snapshot
 - Warn on import when the file is older than the stored state
 
+## Warband Builder compatibility
+
+The export is still written in the shape the Warband Builder reads, and for the
+six factions out of the rulebook the way back is built to hold: `statOverrides`
+carries absolute values, and everything the builder's model has no field for
+rides along under a key its import leaves alone.
+
+**It has not been measured since this app grew a builder of its own.** And for
+the two homebrew factions it cannot hold: `clan-pestilens` and
+`greenskin-marauders`, and the eleven fighter profiles under them, exist only
+here. The builder accepts such a file and then resolves neither the faction nor
+any of its fighters.
+
+Until that is settled, treat Export and Snapshot as the way to keep a copy
+rather than as a round trip. Restoring it is the last item on the roadmap below,
+because everything above it changes the file that would be checked.
+
 ## Roadmap
 
+Done:
+
 - [x] Import warband JSON, swipe through the deck, export it again
-- [x] Build a warband in the app, for one faction
+- [x] Build a warband in the app, for all eight factions
 - [x] The warband itself as the first card
 - [x] Mark fighters as activated, count the rounds, undo one step
-- [ ] Wounds, and out of action derived from them
-- [ ] Work offline at the table: cache the game data, keep the screen awake
-- [ ] The aftermath sequence – injuries, experience, exploration, buying
-- [ ] Reference cards for weapons, items, abilities and keywords in the same deck
-- [ ] Waiting as a third battle state, alongside activated
-- [ ] The remaining six factions in the ruleset, and editing a warband after it
-      has been built
+
+**Confirm what is there.** Eight factions are transcribed and none has been
+played; whatever turns up here changes the shape of everything below.
+
+- [ ] Play a Possessed warband end to end – the faction that tests the rest
+
+**The battle.** Wounds, out of action and waiting share one write path, so they
+are one step rather than three.
+
+- [ ] In-game states: wounds, out of action, waiting
+
+**After the battle.** The aftermath sequence has six steps, and it is the first
+thing that writes to the campaign rather than to a battle.
+
+- [ ] Experience and renown
+- [ ] Heroic traits
+- [ ] Injuries
+- [ ] The rest of the sequence: favour, income, the trading post, recalculated
+      reputation
+
+**The warband between evenings.** Touching a warband that already exists – so
+far it is built once and read-only after that.
+
+- [ ] Hired Swords
+- [ ] The warband stash and its notes, and changing a fighter afterwards: their
+      equipment, their name, dismissing them
+
+**What all of it depends on.** Neither can be pulled forward: their subject is
+the result of everything above.
+
+- [ ] A pass over the design and the interface outside the cards
+- [ ] Warband Builder compatibility, measured rather than assumed
+
+Not sorted into that order and not dropped: working offline at the table –
+cached game data, screen kept awake.
 
 Further out and nothing promised: NFC tags under the model bases, a photo of the
 painted model as the card image, showing an opponent the warband over a

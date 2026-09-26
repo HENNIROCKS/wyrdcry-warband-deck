@@ -43,7 +43,12 @@
 		{
 			question: 'Can I keep working in the Warband Builder?',
 			answer:
-				'Yes. The export writes the same JSON the builder reads, with everything the builder stores left untouched. Import it there, change the warband, export it again and bring it back.'
+				'Not reliably, not yet. The export is still written in the shape the builder reads, and for the six official factions the way back is built to hold – but it has not been checked since this app grew a builder of its own. A warband of a homebrew faction cannot go back at all: Clan Pestilens and the Greenskin Marauders exist only here, so the builder accepts the file and then finds neither the faction nor any of its fighters. Export and snapshot are the way to keep a copy meanwhile.'
+		},
+		{
+			question: 'Which factions can I build?',
+			answer:
+				'All eight in this app: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead, Witch Hunters and the Possessed out of the rulebook, plus Clan Pestilens and the Greenskin Marauders as homebrew. Each one is transcribed by hand against the game data, so a value here can differ from the builder – the characteristics deliberately do, because this app works modifiers into them that the builder leaves in the item text.'
 		}
 	];
 </script>
@@ -53,11 +58,19 @@
 
 	<section>
 		<p>
-			Your own Wyrdcry warband as a deck of cards: import the warband from the
-			Warband Builder, swipe through the fighters, track a battle.
+			Your own Wyrdcry warband as a deck of cards: build it here or import it
+			from the Warband Builder, swipe through the fighters, track a battle.
 		</p>
 		<p class="muted">
 			An independent fan project. No connection to Games Workshop.
+		</p>
+		<!-- Said on the page rather than only in the README: whoever builds a
+		     warband here is about to rely on it, and the way back is the thing they
+		     cannot find out by trying it once. -->
+		<p class="notice">
+			<strong>The way back to the Warband Builder is not currently assured.</strong>
+			Warbands built here carry factions and corrections the builder's own data
+			does not have. Keep a copy through Export or Snapshot.
 		</p>
 		<p class="version">
 			Version {__APP_VERSION__} · Early{#if buildDate}{' '}· Build {buildDate}{/if}{#if ruleset}{' '}· Ruleset {ruleset}{/if}
@@ -84,10 +97,11 @@
 			account, no server, no sync.
 		</p>
 		<p>
-			<strong>Export</strong> writes the current state back as JSON, ready to
-			import into the Warband Builder again. <strong>Snapshot</strong> writes a
-			dated copy that nothing overwrites later. Whatever has not been exported is
-			gone once the app is uninstalled.
+			<strong>Export</strong> writes the current state as JSON, in the shape the
+			Warband Builder reads. <strong>Snapshot</strong> writes a dated copy that
+			nothing overwrites later. Whatever has not been exported is gone once the
+			app is uninstalled — so export even while the way back is unassured: the
+			file this app wrote, this app reads.
 		</p>
 	</section>
 
@@ -165,6 +179,16 @@
 
 	.muted {
 		color: var(--ui-text-muted);
+	}
+
+	/* The one thing on this page that could cost someone their work, so it is
+	   marked where it stands rather than left to read as a third paragraph. */
+	.notice {
+		padding: 10px 12px;
+		font-size: var(--ui-t-base);
+		background: var(--ui-warn-bg);
+		border: 1px solid var(--ui-warn);
+		border-radius: 9px;
 	}
 
 	ul {
