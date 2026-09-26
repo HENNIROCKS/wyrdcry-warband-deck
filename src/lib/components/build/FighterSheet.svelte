@@ -4,8 +4,9 @@
 	 * what it carries. A full screen rather than a row, because equipment is three
 	 * lists and a phone has no room beside them.
 	 */
-	import { ITEMS, WEAPONS, type Faction, type Fighter } from '$lib/rules';
-	import { equipmentCost, gearOf, isBeast, isThrall, offers, type Offer } from '$lib/build/equipment';
+	import RuleText from '$lib/components/RuleText.svelte';
+	import { ITEMS, WEAPONS, type Ability, type Faction, type Fighter } from '$lib/rules';
+	import { equipmentCost, gearOf, isAscended, isBeast, isThrall, offers, type Offer } from '$lib/build/equipment';
 	import { profileOf } from '$lib/build/profile';
 	import { recruitmentFee } from '$lib/build/roster';
 	import type { Draft, DraftFighter } from '$lib/build/types';
@@ -34,12 +35,23 @@
 	const brought = $derived(gearOf(fighter));
 	const beast = $derived(isBeast(fighter));
 	const thrall = $derived(isThrall(fighter));
+	const ascended = $derived(isAscended(fighter));
 	const offered = $derived(
 		choice?.kind === 'stat' ? (choice.characteristics ?? []) : (choice?.abilities ?? [])
 	);
 	const missing = $derived(choice ? entry.choice.length !== choice.pick : false);
+	/* What the fighter brings by its profile, as against what the choice adds.
+	   Some of it is an instruction carried out while recruiting – "it must make
+	   a roll on the mutation table" – so it belongs on this screen, not only on
+	   the card the fighter ends up on. */
+	const carries = $derived(
+		fighter.abilities
+			.map((id) => faction.abilities.find((entry) => entry.id === id))
+			.filter((entry): entry is Ability => Boolean(entry))
+	);
 
-	let chips: HTMLDivElement | undefined = $state();
+	/* The container of the options, whichever shape they took. */
+	let chips: HTMLElement | undefined = $state();
 	let focused = false;
 
 	/* A fighter that brings a choice opens on it. Recruiting was the tap; the
@@ -76,10 +88,14 @@
 		);
 	}
 
-	/** What a chip says: a characteristic with its bonus, or the ability's name. */
+	/** What a chip says: a characteristic with its bonus. */
 	function optionLabel(option: string): string {
-		if (choice?.kind === 'stat') return `${option} +${choice.bonus}`;
-		return faction.abilities.find((entry) => entry.id === option)?.name ?? option;
+		return `${option} +${choice?.bonus}`;
+	}
+
+	/** The ability behind one option of a choice, for its name and its sentence. */
+	function optionAbility(option: string): Ability | undefined {
+		return faction.abilities.find((entry) => entry.id === option);
 	}
 
 	function pick(value: string) {
@@ -124,18 +140,50 @@
 			{/each}
 		</p>
 
+		{#if carries.length}
+			<section>
+				<h3>Abilities</h3>
+				<ul class="abilities">
+					{#each carries as own (own.id)}
+						<li>
+							<span class="name">{own.name}</span>
+							<span class="text"><RuleText text={own.text} /></span>
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
+
 		{#if choice}
 			<section class="choice" class:needs={missing}>
 				<h3>{ability?.name ?? 'Choose'}</h3>
 				<p class="hint">{ability?.text ?? choice.prompt}</p>
-				<div class="chips" bind:this={chips}>
-					{#each offered as option (option)}
-						{@const on = entry.choice.includes(option)}
-						<button class="chip" class:on aria-pressed={on} onclick={() => pick(option)}>
-							{optionLabel(option)}
-						</button>
-					{/each}
-				</div>
+				{#if choice.kind === 'stat'}
+					<div class="chips" bind:this={chips}>
+						{#each offered as option (option)}
+							{@const on = entry.choice.includes(option)}
+							<button class="chip" class:on aria-pressed={on} onclick={() => pick(option)}>
+								{optionLabel(option)}
+							</button>
+						{/each}
+					</div>
+				{:else}
+					<!-- A stat needs no explaining – "fight +1" is the whole of it. An
+					     ability is a paragraph, and picking one of three without reading
+					     them is not a choice, so each option carries its own text. -->
+					<ul class="options" bind:this={chips}>
+						{#each offered as option (option)}
+							{@const on = entry.choice.includes(option)}
+							{@const offer = optionAbility(option)}
+							<li>
+								<button class:on aria-pressed={on} onclick={() => pick(option)}>
+									<span class="name">{offer?.name ?? option}</span>
+									{#if offer}<span class="text"><RuleText text={offer.text} /></span>{/if}
+								</button>
+							</li>
+						{/each}
+					</ul>
+				{/if}
 				{#if missing}
 					<p class="open">Pick {choice.pick} to carry on.</p>
 				{/if}
@@ -181,6 +229,11 @@
 			<section>
 				<h3>Equipment</h3>
 				<p class="hint">A THRALL cannot be given weapons, armour or equipment.</p>
+			</section>
+		{:else if ascended}
+			<section>
+				<h3>Equipment</h3>
+				<p class="hint">An Ascended fighter refuses weapons, armour and equipment.</p>
 			</section>
 		{:else}
 			{#each [['Melee', groups.melee], ['Ranged', groups.ranged], ['Armour', groups.armour]] as const as [title, list] (title)}
@@ -358,6 +411,55 @@
 		color: var(--ui-accent-text);
 		background: var(--ui-accent-bg);
 		border-color: var(--ui-accent);
+	}
+
+	/* An option that carries a paragraph: the name on its own line, the sentence
+	   under it, the whole row the target. */
+	.options button {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		width: 100%;
+		padding: 11px 12px;
+		text-align: left;
+		color: var(--ui-text);
+		background: var(--ui-surface);
+		border: 1px solid var(--ui-border);
+		border-radius: 9px;
+	}
+
+	.options button.on {
+		background: var(--ui-accent-bg);
+		border-color: var(--ui-accent);
+	}
+
+	.options .name,
+	.abilities .name {
+		font-size: var(--ui-t-lg);
+	}
+
+	.options button.on .name {
+		color: var(--ui-accent-text);
+	}
+
+	.options .text,
+	.abilities .text {
+		font-size: var(--ui-t-base);
+		line-height: 1.5;
+		/* The rules write their own line breaks – a list of effects under one
+		   ability – and they are what makes the paragraph readable. */
+		white-space: pre-line;
+		color: var(--ui-text-muted);
+	}
+
+	.abilities li {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 10px 12px;
+		background: var(--ui-surface);
+		border: 1px solid var(--ui-border);
+		border-radius: 9px;
 	}
 
 	ul {

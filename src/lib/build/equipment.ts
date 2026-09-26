@@ -48,6 +48,16 @@ export function isThrall(fighter: Fighter): boolean {
 	return fighter.keywords.includes('thrall');
 }
 
+/**
+ * A fighter with the Ascended trait, e.g. the Possessed: it refuses everything
+ * that would be bought for it, but still carries the gear on its profile. Read
+ * off the ability list like `isPenitent`, because MUTANT says nothing about
+ * equipment – the Mutant henchman buys weapons like any other.
+ */
+export function isAscended(fighter: Fighter): boolean {
+	return fighter.abilities.includes('ascended');
+}
+
 export function slotsUsed(equipment: string[]): Slots {
 	let melee = 0;
 	let ranged = 0;
@@ -113,6 +123,7 @@ export function allows(faction: Faction, fighter: Fighter, id: string): boolean 
 export function refuse(faction: Faction, fighter: Fighter, equipment: string[], id: string): string | null {
 	if (isBeast(fighter)) return 'A BEAST fights with what is on its profile and cannot be given equipment';
 	if (isThrall(fighter)) return 'A THRALL cannot be equipped with any weapons, armour or equipment';
+	if (isAscended(fighter)) return 'An Ascended fighter refuses to be equipped with any weapons, armour or equipment';
 	if (!allows(faction, fighter, id)) {
 		const allowance =
 			faction.equipment.find((entry) => entry.id === `weapon:${id}`) ??
