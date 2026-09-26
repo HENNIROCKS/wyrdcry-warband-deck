@@ -94,11 +94,13 @@
 	const index = $derived(STEPS.findIndex((entry) => entry.id === step));
 
 	/* Only the problems of the step being shown: the roster is incomplete while
-	   the rules are being picked, and saying so then is noise. */
+	   the rules are being picked, and saying so then is noise. The first step
+	   has none of its own – the faction always has a default – so it never
+	   blocks "Next". */
 	const here = $derived(
 		found.filter((problem) =>
 			step === 'warband'
-				? problem.step === 'faction'
+				? false
 				: step === 'rules'
 					? problem.step === 'rules'
 					: step === 'roster'
@@ -118,11 +120,11 @@
 		return found.find((problem) => problem.key === key)?.text ?? null;
 	}
 
-	/* The name is the one field on the first step, so its complaint belongs at
-	   the field rather than in a list further down. */
+	/* The name sits ahead of the rules on the second step, so its complaint
+	   belongs at the field rather than in a list further down. */
 	const named = $derived(Boolean(draft.name.trim()));
 	const nameProblem = $derived(
-		found.find((problem) => problem.step === 'faction')?.text ?? 'The warband needs a name'
+		found.find((problem) => problem.step === 'rules')?.text ?? 'The warband needs a name'
 	);
 
 	/* The index, not the entry: the sheet writes into it, so it has to be bound. */
@@ -231,22 +233,6 @@
 
 <div class="body">
 	{#if step === 'warband'}
-		<label class="named" class:missing={!named}>
-			<span>Name</span>
-			<input
-				bind:value={draft.name}
-				placeholder="The Ostermark Free Company"
-				maxlength="40"
-				aria-invalid={!named}
-				aria-describedby={named ? undefined : 'name-open'}
-			/>
-			{#if !named}
-				<!-- The wording comes from `problems`, so the field and the finish step
-				     cannot say it differently. -->
-				<p class="open" id="name-open">{nameProblem}</p>
-			{/if}
-		</label>
-
 		<section>
 			<h2>Faction</h2>
 			{#each groups as group (group.origin)}
@@ -274,6 +260,22 @@
 			{/each}
 		</section>
 	{:else if step === 'rules' && faction}
+		<label class="named" class:missing={!named}>
+			<span>Name</span>
+			<input
+				bind:value={draft.name}
+				placeholder="The Ostermark Free Company"
+				maxlength="40"
+				aria-invalid={!named}
+				aria-describedby={named ? undefined : 'name-open'}
+			/>
+			{#if !named}
+				<!-- The wording comes from `problems`, so the field and the finish step
+				     cannot say it differently. -->
+				<p class="open" id="name-open">{nameProblem}</p>
+			{/if}
+		</label>
+
 		{#each faction.rules as rule (rule.id)}
 			<section>
 				<h2>{rule.name}</h2>

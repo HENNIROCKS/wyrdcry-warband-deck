@@ -104,7 +104,7 @@ export function problems(faction: Faction, draft: Draft): Problem[] {
 	if (!draft.name.trim()) {
 		/* The builder's import drops a warband without a name without a word, so
 		   this one is not cosmetic. */
-		found.push({ step: 'faction', text: 'The warband needs a name' });
+		found.push({ step: 'rules', text: 'The warband needs a name' });
 	}
 
 	for (const rule of faction.rules) {

@@ -36,7 +36,7 @@ export interface Draft {
 /** Why something cannot be done, in a sentence the wizard can show as it is. */
 export interface Problem {
 	/** What the message is about, so a step can show only its own problems. */
-	step: 'faction' | 'rules' | 'roster' | 'fighter' | 'budget';
+	step: 'rules' | 'roster' | 'fighter' | 'budget';
 	/** The draft fighter it belongs to, where it belongs to one. */
 	key?: string;
 	text: string;
