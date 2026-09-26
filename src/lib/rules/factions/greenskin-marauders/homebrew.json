@@ -1,0 +1,21 @@
+{
+  "keywords": [
+    { "id": "orc", "name": "ORC", "type": "race", "rules": [] },
+    { "id": "goblin", "name": "GOBLIN", "type": "race", "rules": [] },
+    { "id": "greenskin-marauders", "name": "GREENSKIN MARAUDERS", "type": "faction", "rules": [] }
+  ],
+  "weapon-rules": [],
+  "weapons": [
+    {
+      "id": "ball-and-chain",
+      "name": "Ball and Chain",
+      "type": "melee",
+      "range": { "min": 0, "max": 2 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 3,
+      "rules": ["mighty-2", "two-handed", "unreliable"],
+      "cost": 25
+    }
+  ]
+}

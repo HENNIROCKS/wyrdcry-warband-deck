@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "pecking-order",
+    "name": "Pecking Order",
+    "phase": "recruitment",
+    "text": "A GREENSKIN MARAUDERS warband may not include more than two GOBLIN fighters for each ORC fighter in the warband, including ORC heroes.",
+    "pick": null,
+    "options": [],
+    "effect": null
+  },
+  {
+    "id": "animosity",
+    "name": "Animosity",
+    "phase": "battle",
+    "text": "[Trait] All GREENSKIN MARAUDERS fighters with the HENCHMAN keyword have this trait.\n\nWhen this fighter is activated, unless it is within 6\" of a visible friendly fighter with the LEADER keyword, roll a die:\n\n- 1 – \"I 'Erd Dat!\" This fighter must make a free attack action against the nearest visible friendly HENCHMAN within 1\" that is a legal target. If there is no such fighter, treat this result as a 2. This fighter then activates as normal. A GOBLIN will never make an attack action against an ORC in this way and treats it as an illegal target – they are far too afraid to challenge them individually.\n- 2 – \"Wud Yoo Say?\" This fighter spends its activation hurling insults at its mates. It makes a Wait action and its activation ends.\n- 3–5 This fighter activates as normal.\n- 6 – \"I'll Show Yer!\" This fighter must immediately make a free move action that ends as close as possible to the nearest visible enemy fighter. It then activates as normal.",
+    "pick": null,
+    "options": [],
+    "effect": null
+  },
+  {
+    "id": "not-orcs",
+    "name": "Not Orcs",
+    "phase": "battle",
+    "text": "[Trait] All GREENSKIN MARAUDERS fighters with the GOBLIN keyword have this trait.\n\nOrcs don't expect much from non-Orcs and are not unsettled if the little ones get cut down. When counting how many friendly fighters have been taken out of action to determine whether your warband is wavering, this fighter counts as half a fighter. The size of your warband is unaffected, and the resulting count may be a fraction; compare it to the threshold as it stands.",
+    "pick": null,
+    "options": [],
+    "effect": null
+  }
+]

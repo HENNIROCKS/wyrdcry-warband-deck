@@ -1,1 +1,8 @@
-{}
+{
+  "id": "greenskin-marauders",
+  "name": "Greenskin Marauders",
+  "keyword": "GREENSKIN MARAUDERS",
+  "warband_size": { "min": 3, "max": 20 },
+  "origin": "homebrew",
+  "version": "0.0.1"
+}

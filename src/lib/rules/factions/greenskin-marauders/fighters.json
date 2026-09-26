@@ -1,1 +1,122 @@
-[]
+[
+  {
+    "id": "orc-boss",
+    "name": "Orc Boss",
+    "cost": 140,
+    "limit": { "min": 0, "max": 1 },
+    "description": "The biggest and meanest of the mob, an Orc Boss rules by breaking heads and keeps ruling until a bigger head breaks his. In the ruins he sees nothing but good scrapping and better loot.",
+    "profile": {
+      "move": 5,
+      "fight": 4,
+      "shoot": 4,
+      "defense": 4,
+      "health": 16,
+      "bravery": 4
+    },
+    "keywords": ["orc", "greenskin-marauders", "hero", "leader"],
+    "abilities": ["da-cunnin-plan", "waaagh"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "orc-big-un",
+    "name": "Orc Big 'Un",
+    "cost": 110,
+    "limit": { "min": 0, "max": 2 },
+    "description": "Bigger than their kin and considerably louder about it, Big 'Uns shoulder their way to the front of every fight. Nothing in the cursed city frightens them, which is less courage than a simple failure to imagine losing.",
+    "profile": {
+      "move": 5,
+      "fight": 4,
+      "shoot": 3,
+      "defense": 3,
+      "health": 14,
+      "bravery": 4
+    },
+    "keywords": ["orc", "greenskin-marauders", "hero"],
+    "abilities": ["ere-we-go"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "orc-shaman",
+    "name": "Orc Shaman",
+    "cost": 100,
+    "limit": { "min": 0, "max": 1 },
+    "description": "Orc Shamans do not so much cast spells as get overtaken by them. The Waaagh! builds up behind their eyes until something has to give, and whatever gives usually gives loudly, greenly, and in the direction of whoever the boss was pointing at.",
+    "profile": {
+      "move": 5,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 14,
+      "bravery": 5
+    },
+    "keywords": ["orc", "greenskin-marauders", "hero", "wizard"],
+    "abilities": [],
+    "gear": [],
+    "choose": {
+      "source": null,
+      "prompt": "When recruiting this fighter, you must select one of the following abilities:",
+      "kind": "ability",
+      "pick": 1,
+      "abilities": ["oi-gerroff", "ledz-go", "zzap"]
+    }
+  },
+  {
+    "id": "goblin-boss",
+    "name": "Goblin Boss",
+    "cost": 70,
+    "limit": { "min": 0, "max": 1 },
+    "description": "Sharper than any Orc and quick to stand behind one, a Goblin Boss keeps the little ones in line with threats, bribes, and the occasional knife in the dark.",
+    "profile": {
+      "move": 5,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 10,
+      "bravery": 6
+    },
+    "keywords": ["goblin", "greenskin-marauders", "hero"],
+    "abilities": ["boss-of-da-gits"],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "orc-warrior",
+    "name": "Orc Warrior",
+    "cost": 70,
+    "limit": { "min": 0, "max": null },
+    "description": "Orc Warriors need no promise of gold, only the promise of a fight. They come to Mordheim for the scrap and stay for the shiny stones growing in its rubble.",
+    "profile": {
+      "move": 5,
+      "fight": 3,
+      "shoot": 3,
+      "defense": 3,
+      "health": 12,
+      "bravery": 5
+    },
+    "keywords": ["orc", "greenskin-marauders", "henchman"],
+    "abilities": [],
+    "gear": [],
+    "choose": null
+  },
+  {
+    "id": "goblin-warrior",
+    "name": "Goblin Warrior",
+    "cost": 40,
+    "limit": { "min": 0, "max": null },
+    "description": "Small, spiteful and far too numerous, Goblins are dragged along to carry the loot and soak up the arrows. They fight best in crowds and run fastest alone.",
+    "profile": {
+      "move": 5,
+      "fight": 2,
+      "shoot": 2,
+      "defense": 3,
+      "health": 8,
+      "bravery": 6
+    },
+    "keywords": ["goblin", "greenskin-marauders", "henchman"],
+    "abilities": [],
+    "gear": [],
+    "choose": null
+  }
+]

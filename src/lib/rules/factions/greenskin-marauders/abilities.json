@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "id": "da-cunnin-plan",
+    "name": "Da Cunnin' Plan",
+    "type": "trait",
+    "text": "While this fighter has not been taken out of action, friendly GREENSKIN MARAUDERS fighters may re-roll failed Bravery tests caused by your warband wavering."
+  },
+  {
+    "id": "waaagh",
+    "name": "Waaagh!",
+    "type": "double",
+    "text": "Select up to (X/2) other visible friendly GREENSKIN MARAUDERS fighters within 6\" of this fighter. Each of those fighters makes a free move action that must end closer to the nearest visible enemy fighter."
+  },
+  {
+    "id": "ere-we-go",
+    "name": "'Ere We Go!",
+    "type": "trait",
+    "text": "This fighter automatically passes any Bravery test caused by an enemy fighter with the TERRIFYING keyword."
+  },
+  {
+    "id": "oi-gerroff",
+    "name": "Oi! Gerroff!",
+    "type": "double",
+    "text": "Magical ability. Select a visible enemy fighter within 8\" of this fighter that is not within 1\" of any other fighter. That fighter makes a free move action of up to (X/2)\" directly away from this fighter, as if it jumped. If it cannot move that far away, allocate (X/2) damage points to that fighter instead."
+  },
+  {
+    "id": "ledz-go",
+    "name": "Led'z go!",
+    "type": "triple",
+    "text": "Magical ability. Until the end of the battle round, friendly GREENSKIN MARAUDERS fighters activated within (X)\" of this fighter may increase their Fight characteristic by 1."
+  },
+  {
+    "id": "zzap",
+    "name": "Zzap!",
+    "type": "triple",
+    "text": "Magical ability. Allocate (X) damage points to the closest visible enemy fighter within 12\" of this fighter."
+  },
+  {
+    "id": "boss-of-da-gits",
+    "name": "Boss Of Da Gits",
+    "type": "trait",
+    "text": "Friendly fighters with the GOBLIN keyword within 6\" of this fighter do not roll for Animosity."
+  }
+]

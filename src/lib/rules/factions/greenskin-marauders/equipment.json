@@ -1,1 +1,14 @@
-[]
+[
+  { "id": "weapon:dagger", "allow": "all" },
+  { "id": "weapon:club", "allow": "all" },
+  { "id": "weapon:axe", "allow": "all" },
+  { "id": "weapon:spear", "allow": "all" },
+  { "id": "weapon:sword", "allow": "all" },
+  { "id": "weapon:ball-and-chain", "allow": "all", "restrict": "goblin" },
+  { "id": "weapon:great-weapon", "allow": "all" },
+  { "id": "weapon:bow", "allow": "all" },
+  { "id": "weapon:crossbow", "allow": "all", "restrict": "orc" },
+  { "id": "item:shield", "allow": "all" },
+  { "id": "item:light-armour", "allow": "all" },
+  { "id": "item:heavy-armour", "allow": "all", "restrict": "orc" }
+]
