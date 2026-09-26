@@ -25,11 +25,11 @@
 	import { putWarband, requestPersistence } from '$lib/storage';
 	import type { StoredWarband } from '$lib/types/warband';
 
-	type Step = 'warband' | 'rules' | 'roster' | 'finish';
+	type Step = 'warband' | 'name' | 'roster' | 'finish';
 
 	const STEPS: { id: Step; title: string }[] = [
 		{ id: 'warband', title: 'Warband' },
-		{ id: 'rules', title: 'Faction rules' },
+		{ id: 'name', title: 'Name' },
 		{ id: 'roster', title: 'Fighters' },
 		{ id: 'finish', title: 'Finish' }
 	];
@@ -101,9 +101,9 @@
 	const here = $derived(
 		found.filter((problem) =>
 			step === 'warband'
-				? false
-				: step === 'rules'
-					? problem.step === 'rules'
+				? problem.step === 'warband'
+				: step === 'name'
+					? problem.step === 'name'
 					: step === 'roster'
 						? problem.step === 'roster' || problem.step === 'budget' || problem.step === 'fighter'
 						: true
@@ -121,11 +121,9 @@
 		return found.find((problem) => problem.key === key)?.text ?? null;
 	}
 
-	/* The name sits ahead of the rules on the second step, so its complaint
-	   belongs at the field rather than in a list further down. */
 	const named = $derived(Boolean(draft.name.trim()));
 	const nameProblem = $derived(
-		found.find((problem) => problem.step === 'rules')?.text ?? 'The warband needs a name'
+		found.find((problem) => problem.step === 'name')?.text ?? 'The warband needs a name'
 	);
 
 	/* The index, not the entry: the sheet writes into it, so it has to be bound. */
@@ -233,7 +231,7 @@
 </ol>
 
 <div class="body">
-	{#if step === 'warband'}
+	{#if step === 'warband' && faction}
 		<section>
 			<h2>Faction</h2>
 			<select
@@ -254,22 +252,6 @@
 				{/each}
 			</select>
 		</section>
-	{:else if step === 'rules' && faction}
-		<label class="named" class:missing={!named}>
-			<span>Name</span>
-			<input
-				bind:value={draft.name}
-				placeholder="The Ostermark Free Company"
-				maxlength="40"
-				aria-invalid={!named}
-				aria-describedby={named ? undefined : 'name-open'}
-			/>
-			{#if !named}
-				<!-- The wording comes from `problems`, so the field and the finish step
-				     cannot say it differently. -->
-				<p class="open" id="name-open">{nameProblem}</p>
-			{/if}
-		</label>
 
 		{#each faction.rules as rule (rule.id)}
 			<section>
@@ -301,6 +283,22 @@
 				{/if}
 			</section>
 		{/each}
+	{:else if step === 'name'}
+		<label class="named" class:missing={!named}>
+			<span>Name</span>
+			<input
+				bind:value={draft.name}
+				placeholder="The Ostermark Free Company"
+				maxlength="40"
+				aria-invalid={!named}
+				aria-describedby={named ? undefined : 'name-open'}
+			/>
+			{#if !named}
+				<!-- The wording comes from `problems`, so the field and the finish step
+				     cannot say it differently. -->
+				<p class="open" id="name-open">{nameProblem}</p>
+			{/if}
+		</label>
 	{:else if step === 'roster' && faction}
 		<section>
 			<h2>Recruited · {draft.fighters.length} of {faction.warband_size.max}</h2>

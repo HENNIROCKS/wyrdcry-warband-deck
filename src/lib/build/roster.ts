@@ -110,7 +110,7 @@ export function problems(faction: Faction, draft: Draft): Problem[] {
 	if (!draft.name.trim()) {
 		/* The builder's import drops a warband without a name without a word, so
 		   this one is not cosmetic. */
-		found.push({ step: 'rules', text: 'The warband needs a name' });
+		found.push({ step: 'name', text: 'The warband needs a name' });
 	}
 
 	for (const rule of faction.rules) {
@@ -118,7 +118,7 @@ export function problems(faction: Faction, draft: Draft): Problem[] {
 		const picked = draft.ruleChoices[rule.id] ?? [];
 		if (picked.length !== rule.pick) {
 			found.push({
-				step: 'rules',
+				step: 'warband',
 				text: `${rule.name}: ${picked.length} of ${rule.pick} chosen`
 			});
 		}
