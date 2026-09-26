@@ -23,6 +23,14 @@ function isWizard(fighter: Fighter): boolean {
 }
 
 /**
+ * A fighter with the Penitent trait, e.g. the Flagellant: a vow rather than a
+ * keyword, so it is read off the ability list instead of `keywords`.
+ */
+function isPenitent(fighter: Fighter): boolean {
+	return fighter.abilities.includes('penitent');
+}
+
+/**
  * A BEAST buys nothing at all, which is a fact about the fighter rather than
  * about any one row. The sheet asks first and leaves the lists out entirely;
  * `refuse` still answers for it, so nothing can be taken by another route.
@@ -119,6 +127,7 @@ export function refuse(faction: Faction, fighter: Fighter, equipment: string[], 
 
 	if (item && item.type === 'armour') {
 		if (isWizard(fighter)) return 'A WIZARD cannot wear armour';
+		if (isPenitent(fighter)) return 'A PENITENT fighter cannot wear armour';
 		if (carried) return 'Already worn';
 		/* One piece of body armour at a time – light or heavy, not both. */
 		if (item.slot === 'body' && held.some((worn) => ITEMS.get(worn)?.slot === 'body')) {
@@ -129,6 +138,10 @@ export function refuse(faction: Faction, fighter: Fighter, equipment: string[], 
 	}
 
 	if (!weapon) return 'Unknown';
+
+	if (weapon.type === 'ranged' && isPenitent(fighter)) {
+		return 'A PENITENT fighter cannot be equipped with ranged weapons';
+	}
 
 	if (weapon.type === 'melee') {
 		const cost = weapon.rules.includes('two-handed') ? 2 : 1;
