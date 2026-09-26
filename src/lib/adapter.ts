@@ -507,11 +507,18 @@ export function toCard(
 	 */
 	const offers = Boolean(profile.ability_preamble?.trim());
 	const picked = offers && chosen?.length ? chosen : null;
+	/* A fighter named after its own faction – the Possessed – answers to every
+	   name but that one. The faction's rules are carried under the faction's
+	   name, so a fighter sharing it would claim them as its own abilities, and
+	   the faction section below prints them a second time. */
+	const ownNames = [name, profile.name].filter(
+		(target) => target.trim().toLowerCase() !== factionName.trim().toLowerCase()
+	);
 	push(
 		'fighter',
 		abilityEntries(
 			picked ? profile.faction_ability_ids.filter((id) => picked.includes(id)) : profile.faction_ability_ids,
-			customAbilities(warband, name, profile.name)
+			customAbilities(warband, ...ownNames)
 		),
 		picked ? '' : profile.ability_preamble
 	);
