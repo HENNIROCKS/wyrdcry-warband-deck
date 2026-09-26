@@ -492,6 +492,15 @@ export function toCard(
 	};
 
 	const keywords = [...profile.race, ...profile.keywords];
+	/* The fighter's own faction, not the warband's – a hired sword recruited into
+	   another faction still carries its own. Both data sources drop it from
+	   `profile.keywords`, so it never reaches `universalFor` by way of this list. */
+	const ownFactionName = FACTIONS.get(profile.faction)?.name ?? factionName;
+	const displayKeywords = [
+		...profile.race,
+		...(ownFactionName ? [ownFactionName] : []),
+		...profile.keywords
+	];
 
 	/* What holds for this one fighter comes first, the general reference last.
 	   Despite its name, the profile's list holds the fighter's own abilities –
@@ -557,7 +566,7 @@ export function toCard(
 		stats,
 		weapons,
 		sections,
-		keywords,
+		keywords: displayKeywords,
 		xp: instance.xp,
 		renown: instance.renown,
 		cost: (instance.costOverride ?? profile.cost ?? 0) + equipmentCost,
