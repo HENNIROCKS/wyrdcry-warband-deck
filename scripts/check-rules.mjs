@@ -341,6 +341,9 @@ for (const folder of folders) {
 		if (!['all', 'hero'].includes(allowance.allow)) {
 			problem(file('equipment'), `"${allowance.id}" is allowed for "${allowance.allow}"`);
 		}
+		if (allowance.restrict !== undefined && !keywordIds.has(allowance.restrict)) {
+			problem(file('equipment'), `"${allowance.id}" is restricted to "${allowance.restrict}", which is not a keyword`);
+		}
 	}
 
 	/* --- Faction rules --- */

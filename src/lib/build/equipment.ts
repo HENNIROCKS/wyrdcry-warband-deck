@@ -8,7 +8,7 @@
  * braces, where the pair is the point.
  */
 
-import { ITEMS, WEAPONS, type Faction, type Fighter, type Item, type Weapon } from '../rules';
+import { ITEMS, KEYWORDS, WEAPONS, type Faction, type Fighter, type Item, type Weapon } from '../rules';
 import type { Slots } from './types';
 
 const MELEE_SLOTS = 2;
@@ -101,6 +101,7 @@ export function allows(faction: Faction, fighter: Fighter, id: string): boolean 
 		faction.equipment.find((entry) => entry.id === `item:${id}`);
 
 	if (!allowance) return false;
+	if (allowance.restrict && !fighter.keywords.includes(allowance.restrict)) return false;
 	return allowance.allow === 'all' || isHero(fighter);
 }
 
@@ -113,6 +114,12 @@ export function refuse(faction: Faction, fighter: Fighter, equipment: string[], 
 	if (isBeast(fighter)) return 'A BEAST fights with what is on its profile and cannot be given equipment';
 	if (isThrall(fighter)) return 'A THRALL cannot be equipped with any weapons, armour or equipment';
 	if (!allows(faction, fighter, id)) {
+		const allowance =
+			faction.equipment.find((entry) => entry.id === `weapon:${id}`) ??
+			faction.equipment.find((entry) => entry.id === `item:${id}`);
+		if (allowance?.restrict && !fighter.keywords.includes(allowance.restrict)) {
+			return `${KEYWORDS.get(allowance.restrict)?.name ?? allowance.restrict} only`;
+		}
 		const sold = faction.equipment.some((entry) => entry.id.endsWith(`:${id}`));
 		return sold ? 'HERO only' : `The ${faction.name} do not sell this`;
 	}

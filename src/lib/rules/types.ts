@@ -169,6 +169,8 @@ export interface Allowance {
 	/** Prefixed `weapon:` or `item:`, because both sides have a `sword`. */
 	id: string;
 	allow: 'all' | 'hero';
+	/** A keyword id the fighter must carry, for a row a faction sells to some of its own but not all. */
+	restrict?: string;
 }
 
 export interface Faction {
