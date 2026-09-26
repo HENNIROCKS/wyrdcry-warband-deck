@@ -74,12 +74,18 @@ export interface Recruitable {
  * The roster with each profile's price and whether one more may join. Refused
  * rows stay in: that a Champion is at three of three is the answer to why they
  * cannot be picked, and hiding the row does not give it.
+ *
+ * The leader stands first whatever order the ruleset lists the fighters in. It
+ * is the one profile a warband cannot go without, and it is the first tap of
+ * every roster; the rest keep the order they are written in.
  */
 export function recruitable(faction: Faction, draft: Draft): Recruitable[] {
 	const left = goldLeft(faction, draft);
 	const full = draft.fighters.length >= (faction.warband_size.max ?? Infinity);
+	const leads = (fighter: Fighter) => (fighter.keywords.includes('leader') ? 0 : 1);
+	const ordered = [...faction.fighters].sort((a, b) => leads(a) - leads(b));
 
-	return faction.fighters.map((fighter) => {
+	return ordered.map((fighter) => {
 		const held = countOf(draft, fighter.id);
 		const fee = recruitmentFee(faction, draft, fighter.id);
 		const max = fighter.limit.max;

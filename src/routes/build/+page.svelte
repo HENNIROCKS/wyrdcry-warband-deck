@@ -13,6 +13,7 @@
 	import { page } from '$app/state';
 
 	import FighterSheet from '$lib/components/build/FighterSheet.svelte';
+	import RuleText from '$lib/components/RuleText.svelte';
 	import { toWarband, selectionsOf } from '$lib/build/export';
 	import { rulesInPlay } from '$lib/build/effects';
 	import { equipmentCost, gearOf } from '$lib/build/equipment';
@@ -279,7 +280,7 @@
 		{#each faction.rules as rule (rule.id)}
 			<section>
 				<h2>{rule.name}</h2>
-				<p class="hint">{rule.text}</p>
+				<p class="hint rule"><RuleText text={rule.text} /></p>
 				{#if rule.pick !== null}
 					{@const picked = (draft.ruleChoices[rule.id] ?? []).length}
 					<p class="count" class:open={picked !== rule.pick}>
@@ -580,6 +581,12 @@
 	.count {
 		font-variant-numeric: tabular-nums;
 		color: var(--ui-accent-text);
+	}
+
+	/* A faction rule writes its own line breaks – a list of blessings, a table of
+	   thresholds – and they are the difference between a rule and a paragraph. */
+	.rule {
+		white-space: pre-line;
 	}
 
 	/* What is still open, wherever it is open. The warn colour carries the
