@@ -671,3 +671,12 @@ export function toCards(warband: Warband, selections?: Selections | null): DeckC
 
 	return [toWarbandCard(warband, fighters), ...fighters];
 }
+
+/**
+ * The Health the card shows. The battle counts its damage points against this
+ * one, not against the profile: a fighter with Heavy Armour endures what its own
+ * card says it endures.
+ */
+export function healthOf(card: FighterCardData): number {
+	return card.stats.find((stat) => stat.key === 'health')?.value ?? 0;
+}

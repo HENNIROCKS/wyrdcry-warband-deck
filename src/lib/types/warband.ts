@@ -76,11 +76,37 @@ export interface DeckMeta {
 
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
 
-/** One round: its number, and who has already acted in it. */
+/**
+ * What a fighter carries in the battle running right now.
+ *
+ * Two lifetimes meet here. `activated` and `waiting` belong to the round and are
+ * cleared by the next one; `damage` and `out` belong to the battle and are only
+ * gone when it ends. Which is why one round does not simply drop the whole map.
+ *
+ * `out` is stored rather than worked out from `damage` and Health: Health is a
+ * figure of the card, and the dots, the count of who still has to act and the
+ * warband's morale all ask for the state without having a card at hand.
+ */
+export interface FighterBattleState {
+	activated: boolean;
+	/**
+	 * Waited as its first action: the activation is over, but the fighter can be
+	 * activated once more this combat phase – so it still counts as one to act.
+	 */
+	waiting: boolean;
+	/** Damage points allocated. The card shows what is left of Health instead. */
+	damage: number;
+	out: boolean;
+}
+
+/** One round: its number, and what each fighter carries in it. */
 export interface BattleRound {
 	round: number;
-	/** Keyed by instanceId. Ids the warband no longer has are ignored on read. */
-	fighters: Record<string, { activated: boolean }>;
+	/**
+	 * Keyed by instanceId. Ids the warband no longer has are ignored on read, and
+	 * a record written before a field existed reads as that field's default.
+	 */
+	fighters: Record<string, Partial<FighterBattleState>>;
 }
 
 /**

@@ -8,7 +8,17 @@
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import { toCards } from '$lib/adapter';
-	import { nextRound, remaining, start, toggle, undoRound } from '$lib/battle';
+	import {
+		allocate,
+		isWavering,
+		nextRound,
+		outOfAction,
+		remaining,
+		start,
+		toggle,
+		toggleWaiting,
+		undoRound
+	} from '$lib/battle';
 	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
 	import type { BattleState, StoredWarband } from '$lib/types/warband';
@@ -24,9 +34,10 @@
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
 	const cards = $derived(active ? toCards(active.warband, active.selections) : []);
 	const battle = $derived(active?.battle ?? null);
-	const left = $derived(
-		remaining(battle, active?.warband.fighters.map((f) => f.instanceId) ?? [])
-	);
+	const fighterIds = $derived(active?.warband.fighters.map((f) => f.instanceId) ?? []);
+	const left = $derived(remaining(battle, fighterIds));
+	const out = $derived(outOfAction(battle, fighterIds));
+	const wavering = $derived(isWavering(battle, fighterIds));
 
 	/**
 	 * Writes the battle state through and keeps the copy in memory in step. It
@@ -161,6 +172,11 @@
 				{#snippet children()}
 					{#if battle}
 						<p>Round {battle.round} · {left} to act</p>
+						{#if out > 0}
+							<p class:wavering>
+								{out} out of action{#if wavering}{' '}· Wavering{/if}
+							</p>
+						{/if}
 						<button onclick={() => setBattle(nextRound(battle))}>Next round</button>
 						{#if battle.undo}
 							<button onclick={() => setBattle(undoRound(battle))}>
@@ -169,6 +185,11 @@
 						{/if}
 						<hr />
 						<button onclick={() => setBattle(null)}>End battle</button>
+						{#if out > 0}
+							<!-- What the aftermath sequence will ask for is exactly this count,
+							     and ending the battle is where it goes. -->
+							<p class="hint">Ending it drops the wounds and who is out of action.</p>
+						{/if}
 					{:else}
 						<p>No battle</p>
 						<button onclick={() => setBattle(start())}>Start battle</button>
@@ -200,7 +221,13 @@
 {/if}
 
 {#if cards.length}
-	<Deck {cards} {battle} ontoggle={(id) => setBattle(toggle(battle, id))} />
+	<Deck
+		{cards}
+		{battle}
+		ontoggle={(id) => setBattle(toggle(battle, id))}
+		onwait={(id) => setBattle(toggleWaiting(battle, id))}
+		onwound={(id, delta, health) => setBattle(allocate(battle, id, delta, health))}
+	/>
 {:else}
 	<div class="empty">
 		<h2>No warband yet</h2>
@@ -282,6 +309,15 @@
 		display: flex;
 		flex: none;
 		gap: 6px;
+	}
+
+	/* Inside the battle menu, under the round line. */
+	.wavering {
+		color: var(--ui-warn-text);
+	}
+
+	.hint {
+		color: var(--ui-text-subtle);
 	}
 
 	.message {

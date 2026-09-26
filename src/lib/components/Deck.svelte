@@ -1,22 +1,28 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
+	import BattleBar from './BattleBar.svelte';
 	import Explanation from './Explanation.svelte';
 	import { explanation } from '../explanation';
 	import FighterCard from './FighterCard.svelte';
 	import WarbandCard from './WarbandCard.svelte';
-	import { isActivated } from '../battle';
+	import { healthOf } from '../adapter';
+	import { stateOf } from '../battle';
 	import type { DeckCard } from '../types/card';
 	import type { BattleState } from '../types/warband';
 
 	let {
 		cards,
 		battle = null,
-		ontoggle
+		ontoggle,
+		onwait,
+		onwound
 	}: {
 		cards: DeckCard[];
 		battle?: BattleState | null;
 		ontoggle?: (instanceId: string) => void;
+		onwait?: (instanceId: string) => void;
+		onwound?: (instanceId: string, delta: number, health: number) => void;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
@@ -41,6 +47,14 @@
 	let captured = false;
 
 	const wrap = (index: number) => ((index % cards.length) + cards.length) % cards.length;
+
+	/* The bar below the stack belongs to the card on top of it. It is the warband
+	   card that has no fighter state, and the bar carries the battle itself there. */
+	const top = $derived(cards[current]);
+	const topFighter = $derived(top.kind === 'fighter' ? top : null);
+	const fighterIds = $derived(
+		cards.filter((card) => card.kind === 'fighter').map((card) => card.instanceId)
+	);
 
 	/**
 	 * Beneath the top card lies the one the current direction points at: to the
@@ -193,12 +207,28 @@
 		{/key}
 	</div>
 
+	{#if ontoggle}
+		<BattleBar
+			{battle}
+			state={topFighter ? stateOf(battle, topFighter.instanceId) : null}
+			health={topFighter ? healthOf(topFighter) : 0}
+			fighters={fighterIds}
+			ontoggle={() => topFighter && ontoggle?.(topFighter.instanceId)}
+			onwait={() => topFighter && onwait?.(topFighter.instanceId)}
+			onwound={(delta) =>
+				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
+		/>
+	{/if}
+
 	<nav class="dots" aria-label="Choose fighter">
 		{#each cards as card, i (card.instanceId)}
+			{@const state = card.kind === 'fighter' ? stateOf(battle, card.instanceId) : null}
 			<button
 				class="dot"
 				class:active={i === current}
-				class:activated={card.kind === 'fighter' && isActivated(battle, card.instanceId)}
+				class:activated={state?.activated}
+				class:waiting={state?.waiting}
+				class:out={state?.out}
 				aria-label={card.name}
 				aria-current={i === current}
 				onclick={() => goto(i)}
@@ -217,11 +247,7 @@
 	{#if data.kind === 'warband'}
 		<WarbandCard card={data} />
 	{:else}
-		<FighterCard
-			card={data}
-			activated={isActivated(battle, data.instanceId)}
-			{ontoggle}
-		/>
+		<FighterCard card={data} state={stateOf(battle, data.instanceId)} />
 	{/if}
 {/snippet}
 
@@ -304,9 +330,21 @@
 		transform: scale(1.35);
 	}
 
-	/* A side effect of the card's own marking, not a control of its own. */
+	/* A side effect of the card's own marking, not a control of its own: who has
+	   acted fades back, who waits keeps a ring because it is still to come, and who
+	   is out of action is marked in the wound colour. */
 	.dot.activated {
 		opacity: 0.35;
+	}
+
+	.dot.waiting {
+		background: transparent;
+		box-shadow: inset 0 0 0 2px var(--ui-accent-text);
+	}
+
+	.dot.out {
+		opacity: 1;
+		background: var(--ui-danger);
 	}
 
 	.position {

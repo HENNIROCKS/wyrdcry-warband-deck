@@ -24,8 +24,10 @@ to the Warband Builder is not currently assured – see
 - Show fighters as cards and swipe through them
 - Tap a worked-out value or a weapon to see where it comes from: which
   modifiers went into it, and which rules apply only in the right situation
-- Mark fighters as activated during a battle, count the rounds and clear the
-  activations for the next one – one step of that is undoable
+- Track a battle: mark fighters as activated or waiting, count the damage each
+  one holds, see who is out of action and when the warband starts wavering,
+  count the rounds and clear the round's states for the next one – one step of
+  that is undoable
 - Export through the system share sheet, either as the current state or as a
   dated snapshot
 - Warn on import when the file is older than the stored state
@@ -55,16 +57,12 @@ Done:
 - [x] Build a warband in the app, for all eight factions
 - [x] The warband itself as the first card
 - [x] Mark fighters as activated, count the rounds, undo one step
+- [x] In-game states: wounds, out of action, waiting
 
 **Confirm what is there.** Eight factions are transcribed and none has been
 played; whatever turns up here changes the shape of everything below.
 
 - [ ] Play a Possessed warband end to end – the faction that tests the rest
-
-**The battle.** Wounds, out of action and waiting share one write path, so they
-are one step rather than three.
-
-- [ ] In-game states: wounds, out of action, waiting
 
 **After the battle.** The aftermath sequence has six steps, and it is the first
 thing that writes to the campaign rather than to a battle.

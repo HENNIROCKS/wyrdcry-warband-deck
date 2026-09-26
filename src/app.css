@@ -18,6 +18,9 @@
 	--ui-accent-text: #87e8bc;
 	--ui-accent-bg: rgba(22, 117, 74, 0.2);
 	--ui-warn: #b45309;
+	/* The same warning as a text colour: 6.9:1 on the surfaces of the interface,
+	   where the border colour reaches 3.0:1 and carries a line, not a word. */
+	--ui-warn-text: #f59e0b;
 	--ui-warn-bg: rgba(180, 83, 9, 0.15);
 	--ui-danger: #b91c1c;
 
@@ -60,6 +63,13 @@
 	 * weapon table's stripes.
 	 */
 	--card-link: #9c2b14;
+	/*
+	 * The wound state. The image field is mixed towards this in step with the
+	 * damage a fighter holds, and the band of one taken out of action is laid in
+	 * it. Deeper than the link red, which is the colour of something to tap.
+	 */
+	--card-blood: #8a1c12;
+	--card-blood-veil: rgba(74, 12, 7, 0.62);
 
 	/* Design width of the printed card. Sizes inside a card are written as
 	   multiples of --u so the whole thing scales with the container, down to
