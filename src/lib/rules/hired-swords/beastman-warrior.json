@@ -1,0 +1,55 @@
+{
+  "id": "beastman-warrior",
+  "name": "Beastman Warrior",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 60,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["possessed"],
+  "description": "Beastmen are savage brutes that infest the forests of the Empire: massive horned creatures with a furious temper and an inhuman resistance to pain.",
+  "profile": {
+    "move": 5,
+    "fight": 5,
+    "shoot": 3,
+    "defense": 4,
+    "health": 16,
+    "bravery": 4
+  },
+  "keywords": ["beastman", "hired-sword", "hero"],
+  "gear": ["weapon:dual-axes"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "bestial-rage",
+      "name": "Bestial Rage",
+      "type": "trait",
+      "text": "Whenever this fighter has any damage points allocated to it, you must increase its Attacks characteristic by 1, and reduce its Defense characteristic by 1."
+    },
+    {
+      "id": "endure",
+      "name": "Endure",
+      "type": "reaction",
+      "text": "A fighter can make this reaction after they are targeted by an attack action but before the hit rolls are made. Subtract 1 from the damage points allocated by each hit and critical hit (to a minimum of 1) from that attack action."
+    },
+    {
+      "id": "headlong-charge",
+      "name": "Headlong Charge",
+      "type": "double",
+      "text": "A fighter can only use this ability if there is an enemy fighter within 6\" of it. This fighter makes a free Move action, and must end that move action within 1\" of that enemy fighter. Then, inflict (X/2) damage points to that enemy fighter."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "dual-axes",
+      "name": "Dual Axes",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 4,
+      "hit": 4,
+      "crit": 4,
+      "rules": [],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
