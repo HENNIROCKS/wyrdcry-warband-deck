@@ -17,11 +17,12 @@
 	import { toWarband, selectionsOf } from '$lib/build/export';
 	import { rulesInPlay } from '$lib/build/effects';
 	import { equipmentCost, gearOf } from '$lib/build/equipment';
-	import { budget, goldLeft, problems, recruitable, value } from '$lib/build/roster';
+	import { budget, countOf, fighterOf, goldLeft, problems, recruitable, value } from '$lib/build/roster';
 	import type { Draft, DraftFighter } from '$lib/build/types';
 	import { RULESET_VERSION } from '$lib/gamedata';
 	import { newId } from '$lib/id';
-	import { CAMPAIGN, FACTIONS } from '$lib/rules';
+	import { CAMPAIGN, FACTIONS, type Fighter } from '$lib/rules';
+	import { ruleText } from '$lib/rules/text';
 	import { putWarband, requestPersistence } from '$lib/storage';
 	import type { StoredWarband } from '$lib/types/warband';
 
@@ -133,11 +134,24 @@
 		sheet && faction ? faction.fighters.find((entry) => entry.id === sheet.fighterId) : null
 	);
 
+	/**
+	 * A fighter whose `choose` rolls on a table is matched on the card by its own
+	 * name (`export.ts` → `customAbilities`), and an empty name falls back to the
+	 * profile's – which for the Possessed equals the faction's own name and is
+	 * dropped there, and for two Mutants is the same name twice. A counted name
+	 * heads that off before the sheet is even open.
+	 */
+	function nameFor(fighter: Fighter): string {
+		if (fighter.choose?.kind !== 'roll') return '';
+		return `${fighter.name} ${countOf(draft, fighter.id) + 1}`;
+	}
+
 	function recruit(fighterId: string) {
+		const fighter = faction ? fighterOf(faction, fighterId) : undefined;
 		const entry: DraftFighter = {
 			key: newId(),
 			fighterId,
-			name: '',
+			name: fighter ? nameFor(fighter) : '',
 			equipment: [],
 			choice: []
 		};
@@ -256,7 +270,7 @@
 		{#each faction.rules as rule (rule.id)}
 			<section>
 				<h2>{rule.name}</h2>
-				<p class="hint rule"><RuleText text={rule.text} /></p>
+				<p class="hint rule"><RuleText text={ruleText(rule)} /></p>
 				{#if rule.pick !== null}
 					{@const picked = (draft.ruleChoices[rule.id] ?? []).length}
 					<p class="count" class:open={picked !== rule.pick}>

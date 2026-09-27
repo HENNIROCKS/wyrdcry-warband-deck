@@ -95,13 +95,23 @@ export interface FighterChoice {
 	 * there is no ability to take the wording from.
 	 */
 	prompt?: string;
-	kind: 'stat' | 'ability';
+	kind: 'stat' | 'ability' | 'roll';
 	pick: number;
 	/** With `kind: 'stat'`: which characteristics are on offer, and by how much. */
 	characteristics?: StatKey[];
 	bonus?: number;
 	/** With `kind: 'ability'`: the ids on offer. */
 	abilities?: string[];
+	/** With `kind: 'roll'`: the id of the rule carrying the `table` to roll on. */
+	table?: string;
+}
+
+/** One row of a roll table, such as the Possessed's Mutation Table. */
+export interface TableRow {
+	/** The 2d6 result this row answers to. */
+	roll: number;
+	name: string;
+	text: string;
 }
 
 export interface Fighter {
@@ -163,6 +173,12 @@ export interface FactionRule {
 	pick: number | null;
 	options: RuleOption[];
 	effect?: RuleEffect | null;
+	/**
+	 * A roll table this rule carries, such as the Possessed's eleven mutations. Held
+	 * here rather than spelled out a second time in `text`, so a fighter's `choose`
+	 * of `kind: 'roll'` and the rule's own display text read the same eleven rows.
+	 */
+	table?: TableRow[];
 }
 
 export interface Allowance {
