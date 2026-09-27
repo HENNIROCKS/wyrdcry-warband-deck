@@ -6,7 +6,15 @@
  *
  * It is split into tokens instead of turned into HTML – part of the text comes
  * from the warband file and therefore from the user, which rules out `{@html}`.
+ *
+ * A keyword left unmarked is recognised all the same, because a warband
+ * exported from the Warband Builder carries its faction rules as free text and
+ * nobody typed backticks into them. Measured over the game data, where every
+ * keyword is marked already, that recogniser changes nothing – it only reaches
+ * text somebody typed.
  */
+
+import { KEYWORDS } from './rules';
 
 export interface MarkupToken {
 	kind: 'text' | 'bold' | 'italic' | 'keyword';
@@ -26,12 +34,48 @@ export interface MarkupToken {
  */
 const PATTERN = /\*\*([^\n]+?)\*\*|\*(?!\*)(?!\s)([^*\n]*[^*\s\n])\*|`([^`]+)`/g;
 
+/*
+ * The deck's own glossary is the vocabulary, homebrew included – it is kept by
+ * hand, spelled in capitals, and already holds the faction names as keywords
+ * (`CLAN ESHIN`). Longest first, or `HERO` would take the front of a longer
+ * entry before the alternation reaches it.
+ *
+ * Capitals are the whole test. Four faction names are ordinary English words –
+ * Possessed, Undead, Mercenaries, Hired Sword – as are Human, Beast, Leader and
+ * Hero, and a sentence that happens to use one of them means the word, not the
+ * keyword. `\b` keeps `HERO` out of `HEROIC`, in both directions.
+ */
+const VOCABULARY = [...KEYWORDS.values()]
+	.map((keyword) => keyword.name.trim())
+	.filter((name) => /^[A-Z][A-Z' ]*$/.test(name))
+	.sort((a, b) => b.length - a.length);
+
+const SPOKEN = VOCABULARY.length
+	? new RegExp(`\\b(${VOCABULARY.map((name) => name.replace(/'/g, "\\'")).join('|')})\\b`, 'g')
+	: null;
+
+/** Text between the marks, with the keywords nobody marked picked out of it. */
+function pushText(tokens: MarkupToken[], value: string): void {
+	if (!SPOKEN) {
+		tokens.push({ kind: 'text', value });
+		return;
+	}
+
+	let last = 0;
+	for (const match of value.matchAll(SPOKEN)) {
+		if (match.index > last) tokens.push({ kind: 'text', value: value.slice(last, match.index) });
+		tokens.push({ kind: 'keyword', value: match[1] });
+		last = match.index + match[0].length;
+	}
+	if (last < value.length) tokens.push({ kind: 'text', value: value.slice(last) });
+}
+
 export function tokenize(text: string): MarkupToken[] {
 	const tokens: MarkupToken[] = [];
 	let last = 0;
 
 	for (const match of text.matchAll(PATTERN)) {
-		if (match.index > last) tokens.push({ kind: 'text', value: text.slice(last, match.index) });
+		if (match.index > last) pushText(tokens, text.slice(last, match.index));
 		tokens.push(
 			match[1] !== undefined
 				? { kind: 'bold', value: match[1] }
@@ -42,6 +86,6 @@ export function tokenize(text: string): MarkupToken[] {
 		last = match.index + match[0].length;
 	}
 
-	if (last < text.length) tokens.push({ kind: 'text', value: text.slice(last) });
+	if (last < text.length) pushText(tokens, text.slice(last));
 	return tokens;
 }
