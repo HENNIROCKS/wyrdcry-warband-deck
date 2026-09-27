@@ -1,0 +1,55 @@
+{
+  "id": "squig-herder",
+  "name": "Squig Herder",
+  "origin": "homebrew",
+  "version": "0.0.1",
+  "cost": 55,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["greenskin-marauders"],
+  "description": "A Squig Herder spends his life among things that bite, and it shows: he is missing pieces, he flinches at nothing, and the one squig he keeps on a short rope is the meanest of a mean bunch. He does not command it so much as aim it.",
+  "profile": {
+    "move": 5,
+    "fight": 3,
+    "shoot": 3,
+    "defense": 3,
+    "health": 10,
+    "bravery": 6
+  },
+  "keywords": ["goblin", "hired-sword", "hero"],
+  "gear": ["weapon:squig-prodder"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "handle-animal",
+      "name": "Handle Animal",
+      "type": "trait",
+      "text": "Friendly `BEAST` and `MONSTER` fighters within 6\" of this fighter may use this fighter's Bravery characteristic when taking Bravery tests."
+    },
+    {
+      "id": "netter",
+      "name": "Netter",
+      "type": "trait",
+      "text": "When an enemy fighter finishes a move action within 1\" of this fighter, roll a die. On a 4+, that fighter may not make attack actions until the end of the battle round."
+    },
+    {
+      "id": "loose-da-squig",
+      "name": "Loose Da Squig!",
+      "type": "double",
+      "text": "Select a visible enemy fighter within (X)\" of this fighter. Allocate (X/2) damage points to that fighter. If that fighter is within 1\" of another visible enemy fighter, allocate 1 damage point to that fighter as well."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "squig-prodder",
+      "name": "Squig Prodder",
+      "type": "melee",
+      "range": { "min": 0, "max": 2 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 3,
+      "rules": [],
+      "cost": 15
+    }
+  ],
+  "items": []
+}
