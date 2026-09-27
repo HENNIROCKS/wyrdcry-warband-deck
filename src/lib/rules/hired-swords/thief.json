@@ -1,0 +1,60 @@
+{
+  "id": "thief",
+  "name": "Thief",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 40,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["mercenaries", "possessed", "undead"],
+  "description": "Thieves have always lurked in the cities of the Old World. Where once they picked pockets and slipped into townhouses, they are now prized for their knack for striking fast and vanishing before anyone can give chase.",
+  "profile": {
+    "move": 6,
+    "fight": 3,
+    "shoot": 4,
+    "defense": 3,
+    "health": 10,
+    "bravery": 5
+  },
+  "keywords": ["human", "hired-sword", "hero"],
+  "gear": ["weapon:throwing-dagger", "weapon:shiv-and-club"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "wall-runner",
+      "name": "Wall-Runner",
+      "type": "trait",
+      "text": "This fighter may ignore the first 3\" moved vertically when climbing or falling."
+    },
+    {
+      "id": "snatch",
+      "name": "Snatch",
+      "type": "double",
+      "text": "A fighter can use this ability while within 1\" of an enemy fighter carrying a treasure or wyrdstone token. Roll a d6: on a 2+, this fighter steals the token. Then, this fighter makes a free Retreat action."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "throwing-dagger",
+      "name": "Throwing Dagger",
+      "type": "ranged",
+      "range": { "min": 0, "max": 6 },
+      "attacks": 2,
+      "hit": 1,
+      "crit": 3,
+      "rules": [],
+      "cost": 0
+    },
+    {
+      "id": "shiv-and-club",
+      "name": "Shiv and Club",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 4,
+      "hit": 2,
+      "crit": 3,
+      "rules": [],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
