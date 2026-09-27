@@ -35,7 +35,7 @@
       "id": "goading",
       "name": "Goading",
       "type": "double",
-      "text": "Select a friendly `BEAST` or `MONSTER` fighter within (X\") of this fighter and roll a die. On a 2+, or on a 3+ if that fighter has the `MONSTER` keyword, it makes a free move action that must end closer to the nearest visible enemy fighter, and may then make a free melee attack action. Otherwise the goad turns: that fighter makes a free melee attack action targeting this fighter."
+      "text": "Select a friendly `BEAST` or `MONSTER` fighter within (X)\" of this fighter and roll a die. On a 2+, or on a 3+ if that fighter has the `MONSTER` keyword, it makes a free move action that must end closer to the nearest visible enemy fighter, and may then make a free melee attack action. Otherwise the goad turns: that fighter makes a free melee attack action targeting this fighter."
     }
   ],
   "weapons": [
