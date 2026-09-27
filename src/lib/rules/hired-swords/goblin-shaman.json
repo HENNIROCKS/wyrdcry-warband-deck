@@ -30,16 +30,16 @@
         "gear": ["weapon:staff"]
       },
       {
-        "id": "brewgit",
-        "name": "Brewgit",
-        "ability": "gargant-brew",
-        "gear": ["weapon:brewgit-brewin-ladle"]
-      },
-      {
         "id": "boggleye",
         "name": "Boggleye",
         "ability": "hypnotic-gaze",
         "gear": ["weapon:staff"]
+      },
+      {
+        "id": "brewgit",
+        "name": "Brewgit",
+        "ability": "gargant-brew",
+        "gear": ["weapon:brewgit-brewin-ladle"]
       },
       {
         "id": "scaremonger",

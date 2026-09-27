@@ -45,7 +45,7 @@
       "type": "melee",
       "range": { "min": 0, "max": 1 },
       "attacks": 4,
-      "hit": 4,
+      "hit": 2,
       "crit": 4,
       "rules": [],
       "cost": 0

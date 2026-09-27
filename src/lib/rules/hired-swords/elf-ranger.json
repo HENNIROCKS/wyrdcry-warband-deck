@@ -49,17 +49,6 @@
       "crit": 4,
       "rules": [],
       "cost": 0
-    },
-    {
-      "id": "sword",
-      "name": "Sword",
-      "type": "melee",
-      "range": { "min": 0, "max": 1 },
-      "attacks": 3,
-      "hit": 2,
-      "crit": 3,
-      "rules": ["parry"],
-      "cost": 0
     }
   ],
   "items": []

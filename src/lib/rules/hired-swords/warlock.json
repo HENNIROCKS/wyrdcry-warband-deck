@@ -38,18 +38,6 @@
       "text": "Magical ability. Select an enemy fighter within 12\" of this fighter to be the target and roll three d6. For each roll of 3+, allocate (X/2) damage to the target. For each roll of 6, allocate (X/2) damage points to all visible fighters within 2\" of the target."
     }
   ],
-  "weapons": [
-    {
-      "id": "sword",
-      "name": "Sword",
-      "type": "melee",
-      "range": { "min": 0, "max": 1 },
-      "attacks": 3,
-      "hit": 2,
-      "crit": 3,
-      "rules": ["parry"],
-      "cost": 0
-    }
-  ],
+  "weapons": [],
   "items": []
 }

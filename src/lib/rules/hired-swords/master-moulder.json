@@ -49,17 +49,6 @@
       "crit": 3,
       "rules": ["whipcrack"],
       "cost": 0
-    },
-    {
-      "id": "warplock-pistol",
-      "name": "Warplock Pistol",
-      "type": "ranged",
-      "range": { "min": 0, "max": 6 },
-      "attacks": 2,
-      "hit": 4,
-      "crit": 7,
-      "rules": ["brace", "mighty-2", "reload", "unreliable"],
-      "cost": 0
     }
   ],
   "items": []

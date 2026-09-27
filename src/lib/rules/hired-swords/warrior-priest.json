@@ -38,18 +38,6 @@
       "text": "A fighter can only use this ability if equipped with a Warhammer or Sigmarite Hammer. Add (X/2) to the damage points allocated to enemy fighters by each hit and critical hit from the next melee attack action made by this fighter in this activation."
     }
   ],
-  "weapons": [
-    {
-      "id": "sigmarite-warhammer",
-      "name": "Sigmarite Warhammer",
-      "type": "melee",
-      "range": { "min": 0, "max": 1 },
-      "attacks": 2,
-      "hit": 3,
-      "crit": 5,
-      "rules": ["blessed", "mighty-2"],
-      "cost": 0
-    }
-  ],
+  "weapons": [],
   "items": []
 }
