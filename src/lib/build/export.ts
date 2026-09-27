@@ -15,6 +15,7 @@
 
 import { newId } from '../id';
 import type { Faction } from '../rules';
+import { ruleText } from '../rules/text';
 import type { CustomAbility, Selections, StatKey, Warband } from '../types/warband';
 import { rulesInPlay } from './effects';
 import { layers } from './profile';
@@ -68,7 +69,7 @@ export function toWarband(faction: Faction, draft: Draft, id = newId()): Warband
 		   plays under are not notes and belong on the fighter cards. */
 		factionNotes: '',
 		customWeapons: [],
-		customAbilities: factionAbilities(faction, draft)
+		customAbilities: [...factionAbilities(faction, draft), ...mutationAbilities(faction, draft)]
 	};
 }
 
@@ -99,15 +100,40 @@ function factionAbilities(faction: Faction, draft: Draft): CustomAbility[] {
 			   open with their type: "[Trait] When this fighter…". The card puts the
 			   type in front of the name, as it does for every other ability, so it
 			   is lifted out of the sentence rather than left standing in it. */
-			const marked = carrier.text.match(/^\s*\[([^\]]+)\]\s*/);
+			const full = ruleText(carrier);
+			const marked = full.match(/^\s*\[([^\]]+)\]\s*/);
 			const type = marked ? marked[1].trim() : '';
-			const text = marked ? carrier.text.slice(marked[0].length) : carrier.text;
+			const text = marked ? full.slice(marked[0].length) : full;
 			const label = type ? `[${type}] ${head}` : head;
 
 			/* "[Type] Name: Description" is the spelling the card reads back
 			   (`adapter.ts`, `customAbilities`). */
 			return { id: newId(), fighter: faction.name, type, ability: `${label}: ${text}${counted}` };
 		});
+}
+
+/**
+ * The mutation a fighter rolled, carried by its own name rather than the
+ * faction's – it belongs to this one fighter, not the whole warband. Matched
+ * on the card by `entry.name`, which `recruit()` never leaves equal to the
+ * fighter's own name or the faction's, see `roster.ts` → `problems()`.
+ */
+function mutationAbilities(faction: Faction, draft: Draft): CustomAbility[] {
+	return draft.fighters.flatMap((entry) => {
+		const fighter = fighterOf(faction, entry.fighterId);
+		const choice = fighter?.choose;
+		if (!fighter || choice?.kind !== 'roll' || !entry.choice.length) return [];
+
+		const row = faction.rules
+			.find((rule) => rule.id === choice.table)
+			?.table?.find((mutation) => String(mutation.roll) === entry.choice[0]);
+		if (!row) return [];
+
+		/* "*Magical ability*." is the spelling the game's own abilities use for the
+		   same kind of label ahead of the sentence; a mutation reads the same way. */
+		const name = entry.name.trim() || fighter.name;
+		return [{ id: newId(), fighter: name, type: '', ability: `${row.name}: *Mutation*. ${row.text}` }];
+	});
 }
 
 export function selectionsOf(faction: Faction, draft: Draft, warband: Warband): Selections {

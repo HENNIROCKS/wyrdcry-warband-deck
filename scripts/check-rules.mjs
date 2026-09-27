@@ -311,6 +311,16 @@ for (const folder of folders) {
 			if (choice.pick > offered.length) {
 				problem(file('fighters'), `the choice of "${fighter.id}" picks ${choice.pick} of ${offered.length}`);
 			}
+		} else if (choice.kind === 'roll') {
+			const table = rules.find((entry) => entry.id === choice.table);
+			if (!table) {
+				problem(file('fighters'), `the choice of "${fighter.id}" rolls on "${choice.table}", rules.json has none`);
+			} else if (!Array.isArray(table.table) || !table.table.length) {
+				problem(file('fighters'), `the choice of "${fighter.id}" rolls on "${choice.table}", which carries no table`);
+			}
+			if (choice.pick !== 1) {
+				problem(file('fighters'), `the choice of "${fighter.id}" rolls but picks ${choice.pick} – a roll gives exactly one result`);
+			}
 		} else {
 			problem(file('fighters'), `the choice of "${fighter.id}" is of kind "${choice.kind}"`);
 		}
@@ -380,6 +390,22 @@ for (const folder of folders) {
 			problem(file('rules'), `"${rule.id}" takes hold in "${rule.phase}", which is not a phase`);
 		}
 		checkEffect(`"${rule.id}"`, rule.effect);
+
+		if (rule.table) {
+			const seen = new Set();
+			for (const row of rule.table) {
+				if (typeof row.roll !== 'number') {
+					problem(file('rules'), `"${rule.id}" has a table row with no roll number`);
+				} else if (seen.has(row.roll)) {
+					problem(file('rules'), `"${rule.id}" has the roll ${row.roll} twice`);
+				} else {
+					seen.add(row.roll);
+				}
+				if (!row.name || !row.text) {
+					problem(file('rules'), `"${rule.id}" has a table row (roll ${row.roll}) with no name or text`);
+				}
+			}
+		}
 
 		const options = rule.options ?? [];
 		if (rule.pick === null) {

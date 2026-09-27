@@ -51,7 +51,12 @@
 		"keywords": ["human", "possessed", "henchman", "mutant"],
 		"abilities": ["anointed"],
 		"gear": [],
-		"choose": null
+		"choose": {
+			"source": "anointed",
+			"kind": "roll",
+			"pick": 1,
+			"table": "mutation-table"
+		}
 	},
 	{
 		"id": "possessed",
@@ -63,6 +68,11 @@
 		"keywords": ["daemon", "possessed", "hero", "mutant"],
 		"abilities": ["ascended"],
 		"gear": ["weapon:possessed-daemonic-appendage"],
-		"choose": null
+		"choose": {
+			"source": "ascended",
+			"kind": "roll",
+			"pick": 1,
+			"table": "mutation-table"
+		}
 	}
 ]

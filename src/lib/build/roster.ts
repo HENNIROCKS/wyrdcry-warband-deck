@@ -147,6 +147,19 @@ export function problems(faction: Faction, draft: Draft): Problem[] {
 		}
 	}
 
+	/*
+	 * A fighter whose `choose` rolls on a table is matched on the card by its own
+	 * name (`export.ts` → `customAbilities`), which drops a name equal to the
+	 * faction's own and, worse, folds together every fighter that shares a name –
+	 * not only two Mutants, but a Mutant and a fighter renamed to match it, since
+	 * `adapter.ts` → `customAbilities()` matches every card by name, not only
+	 * cards that roll themselves. `recruit()` heads off the usual case with a
+	 * counted default; this is the check for when a player renames into the trap
+	 * anyway, from either side.
+	 */
+	const rolls = new Set<string>();
+	const namesByKey = new Map<string, string>();
+
 	for (const entry of draft.fighters) {
 		const fighter = fighterOf(faction, entry.fighterId);
 		if (!fighter) {
@@ -159,6 +172,34 @@ export function problems(faction: Faction, draft: Draft): Problem[] {
 				step: 'fighter',
 				key: entry.key,
 				text: `${fighter.name}: ${entry.choice.length} of ${choice.pick} chosen`
+			});
+		}
+		const shown = entry.name.trim() || fighter.name;
+		namesByKey.set(entry.key, shown);
+		if (choice?.kind === 'roll') {
+			if (shown.toLowerCase() === faction.name.trim().toLowerCase()) {
+				found.push({
+					step: 'fighter',
+					key: entry.key,
+					text: `${fighter.name}: give it a name other than "${faction.name}", or its mutation never reaches the card`
+				});
+			}
+			rolls.add(entry.key);
+		}
+	}
+
+	const byName = new Map<string, string[]>();
+	for (const [key, shown] of namesByKey) {
+		byName.set(shown.toLowerCase(), [...(byName.get(shown.toLowerCase()) ?? []), key]);
+	}
+
+	for (const keys of byName.values()) {
+		if (keys.length < 2 || !keys.some((key) => rolls.has(key))) continue;
+		for (const key of keys) {
+			found.push({
+				step: 'fighter',
+				key,
+				text: "Shares its name with another fighter here – whichever of them rolled a mutation would show on both cards"
 			});
 		}
 	}

@@ -39,6 +39,11 @@
 	const offered = $derived(
 		choice?.kind === 'stat' ? (choice.characteristics ?? []) : (choice?.abilities ?? [])
 	);
+	/* The eleven rows of a roll choice, such as the Possessed's Mutation Table –
+	   held on the rule the choice names, not repeated on the fighter. */
+	const table = $derived(
+		choice?.kind === 'roll' ? (faction.rules.find((r) => r.id === choice.table)?.table ?? []) : []
+	);
 	const missing = $derived(choice ? entry.choice.length !== choice.pick : false);
 	/* What the fighter brings by its profile, as against what the choice adds.
 	   Some of it is an instruction carried out while recruiting – "it must make
@@ -106,6 +111,17 @@
 		   not to first work out what to untick. */
 		else entry.choice = [...entry.choice.slice(1), value];
 	}
+
+	/** A single row, rerollable: a fresh tap simply replaces the one already held. */
+	function rollFor(roll: number) {
+		entry.choice = [String(roll)];
+	}
+
+	/** Two d6, not one d12 – 7 is the common result, 2 and 12 the rare ones. */
+	function rollDice() {
+		const die = () => Math.floor(Math.random() * 6) + 1;
+		rollFor(die() + die());
+	}
 </script>
 
 <div class="sheet">
@@ -166,6 +182,23 @@
 								{optionLabel(option)}
 							</button>
 						{/each}
+					</div>
+				{:else if choice.kind === 'roll'}
+					<!-- Rolled here or at the table: either way exactly one row is held,
+					     so a tap replaces rather than toggles. -->
+					<div class="roll-choice" bind:this={chips}>
+						<button class="roll" onclick={rollDice}>Roll 2d6</button>
+						<ul class="options table">
+							{#each table as row (row.roll)}
+								{@const on = String(row.roll) === entry.choice[0]}
+								<li>
+									<button class:on aria-pressed={on} onclick={() => rollFor(row.roll)}>
+										<span class="name">{row.roll} – {row.name}</span>
+										<span class="text"><RuleText text={row.text} /></span>
+									</button>
+								</li>
+							{/each}
+						</ul>
 					</div>
 				{:else}
 					<!-- A stat needs no explaining – "fight +1" is the whole of it. An
@@ -411,6 +444,22 @@
 		color: var(--ui-accent-text);
 		background: var(--ui-accent-bg);
 		border-color: var(--ui-accent);
+	}
+
+	.roll-choice {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.roll {
+		padding: 11px 13px;
+		font-size: var(--ui-t-md);
+		font-weight: 600;
+		color: var(--ui-accent-text);
+		background: var(--ui-accent-bg);
+		border: 1px solid var(--ui-accent);
+		border-radius: 9px;
 	}
 
 	/* An option that carries a paragraph: the name on its own line, the sentence
