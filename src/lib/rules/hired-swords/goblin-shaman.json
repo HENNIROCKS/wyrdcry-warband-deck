@@ -1,80 +1,150 @@
 {
-	"id": "goblin-shaman",
-	"name": "Goblin Shaman",
-	"origin": "homebrew",
-	"version": "0.0.1",
-	"cost": 50,
-	"limit": { "min": 0, "max": 1 },
-	"may_hire": ["greenskin-marauders"],
-	"description": "A Gobbapalooza is a gaggle of wise-grots who advise their boss whether he asked or not, and one of them can usually be talked into following a warband into the ruins for a share of the shinies. Which one turns up says everything about how the next fight will go.",
-	"profile": {
-		"move": 5,
-		"fight": 2,
-		"shoot": 3,
-		"defense": 3,
-		"health": 10,
-		"bravery": 6
-	},
-	"keywords": ["goblin", "hired-sword", "hero", "wizard"],
-	"gear": [],
-	"choose": {
-		"source": null,
-		"prompt": "When you recruit this fighter, select one of the following roles. It gains that role's talent and is armed with the weapon shown alongside it.",
-		"kind": "role",
-		"pick": 1,
-		"roles": [
-			{
-				"id": "shaman",
-				"name": "Shaman",
-				"ability": "gaze-of-mork",
-				"gear": ["weapon:staff"]
-			},
-			{
-				"id": "brewgit",
-				"name": "Brewgit",
-				"ability": "gargant-brew",
-				"gear": ["weapon:brewgit-brewin-ladle"]
-			}
-		]
-	},
-	"abilities": [
-		{
-			"id": "fungus-brew",
-			"name": "Fungus Brew",
-			"type": "trait",
-			"text": "In the first and second battle rounds, subtract 1 from the damage allocated to this fighter for each hit and critical hit, to a minimum of 1."
-		},
-		{
-			"id": "slippery-git",
-			"name": "Slippery Git",
-			"type": "trait",
-			"text": "This fighter is in cover while it is within 1\" of another friendly `GOBLIN` fighter."
-		},
-		{
-			"id": "gaze-of-mork",
-			"name": "Gaze of Mork",
-			"type": "triple",
-			"text": "Magical ability. Select the closest visible enemy fighter within 12\" of this fighter and roll three dice. For each roll of 4+, allocate (X/2) damage points to that fighter."
-		},
-		{
-			"id": "gargant-brew",
-			"name": "Gargant Brew",
-			"type": "double",
-			"text": "Magical ability. Select a friendly `ORC` or `GOBLIN` fighter within (X)\" of this fighter. Until the end of the battle round, add 1 to its Fight characteristic. At the start of the next battle round, that fighter becomes Panicked."
-		}
-	],
-	"weapons": [
-		{
-			"id": "brewgit-brewin-ladle",
-			"name": "Brewin' Ladle",
-			"type": "melee",
-			"range": { "min": 0, "max": 1 },
-			"attacks": 3,
-			"hit": 2,
-			"crit": 3,
-			"rules": [],
-			"cost": 10
-		}
-	],
-	"items": []
+  "id": "goblin-shaman",
+  "name": "Goblin Shaman",
+  "origin": "homebrew",
+  "version": "0.0.1",
+  "cost": 50,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["greenskin-marauders"],
+  "description": "A Gobbapalooza is a gaggle of wise-grots who advise their boss whether he asked or not, and one of them can usually be talked into following a warband into the ruins for a share of the shinies. Which one turns up says everything about how the next fight will go.",
+  "profile": {
+    "move": 5,
+    "fight": 2,
+    "shoot": 3,
+    "defense": 3,
+    "health": 10,
+    "bravery": 6
+  },
+  "keywords": ["goblin", "hired-sword", "hero", "wizard"],
+  "gear": [],
+  "choose": {
+    "source": null,
+    "prompt": "When you recruit this fighter, select one of the following roles. It gains that role's talent and is armed with the weapon shown alongside it.",
+    "kind": "role",
+    "pick": 1,
+    "roles": [
+      {
+        "id": "shaman",
+        "name": "Shaman",
+        "ability": "gaze-of-mork",
+        "gear": ["weapon:staff"]
+      },
+      {
+        "id": "brewgit",
+        "name": "Brewgit",
+        "ability": "gargant-brew",
+        "gear": ["weapon:brewgit-brewin-ladle"]
+      },
+      {
+        "id": "boggleye",
+        "name": "Boggleye",
+        "ability": "hypnotic-gaze",
+        "gear": ["weapon:staff"]
+      },
+      {
+        "id": "scaremonger",
+        "name": "Scaremonger",
+        "ability": "waves-of-terror",
+        "gear": ["weapon:scaremonger-boingob-skull"]
+      },
+      {
+        "id": "shroomancer",
+        "name": "Shroomancer",
+        "ability": "bloatstool-spores",
+        "gear": ["weapon:staff"]
+      },
+      {
+        "id": "spiker",
+        "name": "Spiker",
+        "ability": "extra-nasty",
+        "gear": ["weapon:spiker-scorpisquig-stikka"]
+      }
+    ]
+  },
+  "abilities": [
+    {
+      "id": "fungus-brew",
+      "name": "Fungus Brew",
+      "type": "trait",
+      "text": "In the first and second battle rounds, subtract 1 from the damage allocated to this fighter for each hit and critical hit, to a minimum of 1."
+    },
+    {
+      "id": "slippery-git",
+      "name": "Slippery Git",
+      "type": "trait",
+      "text": "This fighter is in cover while it is within 1\" of another friendly `GOBLIN` fighter."
+    },
+    {
+      "id": "gaze-of-mork",
+      "name": "Gaze of Mork",
+      "type": "triple",
+      "text": "Magical ability. Select the closest visible enemy fighter within 12\" of this fighter and roll three dice. For each roll of 4+, allocate (X/2) damage points to that fighter."
+    },
+    {
+      "id": "hypnotic-gaze",
+      "name": "Hypnotic Gaze",
+      "type": "double",
+      "text": "Magical ability. Select a visible fighter within (X)\" of this fighter. If it is an enemy fighter, it becomes Panicked. If it is a friendly fighter, it automatically passes Bravery tests until the end of the battle round."
+    },
+    {
+      "id": "gargant-brew",
+      "name": "Gargant Brew",
+      "type": "double",
+      "text": "Magical ability. Select a friendly `ORC` or `GOBLIN` fighter within (X)\" of this fighter. Until the end of the battle round, add 1 to its Fight characteristic. At the start of the next battle round, that fighter becomes Panicked."
+    },
+    {
+      "id": "waves-of-terror",
+      "name": "Waves of Terror",
+      "type": "double",
+      "text": "Magical ability. Each enemy fighter within (X)\" of this fighter must take a Bravery test or become Panicked."
+    },
+    {
+      "id": "bloatstool-spores",
+      "name": "Bloatstool Spores",
+      "type": "triple",
+      "text": "Magical ability. Roll a die for each enemy fighter within (X/2)\" of this fighter. On a 3+, allocate (X/2) damage points to that fighter."
+    },
+    {
+      "id": "extra-nasty",
+      "name": "Extra-Nasty",
+      "type": "double",
+      "text": "Magical ability. Select a friendly `GOBLIN` fighter within (X)\" of this fighter. Until the end of the battle round, add 2 to the damage allocated for each critical hit scored by that fighter's melee attack actions."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "brewgit-brewin-ladle",
+      "name": "Brewin' Ladle",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 3,
+      "rules": [],
+      "cost": 10
+    },
+    {
+      "id": "scaremonger-boingob-skull",
+      "name": "Tusks and Fangs of Boingob",
+      "type": "melee",
+      "range": { "min": 0, "max": 2 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 4,
+      "rules": [],
+      "cost": 20
+    },
+    {
+      "id": "spiker-scorpisquig-stikka",
+      "name": "Scorpisquig Stikka",
+      "type": "melee",
+      "range": { "min": 0, "max": 2 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 5,
+      "rules": [],
+      "cost": 25
+    }
+  ],
+  "items": []
 }
