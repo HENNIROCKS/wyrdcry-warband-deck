@@ -1,0 +1,66 @@
+{
+  "id": "elf-ranger",
+  "name": "Elf Ranger",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 70,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["mercenaries", "sisters-of-sigmar", "witch-hunters"],
+  "description": "Elf rangers work as scouts and spies beyond the borders of the high elf realms, tracking targets of interest and eliminating them where possible. As hired swords, they offer little in comradery, but plenty in murderous efficiency.",
+  "profile": {
+    "move": 6,
+    "fight": 4,
+    "shoot": 6,
+    "defense": 3,
+    "health": 10,
+    "bravery": 3
+  },
+  "keywords": ["elf", "hired-sword", "hero"],
+  "gear": ["weapon:elven-bow", "weapon:sword"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "trick-shot",
+      "name": "Trick Shot",
+      "type": "trait",
+      "text": "When this fighter makes a ranged attack action, the target does not count as being in cover."
+    },
+    {
+      "id": "stealthy",
+      "name": "Stealthy",
+      "type": "trait",
+      "text": "Whenever an enemy fighter is targeting this fighter, this fighter is in cover if both of the following are true:\n\n- It is more than 6\" from the enemy fighter.\n\n- It is within 1\" of an obstacle, or part of its base is underneath any part of a terrain piece."
+    },
+    {
+      "id": "disengage",
+      "name": "Disengage",
+      "type": "double",
+      "text": "A fighter can only use this ability if they are within 1\" of an enemy fighter. This fighter makes a free Retreat action."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "elven-bow",
+      "name": "Elven Bow",
+      "type": "ranged",
+      "range": { "min": 3, "max": 18 },
+      "attacks": 3,
+      "hit": 3,
+      "crit": 4,
+      "rules": [],
+      "cost": 0
+    },
+    {
+      "id": "sword",
+      "name": "Sword",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 3,
+      "rules": ["parry"],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
