@@ -1,0 +1,55 @@
+{
+  "id": "freelance-knight",
+  "name": "Freelance Knight",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 60,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["mercenaries", "sisters-of-sigmar", "witch-hunters"],
+  "description": "Freelancers, or '“robber knights', are fallen nobles with little to their name but their weapons and armour. Drunk and bitter, they haunt the surrounding settlements for work, caring more for coin than honour.",
+  "profile": {
+    "move": 5,
+    "fight": 5,
+    "shoot": 3,
+    "defense": 6,
+    "health": 16,
+    "bravery": 3
+  },
+  "keywords": ["human", "hired-sword", "hero"],
+  "gear": ["weapon:mastercrafted-sword"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "duelist",
+      "name": "Duelist",
+      "type": "trait",
+      "text": "Once per battle round, this fighter can make the ‘Counter’ reaction without having to forfeit an action to do so."
+    },
+    {
+      "id": "guard",
+      "name": "Guard",
+      "type": "trait",
+      "text": "When this fighter makes the Wait action, increase it's Defense characteristic by 2 until its next activation."
+    },
+    {
+      "id": "heckle",
+      "name": "Heckle",
+      "type": "double",
+      "text": "Select (X/2) enemy fighters that is within 6\" of this fighter. Until the end of the battle round, when making attack actions, those fighters must reduce their Fight and Shoot characteristics by 3, unless those attack actions target this fighter."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "mastercrafted-sword",
+      "name": "Mastercrafted Sword",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 3,
+      "hit": 3,
+      "crit": 4,
+      "rules": ["parry"],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
