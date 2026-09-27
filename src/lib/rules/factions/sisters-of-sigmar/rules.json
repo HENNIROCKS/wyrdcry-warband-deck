@@ -3,7 +3,7 @@
     "id": "martyrdom",
     "name": "Martyrdom",
     "phase": "battle",
-    "text": "[Reaction] A fighter can make this reaction when they suffer enough damage to take them out of action, but before removing them from the battlefield. Add 1 Wyrd Dice to your saved Wyrd Dice. If this fighter has the HERO keyword, add 2 instead. If this fighter has the LEADER keyword, add 3 instead.",
+    "text": "[Reaction] A fighter can make this reaction when they suffer enough damage to take them out of action, but before removing them from the battlefield. Add 1 Wyrd Dice to your saved Wyrd Dice. If this fighter has the `HERO` keyword, add 2 instead. If this fighter has the `LEADER` keyword, add 3 instead.",
     "pick": null,
     "options": [],
     "effect": null
