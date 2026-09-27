@@ -1,0 +1,55 @@
+{
+  "id": "warrior-priest",
+  "name": "Warrior Priest",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 70,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["mercenaries", "witch-hunters"],
+  "description": "With fire burning in their eyes, the Warrior-Priests stride into battle, chanting aloud the Deus Sigmar, the praise of the patron god of the Empire.",
+  "profile": {
+    "move": 5,
+    "fight": 5,
+    "shoot": 3,
+    "defense": 5,
+    "health": 14,
+    "bravery": 3
+  },
+  "keywords": ["human", "hired-sword", "hero"],
+  "gear": ["weapon:sigmarite-warhammer"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "voice-of-sigmar",
+      "name": "Voice of Sigmar",
+      "type": "trait",
+      "text": "Increase the Bravery characteristic of all visible friendly fighters within 3\" of this fighter by 1. In addition, if this fighter is recruited by a `WITCH HUNTER` warband, you may increase the warband's Zeal by 1 whenever this fighter uses an ability."
+    },
+    {
+      "id": "denounce",
+      "name": "Denounce",
+      "type": "reaction",
+      "text": "A fighter may use this reaction when a visible fighter within 6\" is the target of a magical ability. Roll a d6: if the result is higher than this fighter’s Bravery characteristic, the ability is cancelled and the ability dice discarded."
+    },
+    {
+      "id": "hammer-of-sigmar",
+      "name": "Hammer of Sigmar",
+      "type": "triple",
+      "text": "A fighter can only use this ability if equipped with a Warhammer or Sigmarite Hammer. Add (X/2) to the damage points allocated to enemy fighters by each hit and critical hit from the next melee attack action made by this fighter in this activation."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "sigmarite-warhammer",
+      "name": "Sigmarite Warhammer",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 2,
+      "hit": 3,
+      "crit": 5,
+      "rules": ["blessed", "mighty-2"],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
