@@ -1,0 +1,55 @@
+{
+  "id": "necromancer",
+  "name": "Necromancer",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 60,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["mercenaries", "possessed", "undead"],
+  "description": "Necromancers are evil wizards who have mastered the corrupt art of Necromancy. Many havefled to Mordheim to escape the agents of Sigmar and practice their dark arts freely.",
+  "profile": {
+    "move": 5,
+    "fight": 3,
+    "shoot": 3,
+    "defense": 3,
+    "health": 12,
+    "bravery": 4
+  },
+  "keywords": ["human", "hired-sword", "hero", "wizard"],
+  "gear": ["weapon:staff"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "raise-dead",
+      "name": "Raise Dead",
+      "type": "double",
+      "text": "Magical ability. Set up a new Zombie wholly within 3\" of this fighter, on a platform or the battlefield floor. That Zombie is considered to be a friendly fighter, and can be activated as normal in this battleround. It has (X) damage points remaining. Raised Zombies are not added to the warband roster and crumble to dust at the end of the battle."
+    },
+    {
+      "id": "transference",
+      "name": "Transference",
+      "type": "triple",
+      "text": "Magical ability. Allocate up to (X) damage points to a fighter within 12\" of this fighter, and then remove the same amount of damage points from a friendly fighter within 3\" of this fighter."
+    },
+    {
+      "id": "vanhels-danse-macabre",
+      "name": "Vanhel’s Danse Macabre",
+      "type": "triple",
+      "text": "Magical ability. Until the end of the battle round, `THRALLS` activated within (X)\" of this fighter may increase their Move characteristic by 2, and their Attacks characteristics by 1."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "staff",
+      "name": "Staff",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 3,
+      "rules": [],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
