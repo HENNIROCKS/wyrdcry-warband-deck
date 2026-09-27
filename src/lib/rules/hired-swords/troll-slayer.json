@@ -1,0 +1,60 @@
+{
+  "id": "troll-slayer",
+  "name": "Troll Slayer",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 60,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["mercenaries", "sisters-of-sigmar", "witch-hunters"],
+  "description": "Troll Slayers are members of a morbid Dwarf cult, sworn to atone for some unforgivable shame. With flame-red hair and ritualistic tattoos, they roam in search of the deadliest monsters, seeking redemption in glorious battle.",
+  "profile": {
+    "move": 4,
+    "fight": 6,
+    "shoot": 3,
+    "defense": 4,
+    "health": 16,
+    "bravery": 3
+  },
+  "keywords": ["dwarf", "hired-sword", "hero"],
+  "gear": ["weapon:twin-dwarven-axes", "weapon:thrown-axe"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "indomitable",
+      "name": "Indomitable",
+      "type": "trait",
+      "text": "Each time this fighter is activated, you can remove D3 damage points allocated to them."
+    },
+    {
+      "id": "deathwish",
+      "name": "Deathwish",
+      "type": "reaction",
+      "text": "When this warrior is targeted by a melee attack action that inflicts enough damage to take this warrior out of action, before it is removed from the battlefield, this warrior makes a free attack action."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "twin-dwarven-axes",
+      "name": "Twin dwarven axes",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 4,
+      "hit": 3,
+      "crit": 4,
+      "rules": ["parry"],
+      "cost": 0
+    },
+    {
+      "id": "thrown-axe",
+      "name": "Thrown axe",
+      "type": "ranged",
+      "range": { "min": 0, "max": 6 },
+      "attacks": 2,
+      "hit": 3,
+      "crit": 4,
+      "rules": [],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
