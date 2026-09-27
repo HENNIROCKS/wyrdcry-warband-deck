@@ -1,0 +1,66 @@
+{
+  "id": "master-moulder",
+  "name": "Master Moulder",
+  "origin": "homebrew",
+  "version": "0.0.1",
+  "cost": 60,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["clan-eshin", "clan-pestilens"],
+  "description": "Clan Moulder sells monsters, and a Master Moulder is the one who decides when a monster is finished. He comes to Mordheim for the wyrdstone and stays for the material, and whatever he leads out of the ruins is rarely what he led in.",
+  "profile": {
+    "move": 6,
+    "fight": 4,
+    "shoot": 3,
+    "defense": 3,
+    "health": 12,
+    "bravery": 5
+  },
+  "keywords": ["skaven", "hired-sword", "hero"],
+  "gear": ["weapon:mancatcher", "weapon:warplock-pistol"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "beastmaster",
+      "name": "Beastmaster",
+      "type": "trait",
+      "text": "Friendly fighters with the `BEAST` or `MONSTER` keyword within 6\" of this fighter may re-roll failed Bravery tests."
+    },
+    {
+      "id": "tyrannical-packmaster",
+      "name": "Tyrannical Packmaster",
+      "type": "trait",
+      "text": "Friendly `BEAST` and `MONSTER` fighters within 6\" of this fighter count as being within 3\" of a friendly `HERO` for the purposes of `Stupidity`."
+    },
+    {
+      "id": "goading",
+      "name": "Goading",
+      "type": "double",
+      "text": "Select a friendly `BEAST` or `MONSTER` fighter within (X\") of this fighter and roll a die. On a 2+, or on a 3+ if that fighter has the `MONSTER` keyword, it makes a free move action that must end closer to the nearest visible enemy fighter, and may then make a free melee attack action. Otherwise the goad turns: that fighter makes a free melee attack action targeting this fighter."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "mancatcher",
+      "name": "Mancatcher",
+      "type": "melee",
+      "range": { "min": 0, "max": 2 },
+      "attacks": 3,
+      "hit": 2,
+      "crit": 3,
+      "rules": ["whipcrack"],
+      "cost": 0
+    },
+    {
+      "id": "warplock-pistol",
+      "name": "Warplock Pistol",
+      "type": "ranged",
+      "range": { "min": 0, "max": 6 },
+      "attacks": 2,
+      "hit": 4,
+      "crit": 7,
+      "rules": ["brace", "mighty-2", "reload", "unreliable"],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
