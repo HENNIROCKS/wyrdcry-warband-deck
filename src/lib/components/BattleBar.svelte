@@ -11,6 +11,7 @@
 		health = 0,
 		hero = false,
 		fighters = [],
+		height = $bindable(0),
 		middle,
 		ontoggle,
 		onwait,
@@ -26,6 +27,12 @@
 		hero?: boolean;
 		/** Every fighter of the warband, for the count and the morale. */
 		fighters?: string[];
+		/**
+		 * What the bar occupies at the foot of the window, read back by the deck:
+		 * the bar is out of the flow, so the cards have to be kept clear of it by
+		 * hand – and its height grows with the row of dots.
+		 */
+		height?: number;
 		/**
 		 * What sits between the two groups – the deck puts its dots there. It is the
 		 * width the row has left over, and it is handed in rather than built here
@@ -47,7 +54,11 @@
 	const wavering = $derived(isWavering(battle, fighters));
 </script>
 
-<div class="bar">
+<!-- Fixed to the window rather than sitting at the end of the deck: at the
+     table the thumb reaches the foot of the screen, and a bar that travels with
+     the layout ends up under the browser's own furniture. -->
+<div class="dock" bind:offsetHeight={height}>
+	<div class="bar">
 	{#if state}
 		<div class="wounds">
 			<button
@@ -118,9 +129,23 @@
 		<p class="summary quiet">No battle</p>
 		<div class="middle">{@render middle?.()}</div>
 	{/if}
+	</div>
 </div>
 
 <style>
+	.dock {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		/* Over the cards, under the explanation overlay and the import sheet. */
+		z-index: 3;
+		background: var(--ui-header-bg);
+		border-top: 1px solid var(--ui-border);
+		/* Its own, because the page no longer carries one at the foot. */
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
 	.bar {
 		display: flex;
 		align-items: center;

@@ -143,6 +143,7 @@
 		max-width: 38rem;
 		margin: 0 auto;
 		padding: 40px 20px;
+		padding-bottom: calc(40px + env(safe-area-inset-bottom));
 	}
 
 	h1 {

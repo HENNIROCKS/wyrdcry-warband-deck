@@ -35,6 +35,8 @@
 	const VELOCITY = 0.5;
 
 	let stack: HTMLDivElement | undefined = $state();
+	/** What the fixed battle bar takes at the foot, so the stack can leave it free. */
+	let barHeight = $state(0);
 	let current = $state(0);
 	/** Horizontal offset of the top card under the finger. */
 	let dx = $state(0);
@@ -172,7 +174,16 @@
 <svelte:window onkeydown={onKeyDown} />
 
 <div class="deck">
-	<div class="stack" class:dragging bind:this={stack}>
+	<!-- The bar is fixed to the window, so the room it takes is reserved here –
+	     the cards end above it rather than running underneath. A margin and not
+	     padding: the panes inside are positioned against this box, and `inset: 0`
+	     would reach straight through a padding. -->
+	<div
+		class="stack"
+		class:dragging
+		bind:this={stack}
+		style:margin-bottom="{barHeight}px"
+	>
 		{#if beneath >= 0}
 			{#key cards[beneath].instanceId}
 				<div
@@ -211,6 +222,7 @@
 
 	{#if ontoggle}
 		<BattleBar
+			bind:height={barHeight}
 			middle={dots}
 			{battle}
 			state={topFighter ? stateOf(battle, topFighter.instanceId) : null}

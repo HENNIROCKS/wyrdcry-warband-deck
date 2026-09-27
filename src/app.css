@@ -153,7 +153,13 @@ body {
 body {
 	margin: 0;
 	padding-top: env(safe-area-inset-top);
-	padding-bottom: env(safe-area-inset-bottom);
+	/*
+	 * No inset at the foot. It would come on top of the viewport height the app
+	 * already claims, and the page would scroll by exactly the height of the home
+	 * indicator – which is what puts a bar at the bottom edge out of thumb's
+	 * reach. Every surface that ends at the foot carries its own instead: the
+	 * battle bar, the wizard's foot, the explanation, the import sheet.
+	 */
 }
 
 button {
