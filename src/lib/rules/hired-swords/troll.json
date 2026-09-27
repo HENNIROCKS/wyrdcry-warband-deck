@@ -1,0 +1,72 @@
+{
+  "id": "troll",
+  "name": "Troll",
+  "origin": "homebrew",
+  "version": "0.0.1",
+  "cost": 90,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["greenskin-marauders"],
+  "description": "Nobody hires a Troll so much as feeds one until it follows. It forgets what it is doing about as often as it remembers, but very little it gets hold of is recoverable afterwards – and whatever you do to a Troll, it tends not to stay done.",
+  "profile": {
+    "move": 6,
+    "fight": 6,
+    "shoot": 2,
+    "defense": 4,
+    "health": 18,
+    "bravery": 5
+  },
+  "keywords": ["monster", "hired-sword", "hero"],
+  "gear": ["weapon:troll-big-club", "weapon:troll-vomit"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "fearsome",
+      "name": "Fearsome",
+      "type": "trait",
+      "text": "Enemy fighters must take a Panic test when making melee attack actions against this fighter."
+    },
+    {
+      "id": "regeneration",
+      "name": "Regeneration",
+      "type": "trait",
+      "text": "At the end of each battle round, roll a die. On a 4+, remove 3 damage points from this fighter."
+    },
+    {
+      "id": "stupidity",
+      "name": "Stupidity",
+      "type": "trait",
+      "text": "Unless activated within 3\" of a visible friendly `HERO` or enemy fighter, roll a die. On a 1-4, this fighter makes a Wait action. On a 5+, this fighter may activate as normal."
+    },
+    {
+      "id": "troll-kin",
+      "name": "Troll Kin",
+      "type": "trait",
+      "text": "When this fighter is recruited, choose whether it is a Stone Troll or a River Troll. That choice is fixed for the rest of the campaign. Stone Troll: when this fighter is targeted by a magical ability, roll a die. On a 4+, that ability has no effect on this fighter. River Troll: enemy fighters must reduce their Fight characteristic by 1 when making melee attack actions that target this fighter."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "troll-big-club",
+      "name": "Big Club",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 3,
+      "hit": 3,
+      "crit": 6,
+      "rules": ["mighty-1"],
+      "cost": 45
+    },
+    {
+      "id": "troll-vomit",
+      "name": "Vomit",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 2,
+      "hit": 3,
+      "crit": 6,
+      "rules": [],
+      "cost": 20
+    }
+  ],
+  "items": []
+}
