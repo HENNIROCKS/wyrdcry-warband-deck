@@ -1,0 +1,61 @@
+{
+  "id": "rat-ogre",
+  "name": "Rat Ogre",
+  "origin": "official",
+  "version": "1.0.0",
+  "cost": 90,
+  "limit": { "min": 0, "max": 1 },
+  "may_hire": ["clan-eshin", "clan-pestilens"],
+  "description": "Rat Ogres are lethal but stupid killing machines, whose small brains are singularly devoted to the pursuit of fighting and tearing their enemies apart.",
+  "profile": {
+    "move": 6,
+    "fight": 6,
+    "shoot": 2,
+    "defense": 4,
+    "health": 20,
+    "bravery": 5
+  },
+  "keywords": ["monster", "hired-sword", "hero"],
+  "gear": ["weapon:sheer-brutality"],
+  "choose": null,
+  "abilities": [
+    {
+      "id": "stupidity",
+      "name": "Stupidity",
+      "type": "trait",
+      "text": "Unless activated within 3\" of a visible friendly `HERO` or enemy fighter, roll a die. On a 1-4, this fighter makes a Wait action. On a 5+, this fighter may activate as normal."
+    },
+    {
+      "id": "fearsome",
+      "name": "Fearsome",
+      "type": "trait",
+      "text": "Enemy fighters must take a Panic test when making melee attack actions against this fighter."
+    },
+    {
+      "id": "bounding-leaps",
+      "name": "Bounding Leaps",
+      "type": "double",
+      "text": "A fighter can only use this ability if there is a visible enemy fighter within 6\" of them. This fighter makes a bonus move action and must finish closer to the closest visible enemy fighter than they were at the start of that move action."
+    },
+    {
+      "id": "savage-mauling",
+      "name": "Savage Mauling",
+      "type": "triple",
+      "text": "This fighter makes a free melee attack action. Then, you may remove the target of that attack action from the battlefield, and place it back anywhere within 1\" of this fighter."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "sheer-brutality",
+      "name": "Sheer Brutality",
+      "type": "melee",
+      "range": { "min": 0, "max": 1 },
+      "attacks": 4,
+      "hit": 3,
+      "crit": 5,
+      "rules": [],
+      "cost": 0
+    }
+  ],
+  "items": []
+}
