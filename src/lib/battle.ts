@@ -16,7 +16,8 @@ export const FRESH: FighterBattleState = {
 	activated: false,
 	waiting: false,
 	damage: 0,
-	out: false
+	out: false,
+	heroic: false
 };
 
 export function start(): BattleState {
@@ -43,6 +44,10 @@ export function isOut(battle: BattleState | null, instanceId: string): boolean {
 
 export function damageOf(battle: BattleState | null, instanceId: string): number {
 	return stateOf(battle, instanceId).damage;
+}
+
+export function isHeroicSpent(battle: BattleState | null, instanceId: string): boolean {
+	return stateOf(battle, instanceId).heroic;
 }
 
 /**
@@ -80,6 +85,15 @@ export function toggle(battle: BattleState | null, instanceId: string): BattleSt
  */
 export function toggleWaiting(battle: BattleState | null, instanceId: string): BattleState {
 	return write(battle, instanceId, { waiting: !isWaiting(battle, instanceId), activated: false });
+}
+
+/**
+ * The heroic reaction, spent or still in hand. It stands alone: a `HERO` may
+ * react with it while activated, so it neither ends an activation nor is ended
+ * by one.
+ */
+export function toggleHeroic(battle: BattleState | null, instanceId: string): BattleState {
+	return write(battle, instanceId, { heroic: !isHeroicSpent(battle, instanceId) });
 }
 
 /**

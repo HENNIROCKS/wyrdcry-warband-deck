@@ -6,7 +6,7 @@
 	import { explanation } from '../explanation';
 	import FighterCard from './FighterCard.svelte';
 	import WarbandCard from './WarbandCard.svelte';
-	import { healthOf } from '../adapter';
+	import { hasKeyword, healthOf } from '../adapter';
 	import { stateOf } from '../battle';
 	import type { DeckCard } from '../types/card';
 	import type { BattleState } from '../types/warband';
@@ -16,13 +16,15 @@
 		battle = null,
 		ontoggle,
 		onwait,
-		onwound
+		onwound,
+		onheroic
 	}: {
 		cards: DeckCard[];
 		battle?: BattleState | null;
 		ontoggle?: (instanceId: string) => void;
 		onwait?: (instanceId: string) => void;
 		onwound?: (instanceId: string, delta: number, health: number) => void;
+		onheroic?: (instanceId: string) => void;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
@@ -209,17 +211,26 @@
 
 	{#if ontoggle}
 		<BattleBar
+			middle={dots}
 			{battle}
 			state={topFighter ? stateOf(battle, topFighter.instanceId) : null}
 			health={topFighter ? healthOf(topFighter) : 0}
 			fighters={fighterIds}
+			hero={topFighter ? hasKeyword(topFighter, 'hero') : false}
 			ontoggle={() => topFighter && ontoggle?.(topFighter.instanceId)}
 			onwait={() => topFighter && onwait?.(topFighter.instanceId)}
+			onheroic={() => topFighter && onheroic?.(topFighter.instanceId)}
 			onwound={(delta) =>
 				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
 		/>
+	{:else}
+		<div class="loose">{@render dots()}</div>
 	{/if}
+</div>
 
+<!-- In the bar's middle where there is one, on their own where there is not –
+     the deck without battle callbacks still has cards to choose between. -->
+{#snippet dots()}
 	<nav class="dots" aria-label="Choose fighter">
 		{#each cards as card, i (card.instanceId)}
 			{@const state = card.kind === 'fighter' ? stateOf(battle, card.instanceId) : null}
@@ -235,9 +246,7 @@
 			></button>
 		{/each}
 	</nav>
-
-	<p class="position">{current + 1} / {cards.length}</p>
-</div>
+{/snippet}
 
 <!-- Outside the stack: inside a pane, the transform would become the frame a
      fixed overlay is placed against. -->
@@ -307,12 +316,17 @@
 		pointer-events: none;
 	}
 
+	/* No padding of its own: inside the bar it is one of three groups and takes
+	   the row's. Standing on its own it is given one. */
 	.dots {
 		display: flex;
 		justify-content: center;
 		flex-wrap: wrap;
 		gap: 6px;
-		padding: 10px 12px 2px;
+	}
+
+	.loose {
+		padding: 10px 12px;
 	}
 
 	.dot {
@@ -347,12 +361,4 @@
 		background: var(--ui-danger);
 	}
 
-	.position {
-		margin: 0;
-		padding-bottom: 8px;
-		text-align: center;
-		font-size: var(--ui-t-xs);
-		font-variant-numeric: tabular-nums;
-		color: var(--ui-text-subtle);
-	}
 </style>

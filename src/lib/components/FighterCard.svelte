@@ -97,6 +97,14 @@
 		<p class="band" aria-hidden="true">{band}</p>
 	{/if}
 
+	<!-- Its own band under the first, because the two say different things: the
+	     one above names what a fighter is doing this round, this one what it has
+	     spent for the whole battle. Quieter than the other, which is the state
+	     the table reads first. -->
+	{#if state.heroic}
+		<p class="band heroic" aria-hidden="true">Heroic reaction used</p>
+	{/if}
+
 	<div class="image-section">
 		<div class="image-box">
 			<div class="image-inner" style="mask-image: {runemark}; -webkit-mask-image: {runemark};"></div>
@@ -122,6 +130,7 @@
 				{/each}
 			</ul>
 		{/if}
+
 
 		<div class="profile">
 			{#if characteristics.length}
@@ -366,7 +375,10 @@
 
 	/* ── In-game states ────────────────────────── */
 
-	.card.dulled {
+	/* The bands measure from the card, and the card clips them. Without this they
+	   would hang off `.pane` instead, which scrolls rather than clips – a band is
+	   wider than the card it lies across, so the deck would scroll sideways. */
+	.card {
 		position: relative;
 	}
 
@@ -423,6 +435,24 @@
 
 	.card.out .band {
 		background: color-mix(in srgb, var(--card-blood) 82%, transparent);
+	}
+
+	/* The same ribbon, held back: half the type size, a thinner ink and no second
+	   pair of rules, so the state of the round keeps the eye and this one is read
+	   after it rather than with it. Placed below the first, where it clears the
+	   first's box at every card size. */
+	.band.heroic {
+		top: calc(132 * var(--u));
+		padding: calc(4 * var(--u)) 0;
+		background: rgba(18, 18, 22, 0.58);
+		border-top-color: transparent;
+		border-bottom-color: transparent;
+		font-size: calc(21 * var(--t));
+		letter-spacing: 0.05em;
+	}
+
+	.card.out .band.heroic {
+		background: rgba(18, 18, 22, 0.58);
 	}
 
 	.warn {

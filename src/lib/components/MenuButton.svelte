@@ -15,13 +15,35 @@
 	/**
 	 * A popover lives in the top layer, where the trigger's position is no longer
 	 * known to it – the browser centres it instead. So the panel is placed by hand
-	 * below the trigger and flush with its right edge, right before it opens.
+	 * beside the trigger and flush with its right edge, right before it opens.
+	 *
+	 * Below the trigger where there is room, above it where there is not: the
+	 * battle bar sits at the bottom edge, and a panel hung under it would open
+	 * off-screen.
 	 */
 	function onBeforeToggle(event: ToggleEvent) {
 		if (event.newState !== 'open' || !trigger || !menu) return;
 		const rect = trigger.getBoundingClientRect();
-		menu.style.top = `${rect.bottom + 6}px`;
 		menu.style.right = `${window.innerWidth - rect.right}px`;
+
+		/* The panel is still closed at this point, and a closed one is
+		   `display: none` and has no height. So it is laid out for the length of a
+		   measurement, unseen. */
+		menu.style.display = 'block';
+		menu.style.visibility = 'hidden';
+		menu.style.top = '0';
+		menu.style.bottom = 'auto';
+		const height = menu.getBoundingClientRect().height;
+		menu.style.display = '';
+		menu.style.visibility = '';
+
+		if (rect.bottom + 6 + height <= window.innerHeight) {
+			menu.style.top = `${rect.bottom + 6}px`;
+			menu.style.bottom = 'auto';
+		} else {
+			menu.style.top = 'auto';
+			menu.style.bottom = `${window.innerHeight - rect.top + 6}px`;
+		}
 	}
 
 	/*

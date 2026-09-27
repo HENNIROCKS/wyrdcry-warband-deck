@@ -689,3 +689,12 @@ export function toCards(warband: Warband, selections?: Selections | null): DeckC
 export function healthOf(card: FighterCardData): number {
 	return card.stats.find((stat) => stat.key === 'health')?.value ?? 0;
 }
+
+/**
+ * Whether a card carries a keyword. Compared without regard to case: the game
+ * data spells them as it likes – `DAEMON` beside `Possessed` – and the card
+ * shows them in capitals through CSS, not through the value.
+ */
+export function hasKeyword(card: FighterCardData, keyword: string): boolean {
+	return card.keywords.some((held) => held.toLowerCase() === keyword.toLowerCase());
+}

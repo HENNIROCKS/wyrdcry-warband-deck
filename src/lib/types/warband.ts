@@ -80,8 +80,9 @@ export type ExportedWarband = Warband & { _deck?: DeckMeta };
  * What a fighter carries in the battle running right now.
  *
  * Two lifetimes meet here. `activated` and `waiting` belong to the round and are
- * cleared by the next one; `damage` and `out` belong to the battle and are only
- * gone when it ends. Which is why one round does not simply drop the whole map.
+ * cleared by the next one; `damage`, `out` and `heroic` belong to the battle and
+ * are only gone when it ends. Which is why one round does not simply drop the
+ * whole map.
  *
  * `out` is stored rather than worked out from `damage` and Health: Health is a
  * figure of the card, and the dots, the count of who still has to act and the
@@ -97,6 +98,11 @@ export interface FighterBattleState {
 	/** Damage points allocated. The card shows what is left of Health instead. */
 	damage: number;
 	out: boolean;
+	/**
+	 * A `HERO` has spent its heroic reaction – the one reaction per battle that
+	 * costs no action. Once per battle, not per round, so it outlives `nextRound`.
+	 */
+	heroic: boolean;
 }
 
 /** One round: its number, and what each fighter carries in it. */

@@ -16,6 +16,7 @@
 		remaining,
 		start,
 		toggle,
+		toggleHeroic,
 		toggleWaiting,
 		undoRound
 	} from '$lib/battle';
@@ -227,6 +228,7 @@
 		ontoggle={(id) => setBattle(toggle(battle, id))}
 		onwait={(id) => setBattle(toggleWaiting(battle, id))}
 		onwound={(id, delta, health) => setBattle(allocate(battle, id, delta, health))}
+		onheroic={(id) => setBattle(toggleHeroic(battle, id))}
 	/>
 {:else}
 	<div class="empty">

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	import MenuButton from './MenuButton.svelte';
 	import { isWavering, remaining } from '../battle';
 	import type { BattleState, FighterBattleState } from '../types/warband';
 
@@ -6,21 +9,33 @@
 		battle = null,
 		state = null,
 		health = 0,
+		hero = false,
 		fighters = [],
+		middle,
 		ontoggle,
 		onwait,
-		onwound
+		onwound,
+		onheroic
 	}: {
 		battle?: BattleState | null;
 		/** The fighter on top of the stack. Null while the warband card is up. */
 		state?: FighterBattleState | null;
 		/** Health as that fighter's card works it out. */
 		health?: number;
+		/** Whether that fighter is a `HERO`, and so has a heroic reaction to spend. */
+		hero?: boolean;
 		/** Every fighter of the warband, for the count and the morale. */
 		fighters?: string[];
+		/**
+		 * What sits between the two groups – the deck puts its dots there. It is the
+		 * width the row has left over, and it is handed in rather than built here
+		 * because choosing a card is the deck's business, not the battle's.
+		 */
+		middle?: Snippet;
 		ontoggle?: () => void;
 		onwait?: () => void;
 		onwound?: (delta: number) => void;
+		onheroic?: () => void;
 	} = $props();
 
 	/* What is left of Health, which is what the stepper counts – the card writes
@@ -60,33 +75,37 @@
 			</button>
 		</div>
 
+		<div class="middle">{@render middle?.()}</div>
+
+		<!-- Every state of a fighter under one word each, rather than a row of
+		     symbols that has to be learned. What is set stays readable without
+		     opening it: the dots beside it carry activated, waiting and out of
+		     action, and the trigger takes a mark while any state is on. -->
 		<div class="states">
-			<button
-				class="icon-button"
-				aria-pressed={state.waiting}
-				aria-label="Waiting"
-				title="Waiting"
-				onclick={() => onwait?.()}
-			>
-				<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M7 3h10" />
-					<path d="M7 21h10" />
-					<path d="M7 3v3.5l5 5 5-5V3" />
-					<path d="M7 21v-3.5l5-5 5 5V21" />
-				</svg>
-			</button>
-			<button
-				class="icon-button"
-				aria-pressed={state.activated}
-				aria-label="Activated"
-				title="Activated"
-				onclick={() => ontoggle?.()}
-			>
-				<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M6 6l12 12" />
-					<path d="M18 6 6 18" />
-				</svg>
-			</button>
+			<!-- No mark on the trigger: every state it holds is already written across
+			     the card above it, and the dots carry it through the stack. -->
+			<MenuButton label="Fighter state">
+				{#snippet icon()}
+					<!-- A word rather than three dots, for the same reason the entries
+					     behind it are words. Not "Conditions": the rules spend that one
+					     on a scenario's victory conditions. -->
+					<span class="label">State</span>
+				{/snippet}
+				<button onclick={() => ontoggle?.()}>
+					<span class="tick" aria-hidden="true">{state.activated ? '✓' : ''}</span>
+					Activated
+				</button>
+				<button onclick={() => onwait?.()}>
+					<span class="tick" aria-hidden="true">{state.waiting ? '✓' : ''}</span>
+					Waiting
+				</button>
+				{#if hero}
+					<button onclick={() => onheroic?.()}>
+						<span class="tick" aria-hidden="true">{state.heroic ? '✓' : ''}</span>
+						Heroic reaction used
+					</button>
+				{/if}
+			</MenuButton>
 		</div>
 	{:else if battle}
 		<!-- The warband card carries the battle instead of a fighter's state: the
@@ -94,8 +113,10 @@
 		<p class="summary">
 			Round {battle.round} · {left_to_act} to act{#if wavering}{' '}<span class="wavering">Wavering</span>{/if}
 		</p>
+		<div class="middle">{@render middle?.()}</div>
 	{:else}
 		<p class="summary quiet">No battle</p>
+		<div class="middle">{@render middle?.()}</div>
 	{/if}
 </div>
 
@@ -112,6 +133,15 @@
 		max-width: calc(var(--deck-max-width) + 2 * var(--deck-gutter));
 		margin-inline: auto;
 		padding: 5px var(--deck-gutter) 0;
+	}
+
+	/* Takes what the two groups leave and centres its content in it, so the dots
+	   sit in the middle of the row rather than against one of them. */
+	.middle {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		justify-content: center;
 	}
 
 	.wounds,
@@ -156,15 +186,27 @@
 		color: var(--ui-text-muted);
 	}
 
-	.icon-button {
-		width: 48px;
+	/* The trigger belongs to `MenuButton` and carries the header's 38px from
+	   `app.css`. At the table it is aimed at with a thumb over a card, so here it
+	   takes the height the damage steppers next to it have, and the width its
+	   word asks for. */
+	.states :global(.icon-button) {
+		width: auto;
+		min-width: 48px;
 		height: 44px;
+		padding: 0 11px;
 	}
 
-	.icon-button[aria-pressed='true'] {
-		background: var(--ui-accent);
-		border-color: var(--ui-accent);
-		color: #fff;
+	.label {
+		font-size: var(--ui-t-md);
+		font-weight: 600;
+	}
+
+	/* Holds the column the entries line up in, whether an entry is ticked or not. */
+	.tick {
+		display: inline-block;
+		width: 1.2em;
+		color: var(--ui-accent);
 	}
 
 	.summary {
