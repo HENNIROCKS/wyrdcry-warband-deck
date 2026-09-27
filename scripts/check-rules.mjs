@@ -83,6 +83,13 @@ const folders = (await readdir(factionsDir, { withFileTypes: true }))
 /** The folders that brought a homebrew.json, checked against `origin` below. */
 const brought = new Set();
 
+/**
+ * Which file a merged weapon, item or keyword was written in. The shape checks
+ * below run over the merged lists, and without this they would name the shared
+ * list for a weapon that sits in a faction's folder or a hired sword's file.
+ */
+const cameFrom = new Map();
+
 /*
  * Merged into the shared lists rather than held beside them, the way the app
  * loads them: everything downstream resolves an id against one list. They are
@@ -114,6 +121,52 @@ for (const folder of folders) {
 			}
 			list.push(entry);
 			taken.add(entry.id);
+			cameFrom.set(entry.id, file);
+		}
+	}
+}
+
+/* --- What the hired swords add to them ----------------------------------- */
+
+/*
+ * One file per hired sword, and the file is the whole entry: its talents and
+ * the weapons only it carries are written into it, because nothing else can
+ * reach them. Those weapons go into the shared lists all the same – everything
+ * downstream resolves an id against one map – so what two hired swords share
+ * has to move to `weapons.json`, and the collision below is what says so.
+ */
+const hiredDir = join(RULES, 'hired-swords');
+const hiredFiles = (await readdir(hiredDir).catch(() => []))
+	.filter((name) => name.endsWith('.json'))
+	.sort();
+
+/** The ones with something in them, as `{ file, name, entry }`. */
+const hiredSwords = [];
+/** Files that are still an empty object, kept out of the problems like a folder. */
+const waitingHired = [];
+
+for (const name of hiredFiles) {
+	const file = join(hiredDir, name);
+	const entry = await read(file);
+	if (!entry) continue;
+	if (!Object.keys(entry).length) {
+		waitingHired.push(`hired-swords/${name}`);
+		continue;
+	}
+	hiredSwords.push({ file, name, entry });
+
+	for (const [key, list, taken] of [
+		['weapons', weapons, weaponIds],
+		['items', items, itemIds]
+	]) {
+		for (const own of entry[key] ?? []) {
+			if (taken.has(own.id)) {
+				problem(file, `"${own.id}" is taken already – what two of them carry belongs in ${key}.json`);
+				continue;
+			}
+			list.push(own);
+			taken.add(own.id);
+			cameFrom.set(own.id, file);
 		}
 	}
 }
@@ -134,26 +187,28 @@ duplicates(shared.weaponRules, weaponRules);
 duplicates(shared.universal, universal);
 
 for (const weapon of weapons) {
-	for (const rule of weapon.rules) {
+	const where = cameFrom.get(weapon.id) ?? shared.weapons;
+	for (const rule of weapon.rules ?? []) {
 		if (!weaponRuleIds.has(rule)) {
-			problem(shared.weapons, `"${weapon.id}" names the special rule "${rule}", weapon-rules.json has none`);
+			problem(where, `"${weapon.id}" names the special rule "${rule}", weapon-rules.json has none`);
 		}
 	}
 	if (weapon.range.min > weapon.range.max) {
-		problem(shared.weapons, `"${weapon.id}" has a range from ${weapon.range.min} to ${weapon.range.max}`);
+		problem(where, `"${weapon.id}" has a range from ${weapon.range.min} to ${weapon.range.max}`);
 	}
 }
 
 for (const item of items) {
-	for (const effect of item.effects) {
+	const where = cameFrom.get(item.id) ?? shared.items;
+	for (const effect of item.effects ?? []) {
 		if (!STATS.includes(effect.characteristic)) {
-			problem(shared.items, `"${item.id}" changes "${effect.characteristic}", which is not a characteristic`);
+			problem(where, `"${item.id}" changes "${effect.characteristic}", which is not a characteristic`);
 		}
 	}
 	/* Armour without a slot would take no place at all: the wizard would let a
 	   fighter wear a shield in a full hand, or two suits of armour at once. */
 	if (item.type === 'armour' && !['hand', 'body'].includes(item.slot)) {
-		problem(shared.items, `"${item.id}" is armour but takes the slot "${item.slot}"`);
+		problem(where, `"${item.id}" is armour but takes the slot "${item.slot}"`);
 	}
 }
 
@@ -431,6 +486,181 @@ for (const folder of folders) {
 	}
 }
 
+/* --- One hired sword per file --------------------------------------------- */
+
+/*
+ * A hired sword belongs to no faction: it is hired when a battle is set up, for
+ * that battle, and `may_hire` says who may hire it. So its file is checked here
+ * rather than in the loop above, and against the same shared lists.
+ */
+
+const hiredIds = new Set();
+
+for (const { file, name, entry } of hiredSwords) {
+	if (`${entry.id}.json` !== name) {
+		problem(file, `id is "${entry.id}" but the file is "${name}"`);
+	}
+	if (hiredIds.has(entry.id)) problem(file, `a second hired sword is called "${entry.id}"`);
+	hiredIds.add(entry.id);
+
+	if (!['official', 'homebrew'].includes(entry.origin)) {
+		problem(file, `origin is "${entry.origin}" – write "official" or "homebrew"`);
+	}
+	/* The shape only, as on a faction: what the number should be is a judgement
+	   about how much of the entry moved. */
+	if (!/^\d+\.\d+\.\d+$/.test(entry.version ?? '')) {
+		problem(file, `version is "${entry.version}" – write it as major.minor.patch`);
+	}
+	/* The fee, paid per battle. Zero would be a free hire, which no entry means. */
+	if (typeof entry.cost !== 'number' || entry.cost <= 0) {
+		problem(file, `cost is "${entry.cost}" – the hiring fee is a number of gold crowns`);
+	}
+
+	const { min, max } = entry.limit ?? {};
+	if (typeof min !== 'number' || (max !== null && typeof max !== 'number')) {
+		problem(file, 'has no usable limit');
+	} else if (max !== null && min > max) {
+		problem(file, `may be hired at least ${min} and at most ${max} times`);
+	}
+
+	/* The list is the whole restriction: an empty one would be a hired sword
+	   nobody can take, and the entry would never show up anywhere. */
+	if (!Array.isArray(entry.may_hire) || !entry.may_hire.length) {
+		problem(file, 'may_hire names no faction, so nobody could ever hire it');
+	}
+	for (const id of entry.may_hire ?? []) {
+		/* Checked against the directory rather than against faction.json: the loop
+		   above already holds every folder's id to its own name. */
+		if (!folders.includes(id)) {
+			problem(file, `may be hired by "${id}", and there is no such faction`);
+		}
+	}
+
+	for (const key of STATS) {
+		if (typeof entry.profile?.[key] !== 'number') problem(file, `has no ${key} in its profile`);
+	}
+	for (const keyword of entry.keywords ?? []) {
+		if (!keywordIds.has(keyword)) {
+			problem(file, `carries the keyword "${keyword}", keywords.json has none`);
+		}
+	}
+	/* Every one of them is hired for a battle and none of them is ever on the
+	   roster, so the keyword that carries those rules is not optional. */
+	if (!(entry.keywords ?? []).includes('hired-sword')) {
+		problem(file, 'does not carry the keyword "hired-sword"');
+	}
+
+	const abilities = entry.abilities ?? [];
+	duplicates(file, abilities);
+	const abilityIds = ids(abilities);
+
+	/**
+	 * Gear resolves against the shared lists, which by now hold what this file
+	 * brought itself. `used` collects what the file reaches for, so an entry it
+	 * carries and never arms anybody with can be named at the end.
+	 */
+	const used = new Set();
+	function checkGear(where, gear) {
+		if (!Array.isArray(gear)) {
+			problem(file, `${where} has no gear list – write [] where it brings nothing`);
+			return;
+		}
+		for (const prefixed of gear) {
+			const [kind, id] = prefixed.split(':');
+			used.add(prefixed);
+			if (kind === 'weapon') {
+				if (!weaponIds.has(id)) problem(file, `${where} carries "${prefixed}", and no weapon is called "${id}"`);
+			} else if (kind === 'item') {
+				if (!itemIds.has(id)) problem(file, `${where} carries "${prefixed}", and no item is called "${id}"`);
+			} else {
+				problem(file, `${where} carries "${prefixed}", which needs a "weapon:" or "item:" prefix`);
+			}
+		}
+	}
+
+	checkGear('it', entry.gear);
+
+	const choice = entry.choose;
+	if (choice) {
+		/* Null where the entry asks for the choice itself; the sentence then comes
+		   from `prompt`, and there is no ability to resolve. */
+		if (choice.source !== null && !abilityIds.has(choice.source)) {
+			problem(file, `its choice comes from "${choice.source}", and it has no such ability`);
+		}
+		if (choice.source === null && !choice.prompt) {
+			problem(file, 'its choice comes from no ability and carries no prompt, so it shows without a sentence');
+		}
+
+		if (choice.kind === 'role') {
+			const roles = choice.roles ?? [];
+			if (!roles.length) problem(file, 'its choice offers no roles');
+			duplicates(file, roles);
+			for (const role of roles) {
+				if (!role.name) problem(file, `the role "${role.id}" has no name`);
+				if (!abilityIds.has(role.ability)) {
+					problem(file, `the role "${role.id}" grants "${role.ability}", and it has no such ability`);
+				}
+				checkGear(`the role "${role.id}"`, role.gear);
+			}
+			/* A role is the fighter's whole face: two of them at once would arm it
+			   twice and leave the card with two talents it did not choose. */
+			if (choice.pick !== 1) {
+				problem(file, `its choice picks ${choice.pick} roles – a fighter is hired as one of them`);
+			}
+		} else if (choice.kind === 'ability') {
+			const offered = choice.abilities ?? [];
+			for (const id of offered) {
+				if (!abilityIds.has(id)) problem(file, `its choice offers "${id}", and it has no such ability`);
+			}
+			if (choice.pick > offered.length) {
+				problem(file, `its choice picks ${choice.pick} of ${offered.length}`);
+			}
+		} else if (choice.kind === 'stat') {
+			const offered = choice.characteristics ?? [];
+			for (const key of offered) {
+				if (!STATS.includes(key)) {
+					problem(file, `its choice offers "${key}", which is not a characteristic`);
+				}
+			}
+			if (choice.pick > offered.length) problem(file, `its choice picks ${choice.pick} of ${offered.length}`);
+			if (typeof choice.bonus !== 'number') problem(file, 'its choice raises a characteristic by nothing');
+		} else if (choice.kind === 'roll') {
+			/* A roll needs the table a faction rule carries, and a hired sword has
+			   no rules of its own to carry one. */
+			problem(file, 'its choice rolls on a table, and a hired sword has no rules to hold one');
+		} else {
+			problem(file, `its choice is of kind "${choice.kind}"`);
+		}
+	}
+
+	/* An ability nothing grants would never reach a card: the talents a hired
+	   sword always has are the ones outside the roles. */
+	const granted = new Set((entry.choose?.roles ?? []).map((role) => role.ability));
+	for (const ability of abilities) {
+		if (!['trait', 'double', 'triple', 'quad', 'reaction'].includes(ability.type)) {
+			problem(file, `"${ability.id}" is of type "${ability.type}"`);
+		}
+		if (!ability.name || !ability.text) problem(file, `"${ability.id}" has no name or no text`);
+	}
+	if (granted.size && granted.size === abilities.length) {
+		problem(file, 'every one of its abilities hangs on a role, so it has no talent of its own');
+	}
+
+	/* A weapon written into the file and armed with nowhere is a transcription
+	   that stopped halfway – and it would still take its id from the shared list. */
+	for (const [key, kind] of [
+		['weapons', 'weapon'],
+		['items', 'item']
+	]) {
+		duplicates(file, entry[key] ?? []);
+		for (const own of entry[key] ?? []) {
+			if (!used.has(`${kind}:${own.id}`)) {
+				problem(file, `carries the ${kind} "${own.id}" and arms nobody with it`);
+			}
+		}
+	}
+}
+
 /* --- Campaign ------------------------------------------------------------ */
 
 if (typeof campaign.warband_budget !== 'number' || campaign.warband_budget <= 0) {
@@ -454,8 +684,9 @@ for (const [name, tiers] of Object.entries({
 /* --- Report -------------------------------------------------------------- */
 
 const written = folders.length - waiting.length;
-const counted = `${written} faction(s), ${weapons.length} weapons, ${items.length} items, ${keywords.length} keywords`;
-const pending = waiting.length ? `\n${waiting.length} folder(s) still to transcribe: ${waiting.join(', ')}` : '';
+const counted = `${written} faction(s), ${hiredSwords.length} hired sword(s), ${weapons.length} weapons, ${items.length} items, ${keywords.length} keywords`;
+const stubs = [...waiting, ...waitingHired];
+const pending = stubs.length ? `\n${stubs.length} still to transcribe: ${stubs.join(', ')}` : '';
 
 if (problems.length) {
 	console.error(`${problems.length} problem(s) in src/lib/rules/ – ${counted}\n`);

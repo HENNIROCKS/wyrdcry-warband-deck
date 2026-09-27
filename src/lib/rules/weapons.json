@@ -121,6 +121,17 @@
 		"cost": 55
 	},
 	{
+		"id": "staff",
+		"name": "Staff",
+		"type": "melee",
+		"range": { "min": 0, "max": 1 },
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": [],
+		"cost": 10
+	},
+	{
 		"id": "vicious-teeth",
 		"name": "Vicious Teeth",
 		"type": "melee",

@@ -95,7 +95,7 @@ export interface FighterChoice {
 	 * there is no ability to take the wording from.
 	 */
 	prompt?: string;
-	kind: 'stat' | 'ability' | 'roll';
+	kind: 'stat' | 'ability' | 'roll' | 'role';
 	pick: number;
 	/** With `kind: 'stat'`: which characteristics are on offer, and by how much. */
 	characteristics?: StatKey[];
@@ -104,6 +104,22 @@ export interface FighterChoice {
 	abilities?: string[];
 	/** With `kind: 'roll'`: the id of the rule carrying the `table` to roll on. */
 	table?: string;
+	/** With `kind: 'role'`: the roles on offer. */
+	roles?: FighterRole[];
+}
+
+/**
+ * One face of a fighter that comes in several: the Goblin Shaman is hired as a
+ * Brewgit or a Spiker, and the role brings a talent and the weapon that goes
+ * with it. Unlike a choice of abilities, which leaves the profile's gear alone.
+ */
+export interface FighterRole {
+	id: string;
+	name: string;
+	/** An ability of the fighter this role belongs to. */
+	ability: string;
+	/** Prefixed `weapon:` or `item:`, like a fighter's own `gear`. */
+	gear: string[];
 }
 
 /** One row of a roll table, such as the Possessed's Mutation Table. */
@@ -230,6 +246,42 @@ export interface Homebrew {
 	weapons?: Weapon[];
 	items?: Item[];
 	'weapon-rules'?: WeaponRule[];
+}
+
+/**
+ * A fighter hired for one battle, from `hired-swords/`.
+ *
+ * Not a `Fighter`: it belongs to no faction, names the factions that may take
+ * it, and its `cost` is a fee paid per battle rather than a share of the
+ * warband's budget. One file per hired sword, and the file is the whole entry –
+ * its talents and the weapons only it carries are written into it rather than
+ * into the shared lists, because nothing else can reach them. What the shared
+ * lists already hold is named by id instead, which is what lets the Freelance
+ * Knight carry his own sword and an ordinary shield.
+ */
+export interface HiredSword {
+	id: string;
+	name: string;
+	/** As on a faction: whether the game prints this one or the deck writes it. */
+	origin: 'official' | 'homebrew';
+	/** The transcription's version, `major.minor.patch`. */
+	version: string;
+	/** The hiring fee, paid for one battle. */
+	cost: number;
+	/** How many of this one a warband may take along. */
+	limit: Span;
+	/** The faction ids that may hire this one. */
+	may_hire: string[];
+	description: string;
+	profile: Record<StatKey, number>;
+	keywords: string[];
+	/** Prefixed `weapon:` or `item:`, resolved against the shared lists. */
+	gear: string[];
+	choose: FighterChoice | null;
+	abilities: Ability[];
+	/** Weapons only this hired sword carries; folded into the shared list on load. */
+	weapons: Weapon[];
+	items: Item[];
 }
 
 export interface Campaign {

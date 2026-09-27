@@ -1,0 +1,49 @@
+{
+	"id": "ogre-bodyguard",
+	"name": "Ogre Bodyguard",
+	"origin": "official",
+	"version": "1.0.0",
+	"cost": 80,
+	"limit": { "min": 0, "max": 1 },
+	"may_hire": ["mercenaries", "possessed", "sisters-of-sigmar", "undead", "witch-hunters"],
+	"description": "A warband backed up by an Ogre makes a fearsome enemy, since Ogres are extremely dangerous fighters and a terrifying sight to behold when enraged.",
+	"profile": {
+		"move": 5,
+		"fight": 5,
+		"shoot": 2,
+		"defense": 4,
+		"health": 20,
+		"bravery": 4
+	},
+	"keywords": ["ogre", "hired-sword", "hero"],
+	"gear": ["weapon:ogre-great-weapon"],
+	"choose": null,
+	"abilities": [
+		{
+			"id": "whack",
+			"name": "Whack",
+			"type": "double",
+			"text": "Select an enemy fighter within 1\" of this fighter. That fighter makes a free move action directly away from this fighter, as if it jumped. When making that move action, it can move up to (X\"). If it cannot move away from this fighter, allocate (X/2) damage points to that fighter instead."
+		},
+		{
+			"id": "bodyguard",
+			"name": "Bodyguard",
+			"type": "reaction",
+			"text": "A fighter can make this reaction when a friendly `HERO` within 1\" is targeted by an attack action. That attack action targets this fighter instead."
+		}
+	],
+	"weapons": [
+		{
+			"id": "ogre-great-weapon",
+			"name": "Ogre Great Weapon",
+			"type": "melee",
+			"range": { "min": 0, "max": 1 },
+			"attacks": 3,
+			"hit": 3,
+			"crit": 6,
+			"rules": ["mighty-1"],
+			"cost": 45
+		}
+	],
+	"items": []
+}

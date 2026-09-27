@@ -36,6 +36,17 @@
 		"rules": []
 	},
 	{
+		"id": "hired-sword",
+		"name": "HIRED SWORD",
+		"type": "faction",
+		"rules": [
+			"Recruited when setting up the battle, for that one battle only",
+			"Not added to the warband roster and does not count towards a warband's size limit",
+			"Counts every fighter of the warband that recruited them as a friendly fighter",
+			"Does not count towards a warband wavering when taken out of action, and is simply removed from the battlefield"
+		]
+	},
+	{
 		"id": "human",
 		"name": "HUMAN",
 		"type": "race",
@@ -62,6 +73,36 @@
 	{
 		"id": "daemon",
 		"name": "DAEMON",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "dwarf",
+		"name": "DWARF",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "elf",
+		"name": "ELF",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "ogre",
+		"name": "OGRE",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "beastman",
+		"name": "BEASTMAN",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "monster",
+		"name": "MONSTER",
 		"type": "race",
 		"rules": []
 	},

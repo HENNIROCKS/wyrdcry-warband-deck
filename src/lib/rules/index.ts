@@ -11,9 +11,13 @@
  * what may this faction buy is a different file from what a Sword does. The
  * price is that ids cross file boundaries; `npm run check:rules` resolves every
  * one of them and names the file a broken one sits in.
+ *
+ * `hired-swords/` is cut the other way: a hired sword belongs to no faction and
+ * raises one question, so it is one file that holds the whole entry.
  */
 
 import { assembleFrom } from './assemble';
+import { collectHiredSwords } from './hired-swords';
 import type {
 	Campaign,
 	Homebrew,
@@ -50,15 +54,29 @@ const homebrew = Object.values(
 	import.meta.glob<{ default: Homebrew }>('./factions/*/homebrew.json', { eager: true })
 ).map((module) => module.default);
 
-function pooled<T extends { id: string }>(shared: unknown, key: keyof Homebrew): Map<string, T> {
+/**
+ * The hired swords are collected before the shared lists are built, because
+ * each of them carries the weapons only it uses and they go into the same
+ * lists. Same reasoning as for the homebrew factions, and the same collision
+ * check in `npm run check:rules` guards it.
+ */
+const hired = collectHiredSwords(
+	import.meta.glob<{ default: unknown }>('./hired-swords/*.json', { eager: true })
+);
+
+function pooled<T extends { id: string }>(
+	shared: unknown,
+	key: keyof Homebrew,
+	carried: T[] = []
+): Map<string, T> {
 	const added = homebrew.flatMap((entry) => (entry[key] ?? []) as unknown as T[]);
-	return byId([...(shared as T[]), ...added]);
+	return byId([...(shared as T[]), ...added, ...carried]);
 }
 
 export const CAMPAIGN = campaign as Campaign;
 export const KEYWORDS = pooled<Keyword>(keywords, 'keywords');
-export const WEAPONS = pooled<Weapon>(weapons, 'weapons');
-export const ITEMS = pooled<Item>(items, 'items');
+export const WEAPONS = pooled<Weapon>(weapons, 'weapons', hired.weapons);
+export const ITEMS = pooled<Item>(items, 'items', hired.items);
 export const WEAPON_RULES = pooled<WeaponRule>(weaponRules, 'weapon-rules');
 export const UNIVERSAL_ABILITIES = universalAbilities as UniversalAbility[];
 
@@ -70,3 +88,10 @@ export const UNIVERSAL_ABILITIES = universalAbilities as UniversalAbility[];
 export const FACTIONS = assembleFrom(
 	import.meta.glob<{ default: unknown }>('./factions/*/*.json', { eager: true })
 );
+
+/**
+ * The hired swords, keyed by id. A warband hires them when a battle is set up
+ * rather than while it is built, so they stand beside the factions rather than
+ * in one: `may_hire` says who may take which.
+ */
+export const HIRED_SWORDS = hired.hiredSwords;
