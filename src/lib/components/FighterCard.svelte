@@ -244,7 +244,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: calc(14 * var(--u));
-		padding: calc(24 * var(--u)) calc(30 * var(--u)) calc(26 * var(--u));
+		/* Deep at the foot: the last thing on a card is a fold, and a fold that
+		   ends flush with the card ends flush with the battle bar under it. The
+		   room is what a thumb needs to hit it without the bar catching the tap. */
+		padding: calc(24 * var(--u)) calc(30 * var(--u)) calc(72 * var(--u));
 	}
 
 	/* The app speaking, not the rulebook – set apart so it is not read as part of
