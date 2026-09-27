@@ -11,13 +11,13 @@
     {
       "id": "plague-vapour",
       "name": "PLAGUE VAPOUR",
-      "text": "After this weapon's attack action is resolved, allocate 1 damage point to each other fighter within 1\" of the target that does not have the CLAN PESTILENS keyword.",
+      "text": "After this weapon's attack action is resolved, allocate 1 damage point to each other fighter within 1\" of the target that does not have the `CLAN PESTILENS` keyword.",
       "effect": null
     },
     {
       "id": "infecting",
       "name": "INFECTING",
-      "text": "On a critical hit, allocate 1 additional damage point to the target unless it has the CLAN PESTILENS keyword.",
+      "text": "On a critical hit, allocate 1 additional damage point to the target unless it has the `CLAN PESTILENS` keyword.",
       "effect": null
     }
   ],

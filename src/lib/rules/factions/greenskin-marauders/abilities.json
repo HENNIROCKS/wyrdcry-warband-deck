@@ -3,19 +3,19 @@
     "id": "da-cunnin-plan",
     "name": "Da Cunnin' Plan",
     "type": "trait",
-    "text": "While this fighter has not been taken out of action, friendly GREENSKIN MARAUDERS fighters may re-roll failed Bravery tests caused by your warband wavering."
+    "text": "While this fighter has not been taken out of action, friendly `GREENSKIN MARAUDERS` fighters may re-roll failed Bravery tests caused by your warband wavering."
   },
   {
     "id": "waaagh",
     "name": "Waaagh!",
     "type": "double",
-    "text": "Select up to (X/2) other visible friendly GREENSKIN MARAUDERS fighters within 6\" of this fighter. Each of those fighters makes a free move action that must end closer to the nearest visible enemy fighter."
+    "text": "Select up to (X/2) other visible friendly `GREENSKIN MARAUDERS` fighters within 6\" of this fighter. Each of those fighters makes a free move action that must end closer to the nearest visible enemy fighter."
   },
   {
     "id": "ere-we-go",
     "name": "'Ere We Go!",
     "type": "trait",
-    "text": "This fighter automatically passes any Bravery test caused by an enemy fighter with the TERRIFYING keyword."
+    "text": "This fighter automatically passes any Bravery test caused by an enemy fighter with the `TERRIFYING` keyword."
   },
   {
     "id": "oi-gerroff",
@@ -27,7 +27,7 @@
     "id": "ledz-go",
     "name": "Led'z go!",
     "type": "triple",
-    "text": "Magical ability. Until the end of the battle round, friendly GREENSKIN MARAUDERS fighters activated within (X)\" of this fighter may increase their Fight characteristic by 1."
+    "text": "Magical ability. Until the end of the battle round, friendly `GREENSKIN MARAUDERS` fighters activated within (X)\" of this fighter may increase their Fight characteristic by 1."
   },
   {
     "id": "zzap",
@@ -39,6 +39,6 @@
     "id": "boss-of-da-gits",
     "name": "Boss Of Da Gits",
     "type": "trait",
-    "text": "Friendly fighters with the GOBLIN keyword within 6\" of this fighter do not roll for Animosity."
+    "text": "Friendly fighters with the `GOBLIN` keyword within 6\" of this fighter do not roll for Animosity."
   }
 ]

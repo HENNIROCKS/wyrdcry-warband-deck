@@ -15,7 +15,7 @@
     "id": "liturgus-infecticus",
     "name": "Liturgus Infecticus",
     "type": "trait",
-    "text": "While this fighter has not been taken out of action, friendly CLAN PESTILENS fighters may re-roll failed Bravery tests."
+    "text": "While this fighter has not been taken out of action, friendly `CLAN PESTILENS` fighters may re-roll failed Bravery tests."
   },
   {
     "id": "manifestation-of-the-final-pandemic",

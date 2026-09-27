@@ -3,7 +3,7 @@
     "id": "hidden-advance",
     "name": "Hidden Advance",
     "phase": "battle",
-    "text": "When deploying a CLAN ESHIN warband to the battlefield, before diving your warband into search parties, you may select up to 4 fighters. Those fighters are hidden, and will not be deployed to the battlefield.  In the beginning of each combat phase after the first, before any fighters are activated, you may set up any amount of hidden fighters on the battlefield, at least 12\" from your opponent's battlefield edge, and further than 6\" away from enemy fighters and objective markers.",
+    "text": "When deploying a `CLAN ESHIN` warband to the battlefield, before diving your warband into search parties, you may select up to 4 fighters. Those fighters are hidden, and will not be deployed to the battlefield.  In the beginning of each combat phase after the first, before any fighters are activated, you may set up any amount of hidden fighters on the battlefield, at least 12\" from your opponent's battlefield edge, and further than 6\" away from enemy fighters and objective markers.",
     "pick": null,
     "options": [],
     "effect": null
