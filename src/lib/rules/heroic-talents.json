@@ -1,0 +1,128 @@
+[
+  {
+    "id": "bodyguard",
+    "name": "Bodyguard",
+    "specialization": "toughness",
+    "type": "double",
+    "text": "Select a friendly `HERO` within 1\" of this fighter. Until the end of the battle round, that Hero cannot be targeted while they are within 1\" of this fighter."
+  },
+  {
+    "id": "endure",
+    "name": "Endure",
+    "specialization": "toughness",
+    "type": "reaction",
+    "text": "A fighter can make this reaction after they are targeted by an attack action but before the hit rolls are made. Subtract 1 from the damage points allocated by each hit and critical hit (to a minimum of 1) from that attack action."
+  },
+  {
+    "id": "eagle-eyes",
+    "name": "Eagle Eyes",
+    "specialization": "perception",
+    "type": "trait",
+    "text": "When making an attack action using a bow, crossbow or handgun, this fighter may ignore the maximum range of the weapon, but if they do, they must reduce their Shoot characteristic by 1."
+  },
+  {
+    "id": "fearsome",
+    "name": "Fearsome",
+    "specialization": "strength",
+    "type": "trait",
+    "text": "This fighter gains the `TERRIFYING` keyword."
+  },
+  {
+    "id": "indomitable",
+    "name": "Indomitable",
+    "specialization": "toughness",
+    "type": "trait",
+    "text": "Each time this fighter is activated, you can remove D3 damage points allocated to them."
+  },
+  {
+    "id": "maintain-momentum",
+    "name": "Maintain Momentum",
+    "specialization": "strength",
+    "type": "triple",
+    "text": "A fighter can only use this ability if an enemy fighter has been taken down by an attack action made by them this activation. This fighter makes a bonus move action or a bonus attack action."
+  },
+  {
+    "id": "nine-lives",
+    "name": "Nine Lives",
+    "specialization": "toughness",
+    "type": "trait",
+    "text": "When rolling for injuries, this fighter can re-roll a result of 11-12. In addition, there is no limit to the amount of permanent injuries this fighter may have."
+  },
+  {
+    "id": "oppressor",
+    "name": "Oppressor",
+    "specialization": "strength",
+    "type": "trait",
+    "text": "Once per battle round, when an enemy fighter makes the 'Retreat' action, this fighter can make the 'Cut Them Down' reaction without having to forfeit an action to do so."
+  },
+  {
+    "id": "patient-hunter",
+    "name": "Patient Hunter",
+    "specialization": "perception",
+    "type": "reaction",
+    "text": "When an enemy fighter ends a move action while visible to this fighter, this fighter can target that enemy fighter with a free ranged attack action."
+  },
+  {
+    "id": "rapid-reload",
+    "name": "Rapid Reload",
+    "specialization": "perception",
+    "type": "trait",
+    "text": "At the end of the battleround, you may reload one of this fighter's weapons with the Reload special rule."
+  },
+  {
+    "id": "reckless-shot",
+    "name": "Reckless Shot",
+    "specialization": "perception",
+    "type": "double",
+    "text": "For this fighter's next ranged attack action, it may target enemy fighters within 1\" of friendly fighters."
+  },
+  {
+    "id": "shield-bash",
+    "name": "Shield Bash",
+    "specialization": "strength",
+    "type": "double",
+    "text": "This ability requires the fighter being equipped with a shield. Select an enemy fighter within 1\" of this fighter. That fighter makes a free retreat action directly away from this fighter. If it cannot move away from this fighter, allocate (X/2) damage points to that fighter instead."
+  },
+  {
+    "id": "shield-wall",
+    "name": "Shield Wall",
+    "specialization": "toughness",
+    "type": "double",
+    "text": "This ability requires the fighter being equipped with a shield. Until the end of the battle round, add (X/2) to the Defense characteristic of all friendly fighters within 1\" of this fighter when targeted by ranged attack actions."
+  },
+  {
+    "id": "staggering-blows",
+    "name": "Staggering Blows",
+    "specialization": "strength",
+    "type": "double",
+    "text": "A fighter can use this ability after allocating damage points to an enemy fighter with a melee attack action. That enemy fighter cannot use reactions for the rest of the battle round. In addition, if the melee attack action allocated damage points from a critical hit, the target cannot use abilities for the rest of the battle round."
+  },
+  {
+    "id": "surgical-precision",
+    "name": "Surgical Precision",
+    "specialization": "perception",
+    "type": "trait",
+    "text": "Select a ranged weapon type. When making attack actions with weapons of that type, increase the Critical Damage characteristic by 1."
+  },
+  {
+    "id": "tough",
+    "name": "Tough",
+    "specialization": "toughness",
+    "type": "trait",
+    "text": "Each time an attack action scores any critical hits on this fighter, 1 of those critical hits becomes a hit instead."
+  },
+  {
+    "id": "trick-shot",
+    "name": "Trick Shot",
+    "specialization": "perception",
+    "type": "trait",
+    "text": "When this fighter makes a ranged attack action, the target does not count as being in cover."
+  },
+  {
+    "id": "weapon-master",
+    "name": "Weapon Master",
+    "specialization": "strength",
+    "type": "trait",
+    "text": "Select a melee weapon type. When making attack actions with weapons of that type, increase the critical damage characteristic by 1."
+  }
+]
