@@ -2,7 +2,38 @@
   "keywords": [
     { "id": "orc", "name": "ORC", "type": "race", "rules": [] },
     { "id": "goblin", "name": "GOBLIN", "type": "race", "rules": [] },
-    { "id": "greenskin-marauders", "name": "GREENSKIN MARAUDERS", "type": "faction", "rules": [] }
+    {
+      "id": "greenskin-marauders",
+      "name": "GREENSKIN MARAUDERS",
+      "type": "faction",
+      "rules": []
+    }
+  ],
+  "racial-limits": [
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "profile": {
+        "move": 6,
+        "fight": 4,
+        "shoot": 5,
+        "defense": 4,
+        "health": 16,
+        "bravery": 6
+      }
+    },
+    {
+      "id": "orc",
+      "name": "Orc",
+      "profile": {
+        "move": 6,
+        "fight": 6,
+        "shoot": 5,
+        "defense": 4,
+        "health": 24,
+        "bravery": 4
+      }
+    }
   ],
   "weapon-rules": [],
   "weapons": [

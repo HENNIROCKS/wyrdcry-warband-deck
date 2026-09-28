@@ -1,0 +1,62 @@
+[
+  {
+    "id": "daemon",
+    "name": "Daemon",
+    "profile": {
+      "move": 8,
+      "fight": 8,
+      "shoot": 4,
+      "defense": 5,
+      "health": 30,
+      "bravery": 2
+    }
+  },
+  {
+    "id": "ghoul",
+    "name": "Ghoul",
+    "profile": {
+      "move": 6,
+      "fight": 6,
+      "shoot": 3,
+      "defense": 4,
+      "health": 24,
+      "bravery": 4
+    }
+  },
+  {
+    "id": "human",
+    "name": "Human",
+    "profile": {
+      "move": 6,
+      "fight": 6,
+      "shoot": 6,
+      "defense": 4,
+      "health": 24,
+      "bravery": 3
+    }
+  },
+  {
+    "id": "skaven",
+    "name": "Skaven",
+    "profile": {
+      "move": 8,
+      "fight": 6,
+      "shoot": 6,
+      "defense": 4,
+      "health": 20,
+      "bravery": 5
+    }
+  },
+  {
+    "id": "vampire",
+    "name": "Vampire",
+    "profile": {
+      "move": 8,
+      "fight": 8,
+      "shoot": 6,
+      "defense": 5,
+      "health": 30,
+      "bravery": 2
+    }
+  }
+]

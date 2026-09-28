@@ -7,6 +7,7 @@
       "rules": []
     }
   ],
+  "racial-limits": [],
   "weapon-rules": [
     {
       "id": "plague-vapour",
