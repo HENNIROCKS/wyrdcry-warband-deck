@@ -153,6 +153,12 @@ export interface Fighter {
 export interface StatRuleEffect {
 	kind: 'stat';
 	characteristic: StatKey;
+	/**
+	 * Added to the characteristic as it stands. The rules say "increase" for an
+	 * improvement, and for Bravery an improvement is a smaller number: it is a
+	 * roll target, passed on a roll at or above it. A rule that improves Bravery
+	 * therefore carries a negative bonus.
+	 */
 	bonus: number;
 	/** Fighter ids, or "all" for the whole warband. */
 	fighters: string[] | 'all';

@@ -50,7 +50,7 @@
         "effect": {
           "kind": "stat",
           "characteristic": "bravery",
-          "bonus": 1,
+          "bonus": -1,
           "fighters": "all"
         }
       },
