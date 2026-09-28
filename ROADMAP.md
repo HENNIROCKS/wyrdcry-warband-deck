@@ -26,6 +26,7 @@
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 🎨 Go over the design and the interface outside the cards
 - [ ] 📄 Export the warband as a roster PDF
+- [ ] 📈 Add author names to warbands and hired swords
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
 
 ## Ideas
