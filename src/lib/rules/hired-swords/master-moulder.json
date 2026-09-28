@@ -3,6 +3,7 @@
   "name": "Master Moulder",
   "origin": "homebrew",
   "version": "0.0.1",
+  "author": "Hendrik Berends",
   "cost": 60,
   "limit": { "min": 0, "max": 1 },
   "may_hire": ["clan-eshin", "clan-pestilens"],

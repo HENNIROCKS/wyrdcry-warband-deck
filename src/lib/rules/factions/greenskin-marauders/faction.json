@@ -4,5 +4,6 @@
   "keyword": "GREENSKIN MARAUDERS",
   "warband_size": { "min": 3, "max": 20 },
   "origin": "homebrew",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "author": "Hendrik Berends"
 }
