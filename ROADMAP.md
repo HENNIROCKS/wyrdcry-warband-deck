@@ -13,9 +13,9 @@
 - [x] ⚔️ In-game states: wounds, out of action, waiting
 - [x] 📈 Award experience after a battle and cross it into renown
 - [x] 📈 Possessed: roll mutations and carry them on the fighter's card
+- [x] ⚔️ Add "in cover" to the in-game states, the first one to move a characteristic
 - [ ] ⚙️ Work offline at the table: cached game data, screen kept awake
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
-- [ ] ⚔️ Add "in cover" to the in-game states, the first one to move a characteristic
 - [ ] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
