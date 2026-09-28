@@ -4,10 +4,12 @@
 	import { dev } from '$app/environment';
 	import { base } from '$app/paths';
 
+	import AftermathSheet from '$lib/components/AftermathSheet.svelte';
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import { toCards } from '$lib/adapter';
+	import { applyAftermath, type AftermathAnswer } from '$lib/aftermath';
 	import {
 		allocate,
 		isWavering,
@@ -27,6 +29,9 @@
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
 	let candidate = $state<ImportCandidate | null>(null);
+	/* Set while the aftermath sheet is up, asking what a battle just ending is
+	   worth in experience before the battle itself is thrown away. */
+	let endingBattle = $state(false);
 	/* The warband a delete has been asked for, held until it is confirmed. */
 	let condemned = $state<StoredWarband | null>(null);
 	let message = $state<string | null>(null);
@@ -49,6 +54,30 @@
 		if (!active) return;
 		active.battle = next;
 		await putBattle(active.warband.id, next ? ($state.snapshot(next) as BattleState) : null);
+	}
+
+	/**
+	 * Applies the experience earned and ends the battle in one write, so a
+	 * closed sheet never leaves xp granted but the battle still running, or the
+	 * reverse. Revision rises because this is the first thing that changes a
+	 * warband after it was built – unlike a battle tap, it is campaign progress.
+	 */
+	async function applyAftermathAndEnd(
+		answers: Map<string, AftermathAnswer>,
+		bonusInstanceId: string | null
+	) {
+		if (!active) return;
+		const snapshot = $state.snapshot(active);
+		const entry: StoredWarband = {
+			...snapshot,
+			warband: applyAftermath(snapshot.warband, answers, bonusInstanceId),
+			battle: null,
+			revision: snapshot.revision + 1,
+			updatedAt: new Date().toISOString()
+		};
+		await putWarband(entry);
+		endingBattle = false;
+		await refresh();
 	}
 
 	onMount(refresh);
@@ -185,12 +214,8 @@
 							</button>
 						{/if}
 						<hr />
-						<button onclick={() => setBattle(null)}>End battle</button>
-						{#if out > 0}
-							<!-- What the aftermath sequence will ask for is exactly this count,
-							     and ending the battle is where it goes. -->
-							<p class="hint">Ending it drops the wounds and who is out of action.</p>
-						{/if}
+						<button onclick={() => (endingBattle = true)}>End battle</button>
+						<p class="hint">Asks who earned experience, then drops the wounds and who is out of action.</p>
 					{:else}
 						<p>No battle</p>
 						<button onclick={() => setBattle(start())}>Start battle</button>
@@ -247,6 +272,16 @@
 		{candidate}
 		onconfirm={confirmImport}
 		oncancel={() => (candidate = null)}
+	/>
+{/if}
+
+{#if endingBattle && active}
+	<AftermathSheet
+		warband={active.warband}
+		cards={cards.filter((c) => c.kind === 'fighter')}
+		{battle}
+		onconfirm={applyAftermathAndEnd}
+		oncancel={() => (endingBattle = false)}
 	/>
 {/if}
 
