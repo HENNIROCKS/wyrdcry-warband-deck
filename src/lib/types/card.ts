@@ -7,8 +7,11 @@ import type { StatKey } from './warband';
  * value, every other layer the signed amount it adds.
  */
 export interface StatLayer {
-	/** `damage` is the battle's own layer: what the fighter has taken off Health. */
-	kind: 'base' | 'permanent' | 'equipment' | 'damage';
+	/**
+	 * `damage` and `battle` are the battle's own layers: `damage` what the
+	 * fighter has taken off Health, `battle` a state like being in cover.
+	 */
+	kind: 'base' | 'permanent' | 'equipment' | 'damage' | 'battle';
 	/** Named the way the card names it: "Profile", "Heavy Armour". */
 	source: string;
 	amount: number;

@@ -17,7 +17,8 @@
 		ontoggle,
 		onwait,
 		onwound,
-		onheroic
+		onheroic,
+		oncover
 	}: {
 		cards: DeckCard[];
 		battle?: BattleState | null;
@@ -25,6 +26,7 @@
 		onwait?: (instanceId: string) => void;
 		onwound?: (instanceId: string, delta: number, health: number) => void;
 		onheroic?: (instanceId: string) => void;
+		oncover?: (instanceId: string) => void;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
@@ -232,6 +234,7 @@
 			ontoggle={() => topFighter && ontoggle?.(topFighter.instanceId)}
 			onwait={() => topFighter && onwait?.(topFighter.instanceId)}
 			onheroic={() => topFighter && onheroic?.(topFighter.instanceId)}
+			oncover={() => topFighter && oncover?.(topFighter.instanceId)}
 			onwound={(delta) =>
 				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
 		/>

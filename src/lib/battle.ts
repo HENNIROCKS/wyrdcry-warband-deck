@@ -17,7 +17,8 @@ export const FRESH: FighterBattleState = {
 	waiting: false,
 	damage: 0,
 	out: false,
-	heroic: false
+	heroic: false,
+	cover: false
 };
 
 export function start(): BattleState {
@@ -48,6 +49,10 @@ export function damageOf(battle: BattleState | null, instanceId: string): number
 
 export function isHeroicSpent(battle: BattleState | null, instanceId: string): boolean {
 	return stateOf(battle, instanceId).heroic;
+}
+
+export function isInCover(battle: BattleState | null, instanceId: string): boolean {
+	return stateOf(battle, instanceId).cover;
 }
 
 /**
@@ -97,6 +102,14 @@ export function toggleHeroic(battle: BattleState | null, instanceId: string): Ba
 }
 
 /**
+ * In cover, standing rather than acting – it neither ends an activation nor
+ * excludes any other state.
+ */
+export function toggleCover(battle: BattleState | null, instanceId: string): BattleState {
+	return write(battle, instanceId, { cover: !isInCover(battle, instanceId) });
+}
+
+/**
  * Allocates or takes back damage points. A fighter holding damage equal to its
  * Health is out of action, and anything past that is discarded – so a fighter
  * whose Health drops afterwards is out at the next tap, not retroactively.
@@ -114,7 +127,8 @@ export function allocate(
 
 /**
  * The next round clears what belongs to a round and keeps what belongs to the
- * battle: the wounds and whoever is out of action carry over.
+ * battle: the wounds, whoever is out of action and whoever is in cover carry
+ * over.
  */
 export function nextRound(battle: BattleState): BattleState {
 	const fighters: Record<string, FighterBattleState> = {};

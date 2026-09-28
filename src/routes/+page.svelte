@@ -18,6 +18,7 @@
 		remaining,
 		start,
 		toggle,
+		toggleCover,
 		toggleHeroic,
 		toggleWaiting,
 		undoRound
@@ -254,6 +255,7 @@
 		onwait={(id) => setBattle(toggleWaiting(battle, id))}
 		onwound={(id, delta, health) => setBattle(allocate(battle, id, delta, health))}
 		onheroic={(id) => setBattle(toggleHeroic(battle, id))}
+		oncover={(id) => setBattle(toggleCover(battle, id))}
 	/>
 {:else}
 	<div class="empty">

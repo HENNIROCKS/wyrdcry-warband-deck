@@ -16,7 +16,8 @@
 		ontoggle,
 		onwait,
 		onwound,
-		onheroic
+		onheroic,
+		oncover
 	}: {
 		battle?: BattleState | null;
 		/** The fighter on top of the stack. Null while the warband card is up. */
@@ -43,6 +44,7 @@
 		onwait?: () => void;
 		onwound?: (delta: number) => void;
 		onheroic?: () => void;
+		oncover?: () => void;
 	} = $props();
 
 	/* What is left of Health, which is what the stepper counts – the card writes
@@ -116,6 +118,10 @@
 						Heroic reaction used
 					</button>
 				{/if}
+				<button onclick={() => oncover?.()}>
+					<span class="tick" aria-hidden="true">{state.cover ? '✓' : ''}</span>
+					In cover
+				</button>
 			</MenuButton>
 		</div>
 	{:else if battle}

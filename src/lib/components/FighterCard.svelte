@@ -48,10 +48,13 @@
 	const characteristics = $derived(
 		card.stats.map((stat) => {
 			const damage = stat.key === 'health' ? Math.min(state.damage, stat.value) : 0;
-			const shown = format({ ...stat, value: stat.value - damage });
-			const layers = damage
-				? [...stat.layers, { kind: 'damage' as const, source: 'Damage', amount: -damage }]
-				: stat.layers;
+			const cover = stat.key === 'defense' && state.cover ? 1 : 0;
+			const shown = format({ ...stat, value: stat.value - damage + cover });
+			const layers = [
+				...stat.layers,
+				...(damage ? [{ kind: 'damage' as const, source: 'Damage', amount: -damage }] : []),
+				...(cover ? [{ kind: 'battle' as const, source: 'In Cover', amount: cover }] : [])
+			];
 			return {
 				key: stat.key,
 				label: stat.label,
@@ -103,6 +106,14 @@
 	     the table reads first. -->
 	{#if state.heroic}
 		<p class="band heroic" aria-hidden="true">Heroic reaction used</p>
+	{/if}
+
+	<!-- A third band, further down still when the heroic one is up too: cover is
+	     neither the round's state nor the heroic reaction, and can stand
+	     alongside both. Standing alone, it takes the heroic band's own place
+	     instead of leaving that place empty. -->
+	{#if state.cover}
+		<p class="band cover" class:stacked={state.heroic} aria-hidden="true">In cover</p>
 	{/if}
 
 	<div class="image-section">
@@ -442,10 +453,16 @@
 
 	/* The same ribbon, held back: half the type size, a thinner ink and no second
 	   pair of rules, so the state of the round keeps the eye and this one is read
-	   after it rather than with it. Placed below the first, where it clears the
-	   first's box at every card size. */
-	.band.heroic {
-		top: calc(132 * var(--u));
+	   after it rather than with it. Cover shares the same place when it stands
+	   alone – there is nothing to hold the place open for.
+
+	   `top` adds the first band's own box – its padding, line height and border –
+	   plus a fixed clearance, rather than naming a unit offset of its own: below
+	   529px card width `--t` floors while `--u` keeps shrinking, so a flat number
+	   that clears the box at one width closes the gap at another. */
+	.band.heroic,
+	.band.cover {
+		top: calc(94 * var(--u) + 40 * var(--t) + 2px);
 		padding: calc(4 * var(--u)) 0;
 		background: rgba(18, 18, 22, 0.58);
 		border-top-color: transparent;
@@ -454,8 +471,15 @@
 		letter-spacing: 0.05em;
 	}
 
-	.card.out .band.heroic {
+	.card.out .band.heroic,
+	.card.out .band.cover {
 		background: rgba(18, 18, 22, 0.58);
+	}
+
+	/* Cover moves down to its own place once heroic is up as well – the same sum
+	   carried one band further, clear of heroic's box at every card size. */
+	.band.cover.stacked {
+		top: calc(110 * var(--u) + 61 * var(--t) + 4px);
 	}
 
 	.warn {
