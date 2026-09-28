@@ -182,7 +182,7 @@
 	.image-section {
 		display: flex;
 		gap: calc(12 * var(--u));
-		margin: calc(16 * var(--u)) calc(38 * var(--u)) 0 calc(var(--deck-inset) * var(--u));
+		margin: calc(16 * var(--u)) calc(38 * var(--u)) 0 calc(30 * var(--u));
 	}
 
 	.image-box {
@@ -265,7 +265,7 @@
 		/* Parts the fighter's name from the profile more than the parchment's own
 		   gap does, so the chips read with the heading above rather than the
 		   characteristics below. */
-		margin: 0 0 calc(16 * var(--u));
+		margin: calc(16 * var(--u)) 0;
 		padding: 0;
 		list-style: none;
 	}
