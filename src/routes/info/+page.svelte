@@ -123,7 +123,7 @@
 			<li><a href="https://wyrdcry.net">Wyrdcry – rules and Warband Builder</a></li>
 			<li><a href="{REPO}/issues">Feedback and bug reports</a></li>
 			<li><a href={REPO}>Source code</a></li>
-			<li><a href="{REPO}#roadmap">What is planned</a></li>
+			<li><a href="{REPO}/blob/main/ROADMAP.md">What is planned</a></li>
 		</ul>
 	</section>
 

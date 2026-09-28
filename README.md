@@ -46,53 +46,12 @@ here. The builder accepts such a file and then resolves neither the faction nor
 any of its fighters.
 
 Until that is settled, treat Export and Snapshot as the way to keep a copy
-rather than as a round trip. Restoring it is the last item on the roadmap below,
-because everything above it changes the file that would be checked.
+rather than as a round trip. Restoring it is the last item on the roadmap,
+because everything before it changes the file that would be checked.
 
 ## Roadmap
 
-Done:
-
-- [x] Import warband JSON, swipe through the deck, export it again
-- [x] Build a warband in the app, for all eight factions
-- [x] The warband itself as the first card
-- [x] Mark fighters as activated, count the rounds, undo one step
-- [x] In-game states: wounds, out of action, waiting
-
-**Confirm what is there.** Eight factions are transcribed and none has been
-played; whatever turns up here changes the shape of everything below.
-
-- [ ] Play a Possessed warband end to end – the faction that tests the rest
-
-**After the battle.** The aftermath sequence has six steps, and it is the first
-thing that writes to the campaign rather than to a battle.
-
-- [ ] Experience and renown
-- [ ] Heroic traits
-- [ ] Injuries
-- [ ] The rest of the sequence: favour, income, the trading post, recalculated
-      reputation
-
-**The warband between evenings.** Touching a warband that already exists – so
-far it is built once and read-only after that.
-
-- [ ] Hired Swords
-- [ ] The warband stash and its notes, and changing a fighter afterwards: their
-      equipment, their name, dismissing them
-
-**What all of it depends on.** Neither can be pulled forward: their subject is
-the result of everything above.
-
-- [ ] A pass over the design and the interface outside the cards
-- [ ] Warband Builder compatibility, measured rather than assumed
-
-Not sorted into that order and not dropped: working offline at the table –
-cached game data, screen kept awake – and Witch Hunters' zeal, tracked through
-a battle the way wounds already are.
-
-Further out and nothing promised: NFC tags under the model bases, a photo of the
-painted model as the card image, showing an opponent the warband over a
-read-only link.
+What is built and what comes next is a checklist in [`ROADMAP.md`](ROADMAP.md).
 
 ## Data
 
