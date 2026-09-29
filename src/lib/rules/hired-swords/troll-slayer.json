@@ -2,6 +2,7 @@
   "id": "troll-slayer",
   "name": "Troll Slayer",
   "origin": "official",
+  "author": "Johan Markström",
   "version": "1.0.0",
   "cost": 60,
   "limit": { "min": 0, "max": 1 },

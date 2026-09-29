@@ -3,6 +3,7 @@
   "name": "Ogre Bodyguard",
   "origin": "official",
   "version": "1.0.0",
+  "author": "Johan Markström",
   "cost": 80,
   "limit": { "min": 0, "max": 1 },
   "may_hire": [
