@@ -230,6 +230,8 @@ export interface Faction {
 	 * in front of them. Raised by hand whenever a value here changes.
 	 */
 	version: string;
+	/** Who transcribed this entry. */
+	author: string;
 	rules: FactionRule[];
 	fighters: Fighter[];
 	equipment: Allowance[];

@@ -260,7 +260,7 @@
 				{#each groups as group (group.origin)}
 					<optgroup label={group.title}>
 						{#each group.entries as entry (entry.id)}
-							<option value={entry.id}>{entry.name} v{entry.version}</option>
+							<option value={entry.id}>{entry.name} (v{entry.version}, Author: {entry.author})</option>
 						{/each}
 					</optgroup>
 				{/each}
