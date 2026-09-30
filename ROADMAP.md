@@ -14,6 +14,7 @@
 - [x] 📈 Award experience after a battle and cross it into renown
 - [x] 📈 Possessed: roll mutations and carry them on the fighter's card
 - [x] ⚔️ Add "in cover" to the in-game states, the first one to move a characteristic
+- [x] 📈 Show a faction's author name when picking it to build a warband
 - [ ] ⚙️ Work offline at the table: cached game data, screen kept awake
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
@@ -26,7 +27,6 @@
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 🎨 Go over the design and the interface outside the cards
 - [ ] 📄 Export the warband as a roster PDF
-- [x] 📈 Show a faction's author name when picking it to build a warband
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
 
