@@ -20,7 +20,7 @@
 - [ ] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
-- [ ] 🛠️ Edit the warband stash and its notes after the build
+- [ ] 🛠️ Edit the warband stash after the build
 - [ ] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [ ] 🛠️ Add notes to fighters, alongside the warband's own notes
 - [ ] 🛠️ Add fluff to fighters and the warband
