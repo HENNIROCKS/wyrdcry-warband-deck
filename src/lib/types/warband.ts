@@ -63,6 +63,13 @@ export interface Selections {
 	modifiers: { instanceId: string; characteristic: StatKey; bonus: number; source: string }[];
 }
 
+/** Free-text background, kept off the warband model so an app field is never mistaken for the builder's own. */
+export interface Fluff {
+	warband: string;
+	/** Keyed by instanceId. */
+	fighters: Record<string, string>;
+}
+
 /** Metadata of this app. The builder ignores unknown keys and hands them back. */
 export interface DeckMeta {
 	format: 'wyrdcry-warband-deck';
@@ -72,6 +79,7 @@ export interface DeckMeta {
 	ruleset: string;
 	/** Absent on every warband that did not come out of the wizard. */
 	selections?: Selections | null;
+	fluff?: Fluff | null;
 }
 
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
@@ -159,4 +167,6 @@ export interface StoredWarband {
 	 * not keep.
 	 */
 	selections?: Selections | null;
+	/** Notes and fluff written here, kept off the warband model the same way `selections` is. */
+	fluff?: Fluff | null;
 }

@@ -22,8 +22,8 @@
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [ ] 🛠️ Edit the warband stash after the build
 - [ ] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
-- [ ] 🛠️ Add notes to fighters, alongside the warband's own notes
-- [ ] 🛠️ Add fluff to fighters and the warband
+- [x] 🛠️ Add notes to fighters, alongside the warband's own notes
+- [x] 🛠️ Add fluff to fighters and the warband
 - [ ] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🛠️ Hire a Hired Sword for a single battle

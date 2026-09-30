@@ -125,6 +125,8 @@ export interface FighterCardData {
 	cost: number;
 	/** The profile id is unknown – the game data does not know this fighter. */
 	unresolved: boolean;
+	/** The player's own background text. Empty where there is none. */
+	fluff: string;
 }
 
 /**
@@ -143,6 +145,8 @@ export interface WarbandCardData {
 	/** The names alone: whoever picks a thing up has its rules on their own card. */
 	stash: string;
 	notes: string;
+	/** The player's own background text. Empty where there is none. */
+	fluff: string;
 }
 
 export type DeckCard = WarbandCardData | FighterCardData;

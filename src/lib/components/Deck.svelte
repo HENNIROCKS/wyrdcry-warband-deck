@@ -18,7 +18,8 @@
 		onwait,
 		onwound,
 		onheroic,
-		oncover
+		oncover,
+		onedit
 	}: {
 		cards: DeckCard[];
 		battle?: BattleState | null;
@@ -27,6 +28,8 @@
 		onwound?: (instanceId: string, delta: number, health: number) => void;
 		onheroic?: (instanceId: string) => void;
 		oncover?: (instanceId: string) => void;
+		/** Opens the sheet to edit whichever card is on top. */
+		onedit?: (instanceId: string) => void;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
@@ -237,6 +240,7 @@
 			oncover={() => topFighter && oncover?.(topFighter.instanceId)}
 			onwound={(delta) =>
 				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
+			onedit={() => onedit?.(top.instanceId)}
 		/>
 	{:else}
 		<div class="loose">{@render dots()}</div>

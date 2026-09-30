@@ -17,7 +17,8 @@
 		onwait,
 		onwound,
 		onheroic,
-		oncover
+		oncover,
+		onedit
 	}: {
 		battle?: BattleState | null;
 		/** The fighter on top of the stack. Null while the warband card is up. */
@@ -45,6 +46,8 @@
 		onwound?: (delta: number) => void;
 		onheroic?: () => void;
 		oncover?: () => void;
+		/** Opens the sheet to edit the card on top of the deck. */
+		onedit?: () => void;
 	} = $props();
 
 	/* What is left of Health, which is what the stepper counts – the card writes
@@ -123,6 +126,7 @@
 					In cover
 				</button>
 			</MenuButton>
+			{@render editMenu()}
 		</div>
 	{:else if battle}
 		<!-- The warband card carries the battle instead of a fighter's state: the
@@ -131,12 +135,31 @@
 			Round {battle.round} · {left_to_act} to act{#if wavering}{' '}<span class="wavering">Wavering</span>{/if}
 		</p>
 		<div class="middle">{@render middle?.()}</div>
+		<div class="states">
+			{@render editMenu()}
+		</div>
 	{:else}
 		<p class="summary quiet">No battle</p>
 		<div class="middle">{@render middle?.()}</div>
+		<div class="states">
+			{@render editMenu()}
+		</div>
 	{/if}
 	</div>
 </div>
+
+{#snippet pencil()}
+	<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M17 3a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+	</svg>
+{/snippet}
+
+{#snippet editMenu()}
+	<MenuButton label="Edit">
+		{#snippet icon()}{@render pencil()}{/snippet}
+		<button onclick={() => onedit?.()}>Edit…</button>
+	</MenuButton>
+{/snippet}
 
 <style>
 	.dock {

@@ -6,6 +6,7 @@
 
 	import AftermathSheet from '$lib/components/AftermathSheet.svelte';
 	import Deck from '$lib/components/Deck.svelte';
+	import EditSheet from '$lib/components/EditSheet.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import { toCards } from '$lib/adapter';
@@ -33,13 +34,30 @@
 	/* Set while the aftermath sheet is up, asking what a battle just ending is
 	   worth in experience before the battle itself is thrown away. */
 	let endingBattle = $state(false);
+	/* The instanceId of the card the edit sheet is open for, 'warband' included. */
+	let editingId = $state<string | null>(null);
 	/* The warband a delete has been asked for, held until it is confirmed. */
 	let condemned = $state<StoredWarband | null>(null);
 	let message = $state<string | null>(null);
 	let fileInput: HTMLInputElement | undefined = $state();
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
-	const cards = $derived(active ? toCards(active.warband, active.selections) : []);
+	const cards = $derived(active ? toCards(active.warband, active.selections, active.fluff) : []);
+	const editingCard = $derived(editingId ? (cards.find((c) => c.instanceId === editingId) ?? null) : null);
+	const editingFields = $derived.by(() => {
+		if (!editingCard) return [];
+		if (editingCard.kind === 'warband') {
+			return [
+				{ key: 'notes', label: 'Notes', value: active?.warband.factionNotes ?? '' },
+				{ key: 'fluff', label: 'Fluff', value: active?.fluff?.warband ?? '' }
+			];
+		}
+		const instance = active?.warband.fighters.find((f) => f.instanceId === editingCard.instanceId);
+		return [
+			{ key: 'notes', label: 'Notes', value: instance?.notes ?? '' },
+			{ key: 'fluff', label: 'Fluff', value: active?.fluff?.fighters[editingCard.instanceId] ?? '' }
+		];
+	});
 	const battle = $derived(active?.battle ?? null);
 	const fighterIds = $derived(active?.warband.fighters.map((f) => f.instanceId) ?? []);
 	const left = $derived(remaining(battle, fighterIds));
@@ -78,6 +96,42 @@
 		};
 		await putWarband(entry);
 		endingBattle = false;
+		await refresh();
+	}
+
+	/**
+	 * Writes notes and fluff in one go, the same way `applyAftermathAndEnd` writes
+	 * the aftermath: a snapshot first, `revision` up because this is campaign
+	 * progress, then one `putWarband`.
+	 */
+	async function saveEdit(values: Record<string, string>) {
+		if (!active || !editingId) return;
+		const snapshot = $state.snapshot(active);
+		const targetId = editingId;
+		const isWarband = targetId === 'warband';
+		const warband = isWarband
+			? { ...snapshot.warband, factionNotes: values.notes }
+			: {
+					...snapshot.warband,
+					fighters: snapshot.warband.fighters.map((f) =>
+						f.instanceId === targetId ? { ...f, notes: values.notes } : f
+					)
+				};
+		const fluff = {
+			warband: isWarband ? values.fluff : (snapshot.fluff?.warband ?? ''),
+			fighters: isWarband
+				? (snapshot.fluff?.fighters ?? {})
+				: { ...(snapshot.fluff?.fighters ?? {}), [targetId]: values.fluff }
+		};
+		const entry: StoredWarband = {
+			...snapshot,
+			warband,
+			fluff,
+			revision: snapshot.revision + 1,
+			updatedAt: new Date().toISOString()
+		};
+		await putWarband(entry);
+		editingId = null;
 		await refresh();
 	}
 
@@ -256,6 +310,7 @@
 		onwound={(id, delta, health) => setBattle(allocate(battle, id, delta, health))}
 		onheroic={(id) => setBattle(toggleHeroic(battle, id))}
 		oncover={(id) => setBattle(toggleCover(battle, id))}
+		onedit={(id) => (editingId = id)}
 	/>
 {:else}
 	<div class="empty">
@@ -284,6 +339,15 @@
 		{battle}
 		onconfirm={applyAftermathAndEnd}
 		oncancel={() => (endingBattle = false)}
+	/>
+{/if}
+
+{#if editingCard}
+	<EditSheet
+		title={editingCard.name}
+		fields={editingFields}
+		onsave={saveEdit}
+		oncancel={() => (editingId = null)}
 	/>
 {/if}
 

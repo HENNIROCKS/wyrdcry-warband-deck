@@ -8,7 +8,7 @@
 
 import { RULESET_VERSION } from './gamedata';
 import { deviceId, getWarband } from './storage';
-import type { DeckMeta, ExportedWarband, StoredWarband, Warband } from './types/warband';
+import type { DeckMeta, ExportedWarband, Fluff, StoredWarband, Warband } from './types/warband';
 
 export const FORMAT = 'wyrdcry-warband-deck';
 
@@ -118,6 +118,22 @@ export async function readFile(file: File): Promise<ImportCandidate> {
 	};
 }
 
+/**
+ * Notes and fluff are written content, not a figure the builder can regenerate –
+ * unlike `selections`, they must not vanish just because a file lacks them.
+ * Per key the incoming file wins where it has one, the stored copy fills the
+ * rest, and an instanceId the incoming roster no longer has is dropped.
+ */
+function mergeFluff(incoming: Fluff | null | undefined, existing: Fluff | null | undefined, warband: Warband): Fluff | null {
+	if (!incoming && !existing) return null;
+	const fighters: Record<string, string> = {};
+	for (const { instanceId } of warband.fighters) {
+		const value = incoming?.fighters?.[instanceId] ?? existing?.fighters?.[instanceId];
+		if (value) fighters[instanceId] = value;
+	}
+	return { warband: incoming?.warband ?? existing?.warband ?? '', fighters };
+}
+
 export function toStored(candidate: ImportCandidate): StoredWarband {
 	const now = new Date().toISOString();
 	return {
@@ -131,7 +147,8 @@ export function toStored(candidate: ImportCandidate): StoredWarband {
 		/* Whatever the file carries, and nothing else. Keeping the stored ones would
 		   describe a warband that is being replaced: the modifiers hang on
 		   instanceIds the incoming roster need not have. */
-		selections: candidate.meta?.selections ?? null
+		selections: candidate.meta?.selections ?? null,
+		fluff: mergeFluff(candidate.meta?.fluff, candidate.existing?.fluff, candidate.warband)
 	};
 }
 
@@ -151,7 +168,8 @@ export async function buildExport(entry: StoredWarband): Promise<ExportedWarband
 			device: await deviceId(),
 			exportedAt: new Date().toISOString(),
 			ruleset: entry.ruleset || RULESET_VERSION,
-			selections: entry.selections
+			selections: entry.selections,
+			fluff: entry.fluff
 		}
 	};
 }

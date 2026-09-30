@@ -37,6 +37,7 @@ import {
 	STAT_KEYS,
 	type CustomWeapon,
 	type FighterInstance,
+	type Fluff,
 	type Selections,
 	type StatKey,
 	type Warband
@@ -313,7 +314,8 @@ export function toCard(
 	instance: FighterInstance,
 	warband: Warband,
 	factionName: string,
-	chosen?: string[] | null
+	chosen?: string[] | null,
+	fluff = ''
 ): FighterCardData {
 	const profile = FIGHTERS.get(instance.fighterId);
 	const name = instance.customName.trim();
@@ -332,7 +334,8 @@ export function toCard(
 			xp: instance.xp,
 			renown: instance.renown,
 			cost: instance.costOverride ?? 0,
-			unresolved: true
+			unresolved: true,
+			fluff
 		};
 	}
 
@@ -570,7 +573,8 @@ export function toCard(
 		xp: instance.xp,
 		renown: instance.renown,
 		cost: (instance.costOverride ?? profile.cost ?? 0) + equipmentCost,
-		unresolved: false
+		unresolved: false,
+		fluff
 	};
 }
 
@@ -592,7 +596,7 @@ function standingFor(favour: number): string {
  *
  * The arithmetic mirrors the builder (`useWarband.ts` in jomblr/wyrdcry).
  */
-export function toWarbandCard(warband: Warband, cards: FighterCardData[]): WarbandCardData {
+export function toWarbandCard(warband: Warband, cards: FighterCardData[], fluff = ''): WarbandCardData {
 	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
 
 	/* A fighter is pending until the purchase is confirmed in the builder – it
@@ -655,7 +659,8 @@ export function toWarbandCard(warband: Warband, cards: FighterCardData[]): Warba
 		faction: faction?.name ?? 'Warband',
 		tables,
 		stash: [...stashWeapons, ...stashItems].join(', '),
-		notes: warband.factionNotes.trim()
+		notes: warband.factionNotes.trim(),
+		fluff
 	};
 }
 
@@ -663,7 +668,7 @@ export function toWarbandCard(warband: Warband, cards: FighterCardData[]): Warba
  * The whole deck: the warband itself first, then its fighters. `selections` is
  * what the wizard here decided; a warband imported from the builder has none.
  */
-export function toCards(warband: Warband, selections?: Selections | null): DeckCard[] {
+export function toCards(warband: Warband, selections?: Selections | null, fluff?: Fluff | null): DeckCard[] {
 	/* The builder writes the faction's display name into `customAbilities.fighter`,
 	   while the warband stores its id. */
 	const faction = warband.factionId ? FACTIONS.get(warband.factionId) : undefined;
@@ -675,10 +680,10 @@ export function toCards(warband: Warband, selections?: Selections | null): DeckC
 	}
 
 	const fighters = warband.fighters.map((f) =>
-		toCard(f, warband, faction?.name ?? '', selections?.fighters[f.instanceId])
+		toCard(f, warband, faction?.name ?? '', selections?.fighters[f.instanceId], fluff?.fighters[f.instanceId] ?? '')
 	);
 
-	return [toWarbandCard(warband, fighters), ...fighters];
+	return [toWarbandCard(warband, fighters, fluff?.warband ?? ''), ...fighters];
 }
 
 /**

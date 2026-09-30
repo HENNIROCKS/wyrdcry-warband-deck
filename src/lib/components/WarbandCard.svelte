@@ -26,6 +26,10 @@
 	</div>
 
 	<div class="parchment">
+		{#if card.fluff}
+			<p class="fluff">{card.fluff}</p>
+		{/if}
+
 		<div class="profile">
 			{#each card.tables as rows, i (i)}
 				<ValueTable {rows} />
@@ -124,6 +128,18 @@
 		flex-direction: column;
 		gap: calc(14 * var(--u));
 		margin-bottom: calc(16 * var(--u));
+	}
+
+	/* Prose, not a rule: no wash, no border, set apart only by the italic. Twice
+	   the parchment's own gap below it, so it reads as its own beat rather than
+	   running into what follows. */
+	.fluff {
+		margin: 0 0 calc(14 * var(--u));
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+		line-height: 1.4;
+		font-style: italic;
+		white-space: pre-wrap;
 	}
 
 	/* The warband notes carry their own line breaks and dashed lists. */

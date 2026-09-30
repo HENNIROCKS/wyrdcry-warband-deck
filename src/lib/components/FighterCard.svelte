@@ -134,6 +134,10 @@
 			</p>
 		{/if}
 
+		{#if card.fluff}
+			<p class="fluff">{card.fluff}</p>
+		{/if}
+
 		{#if card.keywords.length}
 			<ul class="keywords">
 				{#each card.keywords as keyword (keyword)}
@@ -141,7 +145,6 @@
 				{/each}
 			</ul>
 		{/if}
-
 
 		<div class="profile">
 			{#if characteristics.length}
@@ -279,6 +282,19 @@
 		margin: calc(16 * var(--u)) 0;
 		padding: 0;
 		list-style: none;
+	}
+
+	/* Prose, not a rule: no wash, no border, set apart only by the italic. Extra
+	   room above it, on top of the parchment's own padding, so it reads as its
+	   own beat rather than sitting flush under the image section. Below it the
+	   parchment's own gap is enough – the keywords follow close. */
+	.fluff {
+		margin: calc(14 * var(--u)) 0 0;
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+		line-height: 1.4;
+		font-style: italic;
+		white-space: pre-wrap;
 	}
 
 	.keywords li {
