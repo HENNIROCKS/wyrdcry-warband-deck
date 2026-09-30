@@ -19,6 +19,7 @@
 - [x] 🛠️ Add fluff to fighters and the warband
 - [ ] ⚙️ Work offline at the table: cached game data, screen kept awake
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
+- [ ] ⚔️ Wavering: ask for the Bravery test when a fighter is first activated
 - [ ] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
