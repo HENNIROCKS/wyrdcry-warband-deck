@@ -17,22 +17,21 @@
 - [x] 📈 Show a faction's author name when picking it to build a warband
 - [x] 🛠️ Add notes to fighters, alongside the warband's own notes
 - [x] 🛠️ Add fluff to fighters and the warband
-- [ ] ⚙️ Work offline at the table: cached game data, screen kept awake
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
+- [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚔️ Wavering: ask for the Bravery test when a fighter is first activated
+- [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
+- [ ] 🛠️ Edit the warband stash after the build
+- [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [ ] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
-- [ ] 📈 Roll injuries after a battle and write them back into the warband
-- [ ] 🛠️ Edit the warband stash after the build
+- [ ] 🎨 Go over the design and the interface outside the cards
 - [ ] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [ ] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🛠️ Hire a Hired Sword for a single battle
-- [ ] 🎨 Go over the design and the interface outside the cards
-- [ ] 🎨 Jump straight to a card, rather than swiping as far as it
-- [ ] 📄 Export the warband as a roster PDF
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
-- [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
+- [ ] 📄 Export the warband as a roster PDF
 
 ## Ideas
 
@@ -44,3 +43,4 @@ Nothing promised, nothing planned.
 - 🔊 A sound when a fighter goes out of action, with a switch to turn it off
 - 🃏 Faction rules on the warband card as well, not only on every fighter card
 - ⚙️ A desktop mode that really saves, over the File System Access API
+- 🎨 Keep the screen awake, or make it easy to jump back to where you were – both just soften the screen going dark
