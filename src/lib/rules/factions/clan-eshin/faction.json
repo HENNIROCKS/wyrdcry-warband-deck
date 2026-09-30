@@ -4,6 +4,5 @@
   "keyword": "CLAN ESHIN",
   "warband_size": { "min": 3, "max": 20 },
   "origin": "official",
-  "version": "1.0.0",
   "author": "Johan Markström"
 }

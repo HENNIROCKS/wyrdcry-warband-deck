@@ -225,11 +225,13 @@ export interface Faction {
 	origin: 'official' | 'homebrew';
 	/**
 	 * Which version of this entry the deck holds, `major.minor.patch`. It is the
-	 * transcription's, not the game's: the deck versions no ruleset, and what a
-	 * player compares at the table is this faction against the sheet or the PDF
-	 * in front of them. Raised by hand whenever a value here changes.
+	 * transcription's, not the game's, and only a homebrew faction carries one:
+	 * an official faction has nothing of its own to version against, since what
+	 * a player compares at the table is this faction against the game's own
+	 * rulebook, not against a transcription history. Raised by hand whenever a
+	 * value here changes.
 	 */
-	version: string;
+	version?: string;
 	/** Who transcribed this entry. */
 	author: string;
 	rules: FactionRule[];

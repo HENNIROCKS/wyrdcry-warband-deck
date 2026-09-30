@@ -279,10 +279,13 @@ for (const folder of folders) {
 		problem(file('homebrew'), `this faction is "${faction.origin}" – only a homebrew faction brings one`);
 	}
 
-	/* The shape only. What the number should be is a judgement about how much of
-	   the entry moved, and no check can make it. */
-	if (!/^\d+\.\d+\.\d+$/.test(faction.version ?? '')) {
+	/* Only a homebrew faction versions a transcription; an official one has
+	   nothing of its own to version against. The shape is all a check can judge
+	   – what the number should be is a judgement about how much moved. */
+	if (faction.origin === 'homebrew' && !/^\d+\.\d+\.\d+$/.test(faction.version ?? '')) {
 		problem(file('faction'), `version is "${faction.version}" – write it as major.minor.patch`);
+	} else if (faction.origin === 'official' && faction.version !== undefined) {
+		problem(file('faction'), `version is "${faction.version}" – an official faction carries no version`);
 	}
 
 	const abilityIds = ids(abilities);

@@ -4,6 +4,5 @@
   "keyword": "UNDEAD",
   "warband_size": { "min": 3, "max": 15 },
   "origin": "official",
-  "version": "1.0.0",
   "author": "Johan Markström"
 }
