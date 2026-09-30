@@ -93,8 +93,8 @@ export type ExportedWarband = Warband & { _deck?: DeckMeta };
  * drop the whole map.
  *
  * `out` is stored rather than worked out from `damage` and Health: Health is a
- * figure of the card, and the dots, the count of who still has to act and the
- * warband's morale all ask for the state without having a card at hand.
+ * figure of the card, and the deck's strokes, the count of who still has to act
+ * and the warband's morale all ask for the state without having a card at hand.
  */
 export interface FighterBattleState {
 	activated: boolean;

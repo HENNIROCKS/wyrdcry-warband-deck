@@ -28,6 +28,7 @@
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 🎨 Go over the design and the interface outside the cards
+- [ ] 🎨 Jump straight to a card, rather than swiping as far as it
 - [ ] 📄 Export the warband as a roster PDF
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it

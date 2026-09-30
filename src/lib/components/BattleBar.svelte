@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-
 	import MenuButton from './MenuButton.svelte';
 	import { isWavering, remaining } from '../battle';
 	import type { BattleState, FighterBattleState } from '../types/warband';
@@ -12,7 +10,6 @@
 		hero = false,
 		fighters = [],
 		height = $bindable(0),
-		middle,
 		ontoggle,
 		onwait,
 		onwound,
@@ -32,15 +29,9 @@
 		/**
 		 * What the bar occupies at the foot of the window, read back by the deck:
 		 * the bar is out of the flow, so the cards have to be kept clear of it by
-		 * hand – and its height grows with the row of dots.
+		 * hand.
 		 */
 		height?: number;
-		/**
-		 * What sits between the two groups – the deck puts its dots there. It is the
-		 * width the row has left over, and it is handed in rather than built here
-		 * because choosing a card is the deck's business, not the battle's.
-		 */
-		middle?: Snippet;
 		ontoggle?: () => void;
 		onwait?: () => void;
 		onwound?: (delta: number) => void;
@@ -91,15 +82,12 @@
 			</button>
 		</div>
 
-		<div class="middle">{@render middle?.()}</div>
-
 		<!-- Every state of a fighter under one word each, rather than a row of
-		     symbols that has to be learned. What is set stays readable without
-		     opening it: the dots beside it carry activated, waiting and out of
-		     action, and the trigger takes a mark while any state is on. -->
+		     symbols that has to be learned. -->
 		<div class="states">
 			<!-- No mark on the trigger: every state it holds is already written across
-			     the card above it, and the dots carry it through the stack. -->
+			     the card above it, and the strokes at its head carry it through the
+			     stack. -->
 			<MenuButton label="Fighter state">
 				{#snippet icon()}
 					<!-- A word rather than three dots, for the same reason the entries
@@ -134,13 +122,11 @@
 		<p class="summary">
 			Round {battle.round} · {left_to_act} to act{#if wavering}{' '}<span class="wavering">Wavering</span>{/if}
 		</p>
-		<div class="middle">{@render middle?.()}</div>
 		<div class="states">
 			{@render editMenu()}
 		</div>
 	{:else}
 		<p class="summary quiet">No battle</p>
-		<div class="middle">{@render middle?.()}</div>
 		<div class="states">
 			{@render editMenu()}
 		</div>
@@ -187,15 +173,6 @@
 		max-width: calc(var(--deck-max-width) + 2 * var(--deck-gutter));
 		margin-inline: auto;
 		padding: 5px var(--deck-gutter) 0;
-	}
-
-	/* Takes what the two groups leave and centres its content in it, so the dots
-	   sit in the middle of the row rather than against one of them. */
-	.middle {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		justify-content: center;
 	}
 
 	.wounds,

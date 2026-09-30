@@ -161,12 +161,6 @@
 		}, duration);
 	}
 
-	function goto(index: number) {
-		if (leaving || index === current) return;
-		current = index;
-		dx = 0;
-	}
-
 	function onKeyDown(event: KeyboardEvent) {
 		if (cards.length < 2) return;
 		if (event.key === 'ArrowRight') fly(-1);
@@ -209,6 +203,7 @@
 				class:locked={explanation() !== null}
 				role="group"
 				aria-roledescription="Card, swipe horizontally"
+				aria-label="Card {current + 1} of {cards.length}"
 				style:transform
 				style:opacity={leaving ? 0 : 1}
 				style:transition={dragging
@@ -223,12 +218,31 @@
 				{@render card(cards[current])}
 			</div>
 		{/key}
+
+		<!-- Lies on the card rather than in the bar below it: the foot of the screen
+		     belongs to the thumb, and the stroke marks the place in the stack where
+		     the eye already is. Outside the panes, so it neither scrolls with the
+		     card nor travels with a swipe. A single card is its own whole stack, and
+		     one stroke across the full width reads as an ornament, not a place. -->
+		{#if cards.length > 1}
+			<div class="ticks" aria-hidden="true">
+				{#each cards as card, i (card.instanceId)}
+					{@const state = card.kind === 'fighter' ? stateOf(battle, card.instanceId) : null}
+					<span
+						class="tick"
+						class:active={i === current}
+						class:activated={state?.activated}
+						class:waiting={state?.waiting}
+						class:out={state?.out}
+					></span>
+				{/each}
+			</div>
+		{/if}
 	</div>
 
 	{#if ontoggle}
 		<BattleBar
 			bind:height={barHeight}
-			middle={dots}
 			{battle}
 			state={topFighter ? stateOf(battle, topFighter.instanceId) : null}
 			health={topFighter ? healthOf(topFighter) : 0}
@@ -242,30 +256,8 @@
 				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
 			onedit={() => onedit?.(top.instanceId)}
 		/>
-	{:else}
-		<div class="loose">{@render dots()}</div>
 	{/if}
 </div>
-
-<!-- In the bar's middle where there is one, on their own where there is not –
-     the deck without battle callbacks still has cards to choose between. -->
-{#snippet dots()}
-	<nav class="dots" aria-label="Choose fighter">
-		{#each cards as card, i (card.instanceId)}
-			{@const state = card.kind === 'fighter' ? stateOf(battle, card.instanceId) : null}
-			<button
-				class="dot"
-				class:active={i === current}
-				class:activated={state?.activated}
-				class:waiting={state?.waiting}
-				class:out={state?.out}
-				aria-label={card.name}
-				aria-current={i === current}
-				onclick={() => goto(i)}
-			></button>
-		{/each}
-	</nav>
-{/snippet}
 
 <!-- Outside the stack: inside a pane, the transform would become the frame a
      fixed overlay is placed against. -->
@@ -335,49 +327,61 @@
 		pointer-events: none;
 	}
 
-	/* No padding of its own: inside the bar it is one of three groups and takes
-	   the row's. Standing on its own it is given one. */
-	.dots {
+	/* Inside the gutter, so the row spans exactly the card's width – which puts the
+	   outermost strokes over the card's rounded corners, and `top` is the radius
+	   itself to clear them at every card size. In card units and not a flat
+	   number: the radius grows with the card, a number that clears it on the phone
+	   cuts into it on a tablet. It marks, it does not take a tap: the swipe
+	   underneath reaches through it. */
+	.ticks {
+		position: absolute;
+		top: calc(14 * var(--deck-unit));
+		left: var(--deck-gutter);
+		right: var(--deck-gutter);
 		display: flex;
-		justify-content: center;
-		flex-wrap: wrap;
-		gap: 6px;
+		/* The strokes differ in height, and stretched they all would not. */
+		align-items: center;
+		gap: 4px;
+		z-index: 2;
+		pointer-events: none;
 	}
 
-	.loose {
-		padding: 10px 12px;
-	}
-
-	.dot {
-		width: 8px;
-		height: 8px;
-		padding: 0;
-		border: 0;
+	/* Ink on paper rather than one of the UI colours: the strokes lie on the
+	   card, and the card is light whatever the interface around it does. */
+	.tick {
+		flex: 1;
+		min-width: 0;
+		height: 4px;
 		border-radius: 999px;
-		background: var(--ui-surface-2);
-		transition: background 120ms ease, transform 120ms ease;
+		background: rgba(0, 0, 0, 0.16);
+		transition: background 120ms ease, height 120ms ease;
 	}
 
-	.dot.active {
-		background: var(--ui-accent-text);
-		transform: scale(1.35);
+	/* Height rather than colour alone, and declared before the states so they
+	   keep the colour: a fighter who has acted is still marked as such while
+	   their card is the one on top. */
+	.tick.active {
+		height: 7px;
+		background: rgba(0, 0, 0, 0.55);
 	}
 
 	/* A side effect of the card's own marking, not a control of its own: who has
-	   acted fades back, who waits keeps a ring because it is still to come, and who
-	   is out of action is marked in the wound colour. */
-	.dot.activated {
-		opacity: 0.35;
+	   acted is struck out, who waits is picked out because they are still to come,
+	   and who is out of action is marked in the wound colour.
+
+	   Struck out in light rather than in a paler ink: against the card's texture a
+	   lighter stroke stands 2.5:1 off its neighbours where a paler one manages
+	   1.1:1, and a state nobody can pick out of the row is not carried at all. */
+	.tick.activated {
+		background: rgba(255, 255, 255, 0.75);
 	}
 
-	.dot.waiting {
-		background: transparent;
-		box-shadow: inset 0 0 0 2px var(--ui-accent-text);
+	.tick.waiting {
+		background: var(--card-green);
 	}
 
-	.dot.out {
-		opacity: 1;
-		background: var(--ui-danger);
+	.tick.out {
+		background: var(--card-blood);
 	}
 
 </style>
