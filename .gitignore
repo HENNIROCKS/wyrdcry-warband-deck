@@ -6,12 +6,12 @@ node_modules/
 .env.*
 !.env.example
 
-# Stammdaten werden aus dem Site-Repo kopiert, siehe scripts/sync-data.mjs
+# Game data, copied from the site repo, see scripts/sync-data.mjs
 /src/lib/data/*.json
 
-# Arbeitsmaterial: Referenz-Screenshots, Exporte, Notizen
+# Working material: reference screenshots, exports, notes
 /_work/
 
-# Lokale Claude-Code-Einstellungen und -Anweisungen
+# Local Claude Code settings and instructions
 /.claude
 /CLAUDE.md
