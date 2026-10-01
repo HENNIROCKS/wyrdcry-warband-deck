@@ -170,7 +170,20 @@ export interface RecruitRuleEffect {
 	discount: { fighter: string; factor: number }[];
 }
 
-export type RuleEffect = StatRuleEffect | RecruitRuleEffect;
+export interface MoraleRuleEffect {
+	kind: 'morale';
+	/**
+	 * What such a fighter adds to the count of fighters out of action when the
+	 * warband's morale is judged. Only the count is weighted: the size of the
+	 * warband, and with it the threshold, stays as it is, and the count may be a
+	 * fraction.
+	 */
+	weight: number;
+	/** Fighter ids, or "all" for the whole warband. */
+	fighters: string[] | 'all';
+}
+
+export type RuleEffect = StatRuleEffect | RecruitRuleEffect | MoraleRuleEffect;
 
 export interface RuleOption {
 	id: string;
@@ -182,7 +195,8 @@ export interface RuleOption {
 
 /**
  * Where a rule takes hold. Only `recruitment` can change a number while the
- * warband is being put together; the others are shown and left alone.
+ * warband is being put together; in `battle` a rule may carry an effect that
+ * changes how the battle is counted, and the rest is shown and left alone.
  */
 export type Phase = 'recruitment' | 'battle' | 'aftermath';
 

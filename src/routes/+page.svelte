@@ -11,6 +11,7 @@
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import { toCards } from '$lib/adapter';
 	import { applyAftermath, type AftermathAnswer } from '$lib/aftermath';
+	import { countedFighters } from '$lib/morale';
 	import {
 		allocate,
 		isWavering,
@@ -59,10 +60,17 @@
 		];
 	});
 	const battle = $derived(active?.battle ?? null);
-	const fighterIds = $derived(active?.warband.fighters.map((f) => f.instanceId) ?? []);
-	const left = $derived(remaining(battle, fighterIds));
-	const out = $derived(outOfAction(battle, fighterIds));
-	const wavering = $derived(isWavering(battle, fighterIds));
+	const counted = $derived(active ? countedFighters(active.warband) : []);
+	const left = $derived(
+		remaining(
+			battle,
+			counted.map((f) => f.instanceId)
+		)
+	);
+	const out = $derived(outOfAction(battle, counted));
+	const wavering = $derived(isWavering(battle, counted));
+	/** Where the wavering bubble hangs: the tail reaches into the header's padding, up to the select. */
+	let headerHeight = $state(0);
 
 	/**
 	 * Writes the battle state through and keeps the copy in memory in step. It
@@ -201,7 +209,7 @@
 	}
 </script>
 
-<header class="bar">
+<header class="bar" bind:offsetHeight={headerHeight}>
 	<div class="identity">
 		{#if warbands.length > 1}
 			<select bind:value={activeId} aria-label="Choose warband">
@@ -289,6 +297,12 @@
 	</div>
 </header>
 
+{#if battle && wavering}
+	<!-- Over the top edge of the cards on purpose: the morale is the one state that
+	     has to be seen from every card, and the tail points at the warband's name. -->
+	<p class="bubble" style:top="{headerHeight - 4}px" role="status">Wavering</p>
+{/if}
+
 <input
 	bind:this={fileInput}
 	type="file"
@@ -304,6 +318,7 @@
 {#if cards.length}
 	<Deck
 		{cards}
+		{counted}
 		{battle}
 		ontoggle={(id) => setBattle(toggle(battle, id))}
 		onwait={(id) => setBattle(toggleWaiting(battle, id))}
@@ -417,6 +432,32 @@
 	/* Inside the battle menu, under the round line. */
 	.wavering {
 		color: var(--ui-warn-text);
+	}
+
+	.bubble {
+		position: fixed;
+		left: 12px;
+		z-index: 10;
+		margin: 0;
+		padding: 5px 12px;
+		border-radius: 10px;
+		background: var(--ui-warn);
+		color: #fff;
+		font-size: var(--ui-t-sm);
+		font-weight: 600;
+		/* Taps go through to the card underneath. */
+		pointer-events: none;
+	}
+
+	/* The tail, pointing up at the name. */
+	.bubble::before {
+		content: '';
+		position: absolute;
+		left: 16px;
+		bottom: 100%;
+		border: 7px solid transparent;
+		border-top-width: 0;
+		border-bottom-color: var(--ui-warn);
 	}
 
 	.hint {

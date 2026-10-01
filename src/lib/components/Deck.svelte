@@ -7,12 +7,13 @@
 	import FighterCard from './FighterCard.svelte';
 	import WarbandCard from './WarbandCard.svelte';
 	import { hasKeyword, healthOf } from '../adapter';
-	import { stateOf } from '../battle';
+	import { stateOf, type Counted } from '../battle';
 	import type { DeckCard } from '../types/card';
 	import type { BattleState } from '../types/warband';
 
 	let {
 		cards,
+		counted,
 		battle = null,
 		ontoggle,
 		onwait,
@@ -22,6 +23,8 @@
 		onedit
 	}: {
 		cards: DeckCard[];
+		/** What each fighter counts for in the morale. Every fighter counts as one where it is left out. */
+		counted?: Counted[];
 		battle?: BattleState | null;
 		ontoggle?: (instanceId: string) => void;
 		onwait?: (instanceId: string) => void;
@@ -61,8 +64,11 @@
 	   card that has no fighter state, and the bar carries the battle itself there. */
 	const top = $derived(cards[current]);
 	const topFighter = $derived(top.kind === 'fighter' ? top : null);
-	const fighterIds = $derived(
-		cards.filter((card) => card.kind === 'fighter').map((card) => card.instanceId)
+	const fighters = $derived(
+		counted ??
+			cards
+				.filter((card) => card.kind === 'fighter')
+				.map((card) => ({ instanceId: card.instanceId, weight: 1 }))
 	);
 
 	/**
@@ -246,7 +252,7 @@
 			{battle}
 			state={topFighter ? stateOf(battle, topFighter.instanceId) : null}
 			health={topFighter ? healthOf(topFighter) : 0}
-			fighters={fighterIds}
+			{fighters}
 			hero={topFighter ? hasKeyword(topFighter, 'hero') : false}
 			ontoggle={() => topFighter && ontoggle?.(topFighter.instanceId)}
 			onwait={() => topFighter && onwait?.(topFighter.instanceId)}

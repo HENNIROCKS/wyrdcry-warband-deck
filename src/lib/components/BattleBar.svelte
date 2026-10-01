@@ -1,6 +1,6 @@
 <script lang="ts">
 	import MenuButton from './MenuButton.svelte';
-	import { isWavering, remaining } from '../battle';
+	import { remaining, type Counted } from '../battle';
 	import type { BattleState, FighterBattleState } from '../types/warband';
 
 	let {
@@ -24,8 +24,8 @@
 		health?: number;
 		/** Whether that fighter is a `HERO`, and so has a heroic reaction to spend. */
 		hero?: boolean;
-		/** Every fighter of the warband, for the count and the morale. */
-		fighters?: string[];
+		/** Every fighter of the warband with its weight, for the count and the morale. */
+		fighters?: Counted[];
 		/**
 		 * What the bar occupies at the foot of the window, read back by the deck:
 		 * the bar is out of the flow, so the cards have to be kept clear of it by
@@ -46,8 +46,10 @@
 	const left = $derived(state ? Math.max(0, health - state.damage) : 0);
 	const unknown = $derived(health <= 0);
 
-	const left_to_act = $derived(remaining(battle, fighters));
-	const wavering = $derived(isWavering(battle, fighters));
+	const left_to_act = $derived(remaining(
+			battle,
+			fighters.map((f) => f.instanceId)
+		));
 </script>
 
 <!-- Fixed to the window rather than sitting at the end of the deck: at the
@@ -120,7 +122,7 @@
 		<!-- The warband card carries the battle instead of a fighter's state: the
 		     morale belongs to the warband, and the bar keeps its height either way. -->
 		<p class="summary">
-			Round {battle.round} · {left_to_act} to act{#if wavering}{' '}<span class="wavering">Wavering</span>{/if}
+			Round {battle.round} · {left_to_act} to act
 		</p>
 		<div class="states">
 			{@render editMenu()}
@@ -249,15 +251,5 @@
 
 	.summary.quiet {
 		color: var(--ui-text-subtle);
-	}
-
-	.wavering {
-		margin-left: 4px;
-		padding: 2px 8px;
-		border-radius: 999px;
-		background: var(--ui-warn-bg);
-		color: var(--ui-warn-text);
-		font-size: var(--ui-t-sm);
-		font-weight: 600;
 	}
 </style>

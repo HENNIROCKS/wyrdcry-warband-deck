@@ -163,17 +163,31 @@ export function remaining(battle: BattleState | null, instanceIds: string[]): nu
 	}).length;
 }
 
-/** How many of the given fighters have been taken out of action. */
-export function outOfAction(battle: BattleState | null, instanceIds: string[]): number {
-	return instanceIds.filter((id) => isOut(battle, id)).length;
+/**
+ * A fighter as the morale counts it. A faction rule can make one count for less
+ * than a whole fighter; the weight arrives resolved, because this module reads
+ * no rules.
+ */
+export interface Counted {
+	instanceId: string;
+	weight: number;
+}
+
+/**
+ * How many fighters have been taken out of action, each at its weight – so the
+ * figure may be a fraction.
+ */
+export function outOfAction(battle: BattleState | null, fighters: Counted[]): number {
+	return fighters.reduce((sum, f) => (isOut(battle, f.instanceId) ? sum + f.weight : sum), 0);
 }
 
 /**
  * Whether the warband's morale is wavering: half its fighters, rounding up, are
- * out of action. Worked out rather than latched, so taking back a mistaken wound
- * takes the warband back out of it as well.
+ * out of action. Only the count is weighted; the size of the warband and with it
+ * the threshold stay as they are. Worked out rather than latched, so taking back
+ * a mistaken wound takes the warband back out of it as well.
  */
-export function isWavering(battle: BattleState | null, instanceIds: string[]): boolean {
-	if (!instanceIds.length) return false;
-	return outOfAction(battle, instanceIds) >= Math.ceil(instanceIds.length / 2);
+export function isWavering(battle: BattleState | null, fighters: Counted[]): boolean {
+	if (!fighters.length) return false;
+	return outOfAction(battle, fighters) >= Math.ceil(fighters.length / 2);
 }

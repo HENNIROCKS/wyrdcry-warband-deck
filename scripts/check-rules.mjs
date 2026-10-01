@@ -438,6 +438,17 @@ for (const folder of folders) {
 					problem(file('rules'), `${where} discounts "${entry.fighter}", fighters.json has none`);
 				}
 			}
+		} else if (effect.kind === 'morale') {
+			if (typeof effect.weight !== 'number' || !(effect.weight > 0)) {
+				problem(file('rules'), `${where} weighs fighters at "${effect.weight}", which is not a positive number`);
+			}
+			if (effect.fighters !== 'all') {
+				for (const id of effect.fighters ?? []) {
+					if (!fighterIds.has(id)) {
+						problem(file('rules'), `${where} applies to "${id}", fighters.json has none`);
+					}
+				}
+			}
 		} else {
 			problem(file('rules'), `${where} has an effect of kind "${effect.kind}"`);
 		}
