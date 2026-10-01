@@ -17,9 +17,10 @@
 - [x] 📈 Show a faction's author name when picking it to build a warband
 - [x] 🛠️ Add notes to fighters, alongside the warband's own notes
 - [x] 🛠️ Add fluff to fighters and the warband
+- [x] ⚔️ Wavering: ask for the Bravery test when a fighter is first activated
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Cache game data for offline use at the table
-- [ ] ⚔️ Wavering: ask for the Bravery test when a fighter is first activated
+- [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
 - [ ] 🛠️ Edit the warband stash after the build
 - [ ] 📈 Roll injuries after a battle and write them back into the warband

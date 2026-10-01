@@ -18,7 +18,8 @@ export const FRESH: FighterBattleState = {
 	damage: 0,
 	out: false,
 	heroic: false,
-	cover: false
+	cover: false,
+	panicked: false
 };
 
 export function start(): BattleState {
@@ -53,6 +54,10 @@ export function isHeroicSpent(battle: BattleState | null, instanceId: string): b
 
 export function isInCover(battle: BattleState | null, instanceId: string): boolean {
 	return stateOf(battle, instanceId).cover;
+}
+
+export function isPanicked(battle: BattleState | null, instanceId: string): boolean {
+	return stateOf(battle, instanceId).panicked;
 }
 
 /**
@@ -110,6 +115,14 @@ export function toggleCover(battle: BattleState | null, instanceId: string): Bat
 }
 
 /**
+ * Panicked, from a failed Bravery test. A panicked fighter still acts, so it
+ * neither ends an activation nor excludes any other state.
+ */
+export function togglePanicked(battle: BattleState | null, instanceId: string): BattleState {
+	return write(battle, instanceId, { panicked: !isPanicked(battle, instanceId) });
+}
+
+/**
  * Allocates or takes back damage points. A fighter holding damage equal to its
  * Health is out of action, and anything past that is discarded – so a fighter
  * whose Health drops afterwards is out at the next tap, not retroactively.
@@ -128,12 +141,12 @@ export function allocate(
 /**
  * The next round clears what belongs to a round and keeps what belongs to the
  * battle: the wounds, whoever is out of action and whoever is in cover carry
- * over.
+ * over. Panic lasts until the end of the battle round, so it goes with the round.
  */
 export function nextRound(battle: BattleState): BattleState {
 	const fighters: Record<string, FighterBattleState> = {};
 	for (const [id, state] of Object.entries(battle.fighters)) {
-		fighters[id] = { ...FRESH, ...state, activated: false, waiting: false };
+		fighters[id] = { ...FRESH, ...state, activated: false, waiting: false, panicked: false };
 	}
 	return {
 		...battle,
@@ -189,5 +202,10 @@ export function outOfAction(battle: BattleState | null, fighters: Counted[]): nu
  */
 export function isWavering(battle: BattleState | null, fighters: Counted[]): boolean {
 	if (!fighters.length) return false;
-	return outOfAction(battle, fighters) >= Math.ceil(fighters.length / 2);
+	return outOfAction(battle, fighters) >= waveringThreshold(fighters);
+}
+
+/** How many fighters out of action make the warband waver: half of it, rounding up. */
+export function waveringThreshold(fighters: Counted[]): number {
+	return Math.ceil(fighters.length / 2);
 }

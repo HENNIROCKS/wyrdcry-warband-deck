@@ -6,15 +6,18 @@
 	import { healthOf } from '../adapter';
 	import { FRESH } from '../battle';
 	import type { CardEntry, CardSection, CardStat, FighterCardData } from '../types/card';
-	import type { FighterBattleState } from '../types/warband';
+	import type { FighterBattleState, StatKey } from '../types/warband';
 
 	let {
 		card,
-		state = FRESH
+		state = FRESH,
+		wavering = false
 	}: {
 		card: FighterCardData;
 		/** What the fighter carries in the battle. The bar below the deck sets it. */
 		state?: FighterBattleState;
+		/** Whether the warband's morale is wavering, which asks for a Bravery test. */
+		wavering?: boolean;
 	} = $props();
 
 	/* The card names the state, the bar changes it – one band, the worst of the
@@ -23,6 +26,33 @@
 	const band = $derived(
 		state.out ? 'Out of Action' : state.waiting ? 'Waiting' : state.activated ? 'Activated' : ''
 	);
+
+	/* While the warband wavers, a fighter must pass a Bravery test when it is first
+	   activated. Due until it is marked activated or waiting – it has acted, so it
+	   rolled – or panicked, which is what failing it means. A waiting fighter's
+	   second activation is not its first, so it asks for no second test. */
+	const test = $derived(wavering && !band && !state.panicked);
+
+	/* The quieter bands under the first, top to bottom. Panicked leads because,
+	   like the first band, it belongs to the round; heroic and cover hold for the
+	   battle. Each takes the next free place, so none leaves a gap. */
+	const quiet = $derived(
+		[
+			state.panicked ? 'Panicked' : '',
+			state.heroic ? 'Heroic reaction used' : '',
+			state.cover ? 'In cover' : ''
+		].filter(Boolean)
+	);
+
+	/* What a state of the battle does to the characteristics while it stands. */
+	const BATTLE_EFFECTS: {
+		state: 'cover' | 'panicked';
+		source: string;
+		amounts: Partial<Record<StatKey, number>>;
+	}[] = [
+		{ state: 'cover', source: 'In Cover', amounts: { defense: 1 } },
+		{ state: 'panicked', source: 'Panicked', amounts: { fight: -1, shoot: -1 } }
+	];
 
 	/* How high the blood stands in the image field: a fighter at half its Health is
 	   red to half its height. */
@@ -48,12 +78,18 @@
 	const characteristics = $derived(
 		card.stats.map((stat) => {
 			const damage = stat.key === 'health' ? Math.min(state.damage, stat.value) : 0;
-			const cover = stat.key === 'defense' && state.cover ? 1 : 0;
-			const shown = format({ ...stat, value: stat.value - damage + cover });
+			const effects = BATTLE_EFFECTS.flatMap((effect) => {
+				const amount = effect.amounts[stat.key];
+				return state[effect.state] && amount
+					? [{ kind: 'battle' as const, source: effect.source, amount }]
+					: [];
+			});
+			const bonus = effects.reduce((sum, layer) => sum + layer.amount, 0);
+			const shown = format({ ...stat, value: stat.value - damage + bonus });
 			const layers = [
 				...stat.layers,
 				...(damage ? [{ kind: 'damage' as const, source: 'Damage', amount: -damage }] : []),
-				...(cover ? [{ kind: 'battle' as const, source: 'In Cover', amount: cover }] : [])
+				...effects
 			];
 			return {
 				key: stat.key,
@@ -96,25 +132,22 @@
 </script>
 
 <article class="card" class:dulled={band !== ''} class:out={state.out} style:--wound={wound}>
+	<!-- The test takes the first band's place, which is free by definition while
+	     it is due. Something to do this round, like the states that band names,
+	     but the card stays undulled: the fighter has not acted yet. -->
 	{#if band}
 		<p class="band" aria-hidden="true">{band}</p>
+	{:else if test}
+		<p class="band" aria-hidden="true">Bravery test</p>
 	{/if}
 
-	<!-- Its own band under the first, because the two say different things: the
-	     one above names what a fighter is doing this round, this one what it has
-	     spent for the whole battle. Quieter than the other, which is the state
-	     the table reads first. -->
-	{#if state.heroic}
-		<p class="band heroic" aria-hidden="true">Heroic reaction used</p>
-	{/if}
-
-	<!-- A third band, further down still when the heroic one is up too: cover is
-	     neither the round's state nor the heroic reaction, and can stand
-	     alongside both. Standing alone, it takes the heroic band's own place
-	     instead of leaving that place empty. -->
-	{#if state.cover}
-		<p class="band cover" class:stacked={state.heroic} aria-hidden="true">In cover</p>
-	{/if}
+	<!-- Bands of their own under the first, because they say different things:
+	     the first names what a fighter is doing this round, these what else
+	     stands on it. Quieter than the first, which is the state the table reads
+	     first. -->
+	{#each quiet as label, slot (label)}
+		<p class="band quiet" style:--slot={slot} aria-hidden="true">{label}</p>
+	{/each}
 
 	<div class="image-section">
 		<div class="image-box">
@@ -469,16 +502,19 @@
 
 	/* The same ribbon, held back: half the type size, a thinner ink and no second
 	   pair of rules, so the state of the round keeps the eye and this one is read
-	   after it rather than with it. Cover shares the same place when it stands
-	   alone – there is nothing to hold the place open for.
+	   after it rather than with it.
 
 	   `top` adds the first band's own box – its padding, line height and border –
 	   plus a fixed clearance, rather than naming a unit offset of its own: below
 	   529px card width `--t` floors while `--u` keeps shrinking, so a flat number
-	   that clears the box at one width closes the gap at another. */
-	.band.heroic,
-	.band.cover {
-		top: calc(94 * var(--u) + 40 * var(--t) + 2px);
+	   that clears the box at one width closes the gap at another. Each further
+	   `--slot` carries the sum on by one quiet band's box – 8u padding, 21t type,
+	   2px border – and the same 8u clearance. */
+	.band.quiet {
+		top: calc(
+			(94 + 16 * var(--slot)) * var(--u) + (40 + 21 * var(--slot)) * var(--t) +
+				(2 + 2 * var(--slot)) * 1px
+		);
 		padding: calc(4 * var(--u)) 0;
 		background: rgba(18, 18, 22, 0.58);
 		border-top-color: transparent;
@@ -487,15 +523,8 @@
 		letter-spacing: 0.05em;
 	}
 
-	.card.out .band.heroic,
-	.card.out .band.cover {
+	.card.out .band.quiet {
 		background: rgba(18, 18, 22, 0.58);
-	}
-
-	/* Cover moves down to its own place once heroic is up as well – the same sum
-	   carried one band further, clear of heroic's box at every card size. */
-	.band.cover.stacked {
-		top: calc(110 * var(--u) + 61 * var(--t) + 4px);
 	}
 
 	.warn {

@@ -55,6 +55,8 @@
 				{#if open.result}<p class="result">{open.result}</p>{/if}
 			</div>
 
+			{#if open.summary}<p class="summary">{open.summary}</p>{/if}
+
 			<ul class="layers">
 				{#each open.facts ?? [] as fact (fact.label)}
 					<li>
@@ -91,6 +93,12 @@
 						<p class="text"><RuleText text={condition.text} /></p>
 					</div>
 				{/each}
+			{/if}
+
+			{#if open.link}
+				<p class="link">
+					<a href={open.link.href} target="_blank" rel="noopener">{open.link.label}</a>
+				</p>
 			{/if}
 
 			<button class="close" onclick={dismiss}>Close</button>
@@ -243,11 +251,27 @@
 		color: var(--card-ink-muted);
 	}
 
-	.text {
+	.text,
+	.summary {
 		margin: 0;
 		font-family: 'Alegreya', serif;
 		font-size: 15px;
 		line-height: 1.45;
+	}
+
+	.summary {
+		margin-top: 10px;
+	}
+
+	/* The card's green, 5.3:1 on this flat paper. */
+	.link {
+		margin: 14px 0 0;
+		font-family: 'Alegreya', serif;
+		font-size: 15px;
+	}
+
+	.link a {
+		color: var(--card-green);
 	}
 
 	/*

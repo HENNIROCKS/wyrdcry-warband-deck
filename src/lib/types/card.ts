@@ -51,12 +51,16 @@ export interface CardExplanation {
 	title: string;
 	/** What the card shows, spelled the way the card spells it: `6`, `4"`. */
 	result?: string;
+	/** A line of the app's own on what the thing means at the table. */
+	summary?: string;
 	/** A profile in short, as the weapon table prints it. */
 	facts?: { label: string; value: string }[];
 	layers?: StatLayer[];
 	conditions?: StatCondition[];
 	/** Rules that come with the thing, in full. */
 	rules?: CardEntry[];
+	/** Where the rule is written, for one the game data does not carry. */
+	link?: { label: string; href: string };
 }
 
 /** One column of a value table: the label above, its value below. */

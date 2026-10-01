@@ -15,22 +15,27 @@
 		cards,
 		counted,
 		battle = null,
+		wavering = false,
 		ontoggle,
 		onwait,
 		onwound,
 		onheroic,
 		oncover,
+		onpanicked,
 		onedit
 	}: {
 		cards: DeckCard[];
 		/** What each fighter counts for in the morale. Every fighter counts as one where it is left out. */
 		counted?: Counted[];
 		battle?: BattleState | null;
+		/** Whether the warband's morale is wavering, for the fighters' Bravery tests. */
+		wavering?: boolean;
 		ontoggle?: (instanceId: string) => void;
 		onwait?: (instanceId: string) => void;
 		onwound?: (instanceId: string, delta: number, health: number) => void;
 		onheroic?: (instanceId: string) => void;
 		oncover?: (instanceId: string) => void;
+		onpanicked?: (instanceId: string) => void;
 		/** Opens the sheet to edit whichever card is on top. */
 		onedit?: (instanceId: string) => void;
 	} = $props();
@@ -258,6 +263,7 @@
 			onwait={() => topFighter && onwait?.(topFighter.instanceId)}
 			onheroic={() => topFighter && onheroic?.(topFighter.instanceId)}
 			oncover={() => topFighter && oncover?.(topFighter.instanceId)}
+			onpanicked={() => topFighter && onpanicked?.(topFighter.instanceId)}
 			onwound={(delta) =>
 				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
 			onedit={() => onedit?.(top.instanceId)}
@@ -273,7 +279,7 @@
 	{#if data.kind === 'warband'}
 		<WarbandCard card={data} />
 	{:else}
-		<FighterCard card={data} state={stateOf(battle, data.instanceId)} />
+		<FighterCard card={data} state={stateOf(battle, data.instanceId)} {wavering} />
 	{/if}
 {/snippet}
 

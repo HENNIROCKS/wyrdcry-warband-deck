@@ -15,6 +15,7 @@
 		onwound,
 		onheroic,
 		oncover,
+		onpanicked,
 		onedit
 	}: {
 		battle?: BattleState | null;
@@ -37,6 +38,7 @@
 		onwound?: (delta: number) => void;
 		onheroic?: () => void;
 		oncover?: () => void;
+		onpanicked?: () => void;
 		/** Opens the sheet to edit the card on top of the deck. */
 		onedit?: () => void;
 	} = $props();
@@ -114,6 +116,10 @@
 				<button onclick={() => oncover?.()}>
 					<span class="tick" aria-hidden="true">{state.cover ? '✓' : ''}</span>
 					In cover
+				</button>
+				<button onclick={() => onpanicked?.()}>
+					<span class="tick" aria-hidden="true">{state.panicked ? '✓' : ''}</span>
+					Panicked
 				</button>
 			</MenuButton>
 			{@render editMenu()}

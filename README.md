@@ -26,7 +26,8 @@ to the Warband Builder is not currently assured – see
   modifiers went into it, and which rules apply only in the right situation
 - Track a battle: mark fighters as activated or waiting, count the damage each
   one holds, see who is out of action and when the warband starts wavering,
-  count the rounds and clear the round's states for the next one – one step of
+  get reminded of each fighter's Bravery test while it does, mark who is
+  panicked, count the rounds and clear the round's states for the next one – one step of
   that is undoable
 - Export through the system share sheet, either as the current state or as a
   dated snapshot

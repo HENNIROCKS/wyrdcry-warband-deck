@@ -87,10 +87,10 @@ export type ExportedWarband = Warband & { _deck?: DeckMeta };
 /**
  * What a fighter carries in the battle running right now.
  *
- * Two lifetimes meet here. `activated` and `waiting` belong to the round and are
- * cleared by the next one; `damage`, `out`, `heroic` and `cover` belong to the
- * battle and are only gone when it ends. Which is why one round does not simply
- * drop the whole map.
+ * Two lifetimes meet here. `activated`, `waiting` and `panicked` belong to the
+ * round and are cleared by the next one; `damage`, `out`, `heroic` and `cover`
+ * belong to the battle and are only gone when it ends. Which is why one round
+ * does not simply drop the whole map.
  *
  * `out` is stored rather than worked out from `damage` and Health: Health is a
  * figure of the card, and the deck's strokes, the count of who still has to act
@@ -117,6 +117,12 @@ export interface FighterBattleState {
 	 * moved just because the round turned over.
 	 */
 	cover: boolean;
+	/**
+	 * Failed the Bravery test a wavering warband asks for, worth −1 Fight and −1
+	 * Shoot. Until the end of the battle round, as the rule says – so `nextRound`
+	 * clears it.
+	 */
+	panicked: boolean;
 }
 
 /** One round: its number, and what each fighter carries in it. */

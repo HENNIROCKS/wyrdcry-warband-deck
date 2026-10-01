@@ -22,9 +22,12 @@
 		toggle,
 		toggleCover,
 		toggleHeroic,
+		togglePanicked,
 		toggleWaiting,
-		undoRound
+		undoRound,
+		waveringThreshold
 	} from '$lib/battle';
+	import { explain } from '$lib/explanation';
 	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
 	import type { BattleState, StoredWarband } from '$lib/types/warband';
@@ -71,6 +74,36 @@
 	const wavering = $derived(isWavering(battle, counted));
 	/** Where the wavering bubble hangs: the tail reaches into the header's padding, up to the select. */
 	let headerHeight = $state(0);
+
+	/**
+	 * A count of fighters, where a faction rule can make one worth half: `2½`.
+	 * Any other fraction is written as a decimal rather than rounded to a half.
+	 */
+	function fighterCount(count: number): string {
+		const whole = Math.floor(count);
+		if (count - whole !== 0.5) return String(count);
+		return `${whole || ''}½`;
+	}
+
+	/* What the bubble means, and the count behind it. The rules text is not in the
+	   game data, so the sheet says it in a line of its own and points to the page
+	   that writes it. */
+	function explainWavering() {
+		explain({
+			title: 'Wavering',
+			summary:
+				'Half the warband is out of action. Each fighter takes a Bravery test when first activated in a round – on a fail it is panicked until the round ends.',
+			facts: [
+				{ label: 'Fighters in the warband', value: String(counted.length) },
+				{ label: 'Out of action', value: fighterCount(out) },
+				{ label: 'Wavering from (half, rounding up)', value: String(waveringThreshold(counted)) }
+			],
+			link: {
+				label: 'The End Phase on wyrdcry.net',
+				href: 'https://wyrdcry.net/docs/rules/the-end-phase'
+			}
+		});
+	}
 
 	/**
 	 * Writes the battle state through and keeps the copy in memory in step. It
@@ -267,7 +300,7 @@
 						<p>Round {battle.round} · {left} to act</p>
 						{#if out > 0}
 							<p class:wavering>
-								{out} out of action{#if wavering}{' '}· Wavering{/if}
+								{fighterCount(out)} out of action{#if wavering}{' '}· Wavering{/if}
 							</p>
 						{/if}
 						<button onclick={() => setBattle(nextRound(battle))}>Next round</button>
@@ -297,11 +330,19 @@
 	</div>
 </header>
 
-{#if battle && wavering}
-	<!-- Over the top edge of the cards on purpose: the morale is the one state that
-	     has to be seen from every card, and the tail points at the warband's name. -->
-	<p class="bubble" style:top="{headerHeight - 4}px" role="status">Wavering</p>
-{/if}
+<!-- The live region stands whether or not the bubble does, so a screen reader is
+     told when the warband starts wavering – a region that appears together with
+     its content is not announced. -->
+<div role="status">
+	{#if battle && wavering}
+		<!-- Over the top edge of the cards on purpose: the morale is the one state
+		     that has to be seen from every card, and the tail points at the
+		     warband's name. Tapped, it says how the count stands. -->
+		<button class="bubble" style:top="{headerHeight - 4}px" onclick={explainWavering}>
+			Wavering
+		</button>
+	{/if}
+</div>
 
 <input
 	bind:this={fileInput}
@@ -320,11 +361,13 @@
 		{cards}
 		{counted}
 		{battle}
+		{wavering}
 		ontoggle={(id) => setBattle(toggle(battle, id))}
 		onwait={(id) => setBattle(toggleWaiting(battle, id))}
 		onwound={(id, delta, health) => setBattle(allocate(battle, id, delta, health))}
 		onheroic={(id) => setBattle(toggleHeroic(battle, id))}
 		oncover={(id) => setBattle(toggleCover(battle, id))}
+		onpanicked={(id) => setBattle(togglePanicked(battle, id))}
 		onedit={(id) => (editingId = id)}
 	/>
 {:else}
@@ -440,13 +483,24 @@
 		z-index: 10;
 		margin: 0;
 		padding: 5px 12px;
+		border: 0;
 		border-radius: 10px;
 		background: var(--ui-warn);
 		color: #fff;
 		font-size: var(--ui-t-sm);
 		font-weight: 600;
-		/* Taps go through to the card underneath. */
-		pointer-events: none;
+		/* Says it can be tapped. */
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
+	/* The tap reaches past the drawn bubble, which stays small so it covers as
+	   little of the card as it can – sideways and down only, so it does not
+	   reach up over the warband select its tail points at. */
+	.bubble::after {
+		content: '';
+		position: absolute;
+		inset: 0 -8px -14px;
 	}
 
 	/* The tail, pointing up at the name. */
