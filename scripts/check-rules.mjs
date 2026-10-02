@@ -11,7 +11,7 @@
  *
  * Usage:  npm run check:rules
  */
-import { readFile, readdir } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -48,12 +48,22 @@ async function read(file) {
 	}
 }
 
+async function exists(file) {
+	try {
+		await access(file);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 const STATS = ['move', 'fight', 'shoot', 'defense', 'health', 'bravery'];
 const PHASES = ['recruitment', 'battle', 'aftermath'];
 
 const shared = {
 	campaign: join(RULES, 'campaign.json'),
 	keywords: join(RULES, 'keywords.json'),
+	racialLimits: join(RULES, 'racial-limits.json'),
 	weapons: join(RULES, 'weapons.json'),
 	items: join(RULES, 'items.json'),
 	weaponRules: join(RULES, 'weapon-rules.json'),
@@ -62,6 +72,7 @@ const shared = {
 
 const campaign = (await read(shared.campaign)) ?? {};
 const keywords = (await read(shared.keywords)) ?? [];
+const racialLimits = (await read(shared.racialLimits)) ?? [];
 const weapons = (await read(shared.weapons)) ?? [];
 const items = (await read(shared.items)) ?? [];
 const weaponRules = (await read(shared.weaponRules)) ?? [];
@@ -69,6 +80,7 @@ const universal = (await read(shared.universal)) ?? [];
 
 const ids = (list) => new Set(list.map((entry) => entry.id));
 const keywordIds = ids(keywords);
+const racialLimitIds = ids(racialLimits);
 const weaponIds = ids(weapons);
 const itemIds = ids(items);
 const weaponRuleIds = ids(weaponRules);
@@ -110,6 +122,7 @@ for (const folder of folders) {
 
 	for (const [key, list, taken] of [
 		['keywords', keywords, keywordIds],
+		['racial-limits', racialLimits, racialLimitIds],
 		['weapons', weapons, weaponIds],
 		['items', items, itemIds],
 		['weapon-rules', weaponRules, weaponRuleIds]
@@ -181,10 +194,34 @@ function duplicates(file, list) {
 }
 
 duplicates(shared.keywords, keywords);
+duplicates(shared.racialLimits, racialLimits);
 duplicates(shared.weapons, weapons);
 duplicates(shared.items, items);
 duplicates(shared.weaponRules, weaponRules);
 duplicates(shared.universal, universal);
+
+/* Every race needs an entry, so a missing one cannot pass for "no limit": that
+   is a `profile` of null. The races come from the race keywords and from the
+   synced fighters, whose race list also carries BEAST and THRALL; without a
+   sync only the keywords are known. */
+const raceIds = new Set(keywords.filter((keyword) => keyword.type === 'race').map((keyword) => keyword.id));
+const syncedFighters = join(ROOT, 'src/lib/data/fighters.json');
+for (const fighter of (await exists(syncedFighters)) ? ((await read(syncedFighters)) ?? []) : []) {
+	for (const race of fighter.race ?? []) raceIds.add(race.toLowerCase().replace(/ /g, '-'));
+}
+for (const race of raceIds) {
+	if (!racialLimitIds.has(race)) problem(shared.racialLimits, `"${race}" is a race without an entry – null if it has no limit`);
+}
+for (const limit of racialLimits) {
+	const where = cameFrom.get(limit.id) ?? shared.racialLimits;
+	if (!raceIds.has(limit.id)) {
+		problem(where, `"${limit.id}" is a racial limit, but no race goes by that id`);
+	}
+	if (limit.profile === null) continue;
+	for (const key of STATS) {
+		if (typeof limit.profile?.[key] !== 'number') problem(where, `"${limit.id}" has no ${key} in its profile`);
+	}
+}
 
 for (const weapon of weapons) {
 	const where = cameFrom.get(weapon.id) ?? shared.weapons;

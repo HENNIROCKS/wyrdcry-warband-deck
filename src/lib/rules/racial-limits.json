@@ -58,5 +58,12 @@
       "health": 30,
       "bravery": 2
     }
-  }
+  },
+  { "id": "beast", "name": "Beast", "profile": null },
+  { "id": "beastman", "name": "Beastman", "profile": null },
+  { "id": "dwarf", "name": "Dwarf", "profile": null },
+  { "id": "elf", "name": "Elf", "profile": null },
+  { "id": "monster", "name": "Monster", "profile": null },
+  { "id": "ogre", "name": "Ogre", "profile": null },
+  { "id": "thrall", "name": "Thrall", "profile": null }
 ]

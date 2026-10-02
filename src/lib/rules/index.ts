@@ -23,12 +23,14 @@ import type {
 	Homebrew,
 	Item,
 	Keyword,
+	RacialLimit,
 	UniversalAbility,
 	Weapon,
 	WeaponRule
 } from './types';
 import campaign from './campaign.json';
 import keywords from './keywords.json';
+import racialLimits from './racial-limits.json';
 import weapons from './weapons.json';
 import items from './items.json';
 import weaponRules from './weapon-rules.json';
@@ -75,6 +77,7 @@ function pooled<T extends { id: string }>(
 
 export const CAMPAIGN = campaign as Campaign;
 export const KEYWORDS = pooled<Keyword>(keywords, 'keywords');
+export const RACIAL_LIMITS = pooled<RacialLimit>(racialLimits, 'racial-limits');
 export const WEAPONS = pooled<Weapon>(weapons, 'weapons', hired.weapons);
 export const ITEMS = pooled<Item>(items, 'items', hired.items);
 export const WEAPON_RULES = pooled<WeaponRule>(weaponRules, 'weapon-rules');

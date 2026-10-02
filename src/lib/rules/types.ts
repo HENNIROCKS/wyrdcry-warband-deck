@@ -74,6 +74,18 @@ export interface Keyword {
 	rules: string[];
 }
 
+/**
+ * How far a race's characteristics can be raised. `id` is the race keyword's id.
+ * Every figure is a ceiling except Bravery, which is a roll to beat and so a
+ * floor: a lower number is the better one. `profile` is null for a race the
+ * rulebook names no limit for.
+ */
+export interface RacialLimit {
+	id: string;
+	name: string;
+	profile: Record<StatKey, number> | null;
+}
+
 export interface Ability {
 	id: string;
 	name: string;
@@ -277,6 +289,7 @@ export interface Faction {
  */
 export interface Homebrew {
 	keywords?: Keyword[];
+	'racial-limits'?: RacialLimit[];
 	weapons?: Weapon[];
 	items?: Item[];
 	'weapon-rules'?: WeaponRule[];
