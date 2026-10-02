@@ -21,6 +21,7 @@
 	import type { Draft, DraftFighter } from '$lib/build/types';
 	import { RULESET_VERSION } from '$lib/gamedata';
 	import { newId } from '$lib/id';
+	import { painted } from '$lib/painted';
 	import { CAMPAIGN, FACTIONS, type Fighter } from '$lib/rules';
 	import { ruleText } from '$lib/rules/text';
 	import { putWarband, requestPersistence } from '$lib/storage';
@@ -65,14 +66,15 @@
 	 * the entries ahead standing, and iOS walks forward onto them with a slow
 	 * drag from the right edge – onto a step past the check "Next" makes, or a
 	 * sheet for a fighter since removed. So every entry carries its depth, and
-	 * one deeper than the page stands on is walked back off at once.
+	 * one deeper than the page stands on is walked back off at once – without
+	 * showing its sheet first, or iOS takes its picture with the sheet in it.
 	 */
-	let depth = page.state.builderDepth ?? 0;
+	let depth = $state(page.state.builderDepth ?? 0);
+	const ahead = $derived((page.state.builderDepth ?? 0) > depth);
 
 	$effect(() => {
-		const at = page.state.builderDepth ?? 0;
-		if (at > depth) history.back();
-		else depth = at;
+		if (ahead) history.back();
+		else depth = page.state.builderDepth ?? 0;
 	});
 
 	function goStep(next: Step) {
@@ -92,8 +94,23 @@
 		history.back();
 	}
 
-	function closeSheet() {
-		if (page.state.builder) history.back();
+	/**
+	 * Set from the moment the sheet is closed until the history has stepped back
+	 * off it. iOS takes its picture of an entry as the page leaves it, and the
+	 * drag forward shows that picture: with the sheet already gone from the
+	 * screen, it shows the roster rather than a sheet that then snaps away.
+	 */
+	let closing = $state(false);
+
+	$effect(() => {
+		if (!page.state.builder) closing = false;
+	});
+
+	async function closeSheet() {
+		if (!page.state.builder || closing) return;
+		closing = true;
+		await painted();
+		history.back();
 	}
 
 	let draft = $state<Draft>({
@@ -454,7 +471,7 @@
 	{/if}
 </nav>
 
-{#if sheet && sheetFighter && faction}
+{#if sheet && sheetFighter && faction && !closing && !ahead}
 	<FighterSheet
 		{faction}
 		{draft}

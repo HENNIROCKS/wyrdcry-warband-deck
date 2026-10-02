@@ -1,15 +1,32 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { dismiss, explanation, settle } from '../explanation';
+	import { painted } from '../painted';
 	import RuleText from './RuleText.svelte';
 	import type { StatLayer } from '../types/card';
 
-	const open = $derived(explanation());
+	/**
+	 * Set from the moment the sheet is closed until the history has stepped back
+	 * off it. iOS takes its picture of an entry as the page leaves it, and the
+	 * drag forward shows that picture: with the sheet already gone from the
+	 * screen, it shows the card rather than a sheet that then snaps away.
+	 */
+	let closing = $state(false);
+
+	const open = $derived(closing ? null : explanation());
 
 	$effect(() => {
 		void page.state;
 		settle();
+		if (!explanation()) closing = false;
 	});
+
+	async function close() {
+		if (closing) return;
+		closing = true;
+		await painted();
+		dismiss();
+	}
 
 	/* The base layer carries the profile value, every other one what it adds. */
 	function amount(layer: StatLayer): string {
@@ -34,7 +51,7 @@
 
 <svelte:window
 	onkeydown={(event) => {
-		if (open && event.key === 'Escape') dismiss();
+		if (open && event.key === 'Escape') close();
 	}}
 />
 
@@ -45,7 +62,7 @@
 		class="backdrop"
 		role="presentation"
 		onclick={(event) => {
-			if (event.target === event.currentTarget) dismiss();
+			if (event.target === event.currentTarget) close();
 		}}
 	>
 		<div
@@ -107,7 +124,7 @@
 				</p>
 			{/if}
 
-			<button class="close" onclick={dismiss}>Close</button>
+			<button class="close" onclick={close}>Close</button>
 		</div>
 	</div>
 {/if}
