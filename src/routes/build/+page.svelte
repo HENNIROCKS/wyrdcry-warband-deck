@@ -60,14 +60,31 @@
 	const step = $derived<Step>(page.state.builderStep ?? 'warband');
 	const openFighter = $derived(page.state.builder ?? null);
 
+	/**
+	 * How many entries deep into the builder the page stands. Going back leaves
+	 * the entries ahead standing, and iOS walks forward onto them with a slow
+	 * drag from the right edge – onto a step past the check "Next" makes, or a
+	 * sheet for a fighter since removed. So every entry carries its depth, and
+	 * one deeper than the page stands on is walked back off at once.
+	 */
+	let depth = page.state.builderDepth ?? 0;
+
+	$effect(() => {
+		const at = page.state.builderDepth ?? 0;
+		if (at > depth) history.back();
+		else depth = at;
+	});
+
 	function goStep(next: Step) {
-		pushState('', { builderStep: next });
+		depth = (page.state.builderDepth ?? 0) + 1;
+		pushState('', { builderStep: next, builderDepth: depth });
 	}
 
 	function openSheet(key: string) {
 		/* The step travels along, or backing out of the sheet would land on a
 		   history entry that does not know which step was open. */
-		pushState('', { builderStep: step, builder: key });
+		depth = (page.state.builderDepth ?? 0) + 1;
+		pushState('', { builderStep: step, builder: key, builderDepth: depth });
 	}
 
 	function back() {

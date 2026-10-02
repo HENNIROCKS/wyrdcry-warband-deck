@@ -11,5 +11,7 @@ declare namespace App {
 		builderStep?: 'warband' | 'name' | 'roster' | 'finish';
 		/** The draft fighter whose sheet the builder has open, by its key. */
 		builder?: string;
+		/** How many entries deep into the builder this one is, see src/routes/build/+page.svelte. */
+		builderDepth?: number;
 	}
 }
