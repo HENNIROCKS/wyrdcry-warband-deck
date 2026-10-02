@@ -26,10 +26,13 @@
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [ ] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
+- [ ] 🃏 Count Mighty on weapons a fighter is born with or mutates into, not only on bought ones
 - [ ] 🎨 Go over the design and the interface outside the cards
+- [ ] 🎨 Light and dark mode, together with going over the design outside the cards
 - [ ] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [ ] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
+- [ ] 📈 A battle history, one line per battle, e.g. "260919 Undead – Draw"
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
 - [ ] 📄 Export the warband as a roster PDF
