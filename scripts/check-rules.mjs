@@ -473,6 +473,14 @@ for (const folder of folders) {
 				if (!row.name || !row.text) {
 					problem(file('rules'), `"${rule.id}" has a table row (roll ${row.roll}) with no name or text`);
 				}
+				for (const keyword of row.keywords ?? []) {
+					if (!keywordIds.has(keyword)) {
+						problem(file('rules'), `"${rule.id}" (roll ${row.roll}) hands out the keyword "${keyword}", keywords.json has none`);
+					}
+				}
+				if (row.weapon !== undefined && !weaponIds.has(row.weapon)) {
+					problem(file('rules'), `"${rule.id}" (roll ${row.roll}) is the weapon "${row.weapon}", weapons.json has none`);
+				}
 			}
 		}
 

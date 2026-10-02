@@ -21,6 +21,7 @@ import {
 	WEAPON_RULES
 } from './gamedata';
 import type { WeaponProfile } from './gamedata';
+import { rolledRow } from './rules-bridge';
 import type {
 	CardEntry,
 	CardSection,
@@ -340,6 +341,8 @@ export function toCard(
 	}
 
 	const sources = statSources(instance.equipment, warband.customWeapons);
+	/* A Possessed mutation: a keyword or a weapon beside its text. */
+	const rolled = rolledRow(profile.faction, profile.id, chosen);
 
 	const stats: CardStat[] = STAT_KEYS.map((key) => {
 		const base = profile[key];
@@ -463,6 +466,11 @@ export function toCard(
 		});
 	}
 
+	/* A mutation that is a weapon, such as the Great Claw. Like the gear above it
+	   is not in the instance, and costs nothing. */
+	const weaponRolled = rolled?.weapon ? WEAPONS.get(rolled.weapon) : undefined;
+	if (rolled?.weapon && weaponRolled) addWeapon(rolled.weapon, weaponRolled);
+
 	/*
 	 * "A fighter that isn't equipped with any melee weapon is considered to be
 	 * unarmed, and uses the Unarmed weapon profile" – the profile itself is in
@@ -471,11 +479,13 @@ export function toCard(
 	 * Beasts and thralls are out of it: neither can be equipped at all, and what
 	 * they fight with is on their profile above. A weapon the warband typed in
 	 * itself has no kind to read, so its presence is taken as a melee weapon
-	 * rather than putting Unarmed next to it.
+	 * rather than putting Unarmed next to it. Neither does a mutation that
+	 * "counts as a melee weapon" without a profile, such as Tentacles.
 	 */
 	const natural = profile.race.includes('BEAST') || profile.race.includes('THRALL');
 	const armed =
 		melee ||
+		Boolean(rolled?.armed) ||
 		warband.customWeapons.some(
 			(w) => instance.equipment.includes(w.id) || instance.equipment.includes(w.name)
 		);
@@ -494,7 +504,11 @@ export function toCard(
 		if (entries.length) sections.push({ kind, preamble, entries });
 	};
 
-	const keywords = [...profile.race, ...profile.keywords];
+	/* A rolled keyword the profile already carries is not printed twice. */
+	const gained = (rolled?.keywords ?? []).filter(
+		(keyword) => !profile.keywords.some((held) => held.toLowerCase() === keyword.toLowerCase())
+	);
+	const keywords = [...profile.race, ...profile.keywords, ...gained];
 	/* The fighter's own faction, not the warband's – a hired sword recruited into
 	   another faction still carries its own. Both data sources drop it from
 	   `profile.keywords`, so it never reaches `universalFor` by way of this list. */
@@ -502,7 +516,8 @@ export function toCard(
 	const displayKeywords = [
 		...profile.race,
 		...(ownFactionName ? [ownFactionName] : []),
-		...profile.keywords
+		...profile.keywords,
+		...gained
 	];
 
 	/* What holds for this one fighter comes first, the general reference last.

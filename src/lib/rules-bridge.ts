@@ -125,3 +125,37 @@ export const RULE_FACTIONS: FactionProfile[] = factions.map(toFactionProfile);
 /* Already carries what a homebrew faction added: `rules/index.ts` folds each
    `homebrew.json` into this map before it is built. */
 export const RULE_WEAPONS: WeaponProfile[] = [...WEAPONS.values()].map(toWeaponProfile);
+
+/** What a rolled table row adds to a fighter's card beyond its text. */
+export interface RolledRow {
+	/** Written as the game data writes them, in capitals. */
+	keywords: string[];
+	/** A weapon id, to look up like any other the card carries. */
+	weapon: string | null;
+	armed: boolean;
+}
+
+/**
+ * The row a fighter's recruitment roll landed on, such as a Possessed mutation.
+ * `chosen` is the roll the wizard kept for this fighter, as a string. Null for a
+ * fighter without a roll and for a warband out of the builder, which keeps none.
+ *
+ * Read from this ruleset even for a printed faction: the game data has the
+ * mutation table only as prose, so there is nothing there for it to win against.
+ */
+export function rolledRow(factionId: string, fighterId: string, chosen?: string[] | null): RolledRow | null {
+	const faction = FACTIONS.get(factionId);
+	const choice = faction?.fighters.find((fighter) => fighter.id === fighterId)?.choose;
+	if (!faction || choice?.kind !== 'roll' || !chosen?.length) return null;
+
+	const row = faction.rules
+		.find((rule) => rule.id === choice.table)
+		?.table?.find((entry) => String(entry.roll) === chosen[0]);
+	if (!row) return null;
+
+	return {
+		keywords: (row.keywords ?? []).map((id) => KEYWORDS.get(id)?.name ?? id.toUpperCase()),
+		weapon: row.weapon ?? null,
+		armed: row.armed ?? false
+	};
+}

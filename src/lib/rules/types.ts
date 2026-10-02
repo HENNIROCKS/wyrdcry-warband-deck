@@ -128,6 +128,16 @@ export interface TableRow {
 	roll: number;
 	name: string;
 	text: string;
+	/** Keywords the row hands the fighter, on top of its profile's. */
+	keywords?: string[];
+	/** A weapon the row itself is, with the profile its text gives. An id from `weapons.json`. */
+	weapon?: string;
+	/**
+	 * "Counts as a melee weapon" with no profile to swing: the fighter is armed
+	 * and leaves Unarmed off its card, but gains no row of its own. Implied by
+	 * `weapon` when that is a melee weapon.
+	 */
+	armed?: boolean;
 }
 
 export interface Fighter {
