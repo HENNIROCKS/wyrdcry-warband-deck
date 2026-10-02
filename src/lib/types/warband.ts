@@ -70,6 +70,17 @@ export interface Fluff {
 	fighters: Record<string, string>;
 }
 
+/** One battle the warband fought, as the player wrote it down afterwards. */
+export interface BattleRecord {
+	id: string;
+	/** A calendar day, YYYY-MM-DD. */
+	date: string;
+	result: 'win' | 'draw' | 'loss';
+	/** Either name may be empty. */
+	opponentWarband: string;
+	opponentPlayer: string;
+}
+
 /** Metadata of this app. The builder ignores unknown keys and hands them back. */
 export interface DeckMeta {
 	format: 'wyrdcry-warband-deck';
@@ -80,6 +91,7 @@ export interface DeckMeta {
 	/** Absent on every warband that did not come out of the wizard. */
 	selections?: Selections | null;
 	fluff?: Fluff | null;
+	history?: BattleRecord[] | null;
 }
 
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
@@ -175,4 +187,6 @@ export interface StoredWarband {
 	selections?: Selections | null;
 	/** Notes and fluff written here, kept off the warband model the same way `selections` is. */
 	fluff?: Fluff | null;
+	/** The battles fought, in the order they were entered. Kept off the warband model like `fluff`. */
+	history?: BattleRecord[] | null;
 }

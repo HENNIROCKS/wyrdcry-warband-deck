@@ -22,7 +22,8 @@
 		onheroic,
 		oncover,
 		onpanicked,
-		onedit
+		onedit,
+		onhistory
 	}: {
 		cards: DeckCard[];
 		/** What each fighter counts for in the morale. Every fighter counts as one where it is left out. */
@@ -38,6 +39,8 @@
 		onpanicked?: (instanceId: string) => void;
 		/** Opens the sheet to edit whichever card is on top. */
 		onedit?: (instanceId: string) => void;
+		/** Opens the warband's battle history, offered from the warband card. */
+		onhistory?: () => void;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
@@ -267,6 +270,7 @@
 			onwound={(delta) =>
 				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
 			onedit={() => onedit?.(top.instanceId)}
+			onhistory={top.kind === 'warband' ? onhistory : undefined}
 		/>
 	{/if}
 </div>

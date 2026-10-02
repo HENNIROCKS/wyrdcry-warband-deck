@@ -43,6 +43,32 @@
 		{#if card.notes}
 			<section class="notes">{@render note(card.notes)}</section>
 		{/if}
+
+		{#if card.battles.length}
+			<section class="battles">
+				<p class="entry"><strong>Battles</strong>: {card.tally}</p>
+				<table>
+					<!-- The columns speak for themselves on the card; a screen reader
+					     needs them named. -->
+					<thead class="visually-hidden">
+						<tr>
+							<th scope="col">Date</th>
+							<th scope="col">Opponent</th>
+							<th scope="col">Result</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each card.battles as battle (battle.id)}
+							<tr>
+								<td class="date">{battle.date}</td>
+								<td>{battle.opponent}</td>
+								<td class="result">{battle.result}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</section>
+		{/if}
 	</div>
 </article>
 
@@ -157,5 +183,52 @@
 		padding: calc(14 * var(--u)) calc(16 * var(--u));
 		border-radius: calc(7.5 * var(--u));
 		background: var(--card-wash-strong);
+	}
+
+	/* A log rather than a figure of the warband: no box and no green, a solid
+	   rule under the heading and a dashed one under each row, set a step below
+	   the notes. */
+	.battles table {
+		width: 100%;
+		margin-top: calc(6 * var(--u));
+		/* Separate rather than collapsed, so each line belongs to exactly one cell
+		   and two of them never meet in the same place. */
+		border-collapse: separate;
+		border-spacing: 0;
+		border-top: 1.5px solid rgba(0, 0, 0, 0.35);
+		font-family: 'Alegreya', serif;
+		font-size: calc(16 * var(--t));
+		line-height: 1.3;
+	}
+
+	.battles td {
+		padding: calc(6 * var(--u)) calc(8 * var(--u)) calc(6 * var(--u)) 0;
+		border-bottom: 1px dashed rgba(0, 0, 0, 0.35);
+		vertical-align: baseline;
+		overflow-wrap: anywhere;
+	}
+
+	.battles .date,
+	.battles .result {
+		width: 1%;
+		white-space: nowrap;
+		font-variant-numeric: lining-nums tabular-nums;
+	}
+
+	.battles .result {
+		padding-right: 0;
+		text-align: right;
+	}
+
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 </style>

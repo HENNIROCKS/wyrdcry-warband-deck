@@ -20,7 +20,8 @@ to the Warband Builder is not currently assured – see
   the Greenskin Marauders as homebrew
 - Import warband JSON from the builder
 - Show the warband itself as the first card: faction, standing, favour,
-  reputation, gold, value, stash and the warband notes
+  reputation, gold, value, stash, the warband notes and a battle history
+  counted into won, drawn and lost
 - Show fighters as cards and swipe through them
 - Tap a worked-out value or a weapon to see where it comes from: which
   modifiers went into it, and which rules apply only in the right situation

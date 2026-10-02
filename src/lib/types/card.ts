@@ -151,6 +151,10 @@ export interface WarbandCardData {
 	notes: string;
 	/** The player's own background text. Empty where there is none. */
 	fluff: string;
+	/** One row per battle, newest first. Empty where none was entered. */
+	battles: { id: string; date: string; opponent: string; result: string }[];
+	/** Won, drawn and lost, counted over `battles`. */
+	tally: string;
 }
 
 export type DeckCard = WarbandCardData | FighterCardData;

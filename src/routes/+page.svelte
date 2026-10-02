@@ -5,6 +5,7 @@
 	import { base } from '$app/paths';
 
 	import AftermathSheet from '$lib/components/AftermathSheet.svelte';
+	import BattleHistorySheet from '$lib/components/BattleHistorySheet.svelte';
 	import Deck from '$lib/components/Deck.svelte';
 	import EditSheet from '$lib/components/EditSheet.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
@@ -30,7 +31,7 @@
 	import { explain } from '$lib/explanation';
 	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
-	import type { BattleState, StoredWarband } from '$lib/types/warband';
+	import type { BattleRecord, BattleState, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
@@ -42,12 +43,13 @@
 	let editingId = $state<string | null>(null);
 	/* The warband a delete has been asked for, held until it is confirmed. */
 	let condemned = $state<StoredWarband | null>(null);
+	let historyOpen = $state(false);
 	let message = $state<string | null>(null);
 	let messageTimer: ReturnType<typeof setTimeout> | undefined;
 	let fileInput: HTMLInputElement | undefined = $state();
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
-	const cards = $derived(active ? toCards(active.warband, active.selections, active.fluff) : []);
+	const cards = $derived(active ? toCards(active.warband, active.selections, active.fluff, active.history) : []);
 	const editingCard = $derived(editingId ? (cards.find((c) => c.instanceId === editingId) ?? null) : null);
 	const editingFields = $derived.by(() => {
 		if (!editingCard) return [];
@@ -174,6 +176,20 @@
 		};
 		await putWarband(entry);
 		editingId = null;
+		await refresh();
+	}
+
+	/** One battle more or less in the history, written like `saveEdit`: revision up, one `putWarband`. */
+	async function saveHistory(change: (history: BattleRecord[]) => BattleRecord[]) {
+		if (!active) return;
+		const snapshot = $state.snapshot(active);
+		const entry: StoredWarband = {
+			...snapshot,
+			history: change(snapshot.history ?? []),
+			revision: snapshot.revision + 1,
+			updatedAt: new Date().toISOString()
+		};
+		await putWarband(entry);
 		await refresh();
 	}
 
@@ -383,6 +399,7 @@
 		oncover={(id) => setBattle(toggleCover(battle, id))}
 		onpanicked={(id) => setBattle(togglePanicked(battle, id))}
 		onedit={(id) => (editingId = id)}
+		onhistory={() => (historyOpen = true)}
 	/>
 {:else}
 	<div class="empty">
@@ -420,6 +437,18 @@
 		fields={editingFields}
 		onsave={saveEdit}
 		oncancel={() => (editingId = null)}
+	/>
+{/if}
+
+{#if historyOpen && active}
+	<BattleHistorySheet
+		history={active.history ?? []}
+		onadd={async (record) => {
+			await saveHistory((history) => [...history, record]);
+			historyOpen = false;
+		}}
+		onremove={(id) => saveHistory((history) => history.filter((r) => r.id !== id))}
+		onclose={() => (historyOpen = false)}
 	/>
 {/if}
 
@@ -551,7 +580,7 @@
 	.message button {
 		flex: none;
 		padding: 5px 8px;
-		color: var(--ui-text-subtle);
+		color: var(--ui-text);
 		background: none;
 		border: 0;
 		text-decoration: underline;

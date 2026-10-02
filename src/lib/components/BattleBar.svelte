@@ -16,7 +16,8 @@
 		onheroic,
 		oncover,
 		onpanicked,
-		onedit
+		onedit,
+		onhistory
 	}: {
 		battle?: BattleState | null;
 		/** The fighter on top of the stack. Null while the warband card is up. */
@@ -41,6 +42,8 @@
 		onpanicked?: () => void;
 		/** Opens the sheet to edit the card on top of the deck. */
 		onedit?: () => void;
+		/** Opens the battle history. Passed only while the warband card is on top. */
+		onhistory?: () => void;
 	} = $props();
 
 	/* What is left of Health, which is what the stepper counts – the card writes
@@ -152,6 +155,9 @@
 	<MenuButton label="Edit">
 		{#snippet icon()}{@render pencil()}{/snippet}
 		<button onclick={() => onedit?.()}>Edit…</button>
+		{#if onhistory}
+			<button onclick={() => onhistory?.()}>Battle history…</button>
+		{/if}
 	</MenuButton>
 {/snippet}
 

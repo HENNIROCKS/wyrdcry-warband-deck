@@ -8,7 +8,7 @@
 
 import { RULESET_VERSION } from './gamedata';
 import { deviceId, getWarband } from './storage';
-import type { DeckMeta, ExportedWarband, Fluff, StoredWarband, Warband } from './types/warband';
+import type { BattleRecord, DeckMeta, ExportedWarband, Fluff, StoredWarband, Warband } from './types/warband';
 
 export const FORMAT = 'wyrdcry-warband-deck';
 
@@ -134,6 +134,32 @@ function mergeFluff(incoming: Fluff | null | undefined, existing: Fluff | null |
 	return { warband: incoming?.warband ?? existing?.warband ?? '', fighters };
 }
 
+const RESULTS: readonly string[] = ['win', 'draw', 'loss'];
+
+/**
+ * The entries of a file's history that the card can show. Sorting reads the
+ * date of every one, so a single entry without it would take the whole deck
+ * down with it rather than only its own line. Missing names read as empty.
+ */
+function readHistory(incoming: unknown): BattleRecord[] | null {
+	if (!Array.isArray(incoming)) return null;
+	return incoming.flatMap((entry): BattleRecord[] => {
+		if (typeof entry !== 'object' || entry === null) return [];
+		const { id, date, result, opponentWarband, opponentPlayer } = entry as Record<string, unknown>;
+		if (typeof id !== 'string' || typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return [];
+		if (typeof result !== 'string' || !RESULTS.includes(result)) return [];
+		return [
+			{
+				id,
+				date,
+				result: result as BattleRecord['result'],
+				opponentWarband: typeof opponentWarband === 'string' ? opponentWarband : '',
+				opponentPlayer: typeof opponentPlayer === 'string' ? opponentPlayer : ''
+			}
+		];
+	});
+}
+
 export function toStored(candidate: ImportCandidate): StoredWarband {
 	const now = new Date().toISOString();
 	return {
@@ -148,7 +174,11 @@ export function toStored(candidate: ImportCandidate): StoredWarband {
 		   describe a warband that is being replaced: the modifiers hang on
 		   instanceIds the incoming roster need not have. */
 		selections: candidate.meta?.selections ?? null,
-		fluff: mergeFluff(candidate.meta?.fluff, candidate.existing?.fluff, candidate.warband)
+		fluff: mergeFluff(candidate.meta?.fluff, candidate.existing?.fluff, candidate.warband),
+		/* Whole, not merged: an entry removed here would come back with every older
+		   export. A file without the field – one from the builder – keeps what is
+		   stored. */
+		history: readHistory(candidate.meta?.history) ?? candidate.existing?.history ?? null
 	};
 }
 
@@ -169,7 +199,8 @@ export async function buildExport(entry: StoredWarband): Promise<ExportedWarband
 			exportedAt: new Date().toISOString(),
 			ruleset: entry.ruleset || RULESET_VERSION,
 			selections: entry.selections,
-			fluff: entry.fluff
+			fluff: entry.fluff,
+			history: entry.history
 		}
 	};
 }
