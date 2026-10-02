@@ -43,6 +43,7 @@
 	/* The warband a delete has been asked for, held until it is confirmed. */
 	let condemned = $state<StoredWarband | null>(null);
 	let message = $state<string | null>(null);
+	let messageTimer: ReturnType<typeof setTimeout> | undefined;
 	let fileInput: HTMLInputElement | undefined = $state();
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
@@ -185,6 +186,16 @@
 		}
 	}
 
+	/**
+	 * A confirmation goes away on its own; an error stays until it is closed,
+	 * because it has to be read. Either replaces whatever was showing.
+	 */
+	function notify(text: string | null, kind: 'notice' | 'error' = 'notice') {
+		clearTimeout(messageTimer);
+		message = text;
+		if (text && kind === 'notice') messageTimer = setTimeout(() => (message = null), 4000);
+	}
+
 	async function onPick(event: Event) {
 		const input = event.currentTarget as HTMLInputElement;
 		const file = input.files?.[0];
@@ -194,9 +205,9 @@
 
 		try {
 			candidate = await readFile(file);
-			message = null;
+			notify(null);
 		} catch (error) {
-			message = error instanceof ImportError ? error.message : 'That file could not be read.';
+			notify(error instanceof ImportError ? error.message : 'That file could not be read.', 'error');
 		}
 	}
 
@@ -210,14 +221,14 @@
 		activeId = entry.warband.id;
 		candidate = null;
 		await refresh();
-		message = null;
+		notify(null);
 	}
 
 	async function doExport(snapshot: boolean) {
 		if (!active) return;
 		const result = await exportWarband(active, snapshot);
-		if (result === 'downloaded') message = 'Downloaded as a file.';
-		else if (result === 'shared') message = 'Shared.';
+		if (result === 'downloaded') notify('Downloaded as a file.');
+		else if (result === 'shared') notify('Shared.');
 	}
 
 	/**
@@ -231,14 +242,14 @@
 		await deleteWarband(condemned.warband.id);
 		condemned = null;
 		await refresh();
-		message = `${gone} deleted.`;
+		notify(`${gone} deleted.`);
 	}
 
 	async function exportCondemned() {
 		if (!condemned) return;
 		const result = await exportWarband(condemned, false);
-		if (result === 'downloaded') message = 'Downloaded as a file.';
-		else if (result === 'shared') message = 'Shared.';
+		if (result === 'downloaded') notify('Downloaded as a file.');
+		else if (result === 'shared') notify('Shared.');
 	}
 </script>
 
@@ -353,7 +364,10 @@
 />
 
 {#if message}
-	<p class="message">{message}</p>
+	<div class="message" role="status">
+		<p>{message}</p>
+		<button onclick={() => notify(null)}>Close</button>
+	</div>
 {/if}
 
 {#if cards.length}
@@ -519,11 +533,29 @@
 	}
 
 	.message {
-		margin: 0;
-		padding: 9px 12px;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 4px 4px 4px 12px;
 		font-size: var(--ui-t-base);
 		background: var(--ui-surface);
 		border-bottom: 1px solid var(--ui-border);
+	}
+
+	.message p {
+		flex: 1;
+		margin: 0;
+	}
+
+	/* The padding gives the thumb a target the height of the bar. */
+	.message button {
+		flex: none;
+		padding: 5px 8px;
+		color: var(--ui-text-subtle);
+		background: none;
+		border: 0;
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
 
 	.empty {
