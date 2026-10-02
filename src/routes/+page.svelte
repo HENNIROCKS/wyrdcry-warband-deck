@@ -10,6 +10,7 @@
 	import EditSheet from '$lib/components/EditSheet.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
+	import RenownSheet from '$lib/components/RenownSheet.svelte';
 	import { toCards } from '$lib/adapter';
 	import { applyAftermath, type AftermathAnswer } from '$lib/aftermath';
 	import { countedFighters } from '$lib/morale';
@@ -29,9 +30,11 @@
 		waveringThreshold
 	} from '$lib/battle';
 	import { explain } from '$lib/explanation';
+	import { earnedLevels, limitFor, optionsFor, spend, type RenownOption } from '$lib/renown';
+	import { RACIAL_LIMITS } from '$lib/rules';
 	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
-	import type { BattleRecord, BattleState, StoredWarband } from '$lib/types/warband';
+	import type { BattleRecord, BattleState, StatKey, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
@@ -44,12 +47,14 @@
 	/* The warband a delete has been asked for, held until it is confirmed. */
 	let condemned = $state<StoredWarband | null>(null);
 	let historyOpen = $state(false);
+	/* Set while the renown sheet is up, asking what the next open level is spent on. */
+	let renownOpen = $state(false);
 	let message = $state<string | null>(null);
 	let messageTimer: ReturnType<typeof setTimeout> | undefined;
 	let fileInput: HTMLInputElement | undefined = $state();
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
-	const cards = $derived(active ? toCards(active.warband, active.selections, active.fluff, active.history) : []);
+	const cards = $derived(active ? toCards(active.warband, active.selections, active.fluff, active.history, active.renownHistory) : []);
 	const editingCard = $derived(editingId ? (cards.find((c) => c.instanceId === editingId) ?? null) : null);
 	const editingFields = $derived.by(() => {
 		if (!editingCard) return [];
@@ -64,6 +69,25 @@
 			{ key: 'notes', label: 'Notes', value: instance?.notes ?? '' },
 			{ key: 'fluff', label: 'Fluff', value: active?.fluff?.fighters[editingCard.instanceId] ?? '' }
 		];
+	});
+	/* Levels waiting for a choice, minus those of a fighter an import has since removed. */
+	const pendingRenown = $derived(
+		(active?.pendingRenown ?? []).filter((e) => active?.warband.fighters.some((f) => f.instanceId === e.instanceId))
+	);
+	const nextRenown = $derived(pendingRenown[0] ?? null);
+	const renownView = $derived.by(() => {
+		if (!active || !nextRenown) return null;
+		const instance = active.warband.fighters.find((f) => f.instanceId === nextRenown.instanceId);
+		const card = cards.find((c) => c.instanceId === nextRenown.instanceId);
+		if (!instance || card?.kind !== 'fighter') return null;
+		/* The base layer is the profile's own figure; the file's override and the gear sit above it. */
+		const profile = Object.fromEntries(
+			card.stats.map((stat) => [stat.key, stat.layers.find((l) => l.kind === 'base')?.amount ?? stat.value])
+		) as Record<StatKey, number>;
+		const options = card.stats.length
+			? optionsFor(profile, instance, nextRenown.branch, active.renownHistory ?? [], limitFor(card.keywords, RACIAL_LIMITS))
+			: [];
+		return { name: card.name, options };
 	});
 	const battle = $derived(active?.battle ?? null);
 	const counted = $derived(active ? countedFighters(active.warband) : []);
@@ -131,16 +155,40 @@
 	) {
 		if (!active) return;
 		const snapshot = $state.snapshot(active);
+		const warband = applyAftermath(snapshot.warband, answers, bonusInstanceId);
+		/* The keywords as they stand now, before the aftermath changes any of them:
+		   they decide which rule each new level falls under. */
+		const levels = earnedLevels(snapshot.warband, warband, (id) => {
+			const card = cards.find((c) => c.instanceId === id);
+			return card?.kind === 'fighter' ? card.keywords : [];
+		});
+		const pending = [...(snapshot.pendingRenown ?? []), ...levels];
 		const entry: StoredWarband = {
 			...snapshot,
-			warband: applyAftermath(snapshot.warband, answers, bonusInstanceId),
+			warband,
 			battle: null,
+			pendingRenown: pending.length ? pending : null,
 			revision: snapshot.revision + 1,
 			updatedAt: new Date().toISOString()
 		};
 		await putWarband(entry);
 		endingBattle = false;
+		renownOpen = levels.length > 0;
 		await refresh();
+	}
+
+	/** Spends the open level in one write, then goes on to the next one or closes. */
+	async function spendRenown(option: RenownOption | null) {
+		if (!active || !nextRenown) return;
+		const snapshot = $state.snapshot(active);
+		try {
+			await putWarband(spend(snapshot, { ...nextRenown }, option ? { ...option } : null));
+		} catch {
+			notify('The choice could not be saved.', 'error');
+			return;
+		}
+		await refresh();
+		if (!nextRenown) renownOpen = false;
 	}
 
 	/**
@@ -343,6 +391,10 @@
 						<p>No battle</p>
 						<button onclick={() => setBattle(start())}>Start battle</button>
 					{/if}
+					{#if pendingRenown.length}
+						<hr />
+						<button onclick={() => (renownOpen = true)}>Spend renown ({pendingRenown.length})</button>
+					{/if}
 				{/snippet}
 			</MenuButton>
 		{/if}
@@ -428,6 +480,19 @@
 		{battle}
 		onconfirm={applyAftermathAndEnd}
 		oncancel={() => (endingBattle = false)}
+	/>
+{/if}
+
+{#if renownOpen && renownView && nextRenown}
+	<RenownSheet
+		instanceId={nextRenown.instanceId}
+		name={renownView.name}
+		level={nextRenown.level}
+		branch={nextRenown.branch}
+		options={renownView.options}
+		waiting={pendingRenown.length - 1}
+		onspend={spendRenown}
+		onclose={() => (renownOpen = false)}
 	/>
 {/if}
 

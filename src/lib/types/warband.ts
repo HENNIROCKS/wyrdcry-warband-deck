@@ -81,6 +81,41 @@ export interface BattleRecord {
 	opponentPlayer: string;
 }
 
+/**
+ * Which rule a renown level falls under, fixed when the level is earned: it is
+ * the fighter's keywords before this aftermath that decide, and by the time the
+ * choice is made the card may already read differently.
+ *
+ * - `henchman`: a Characteristics Increase, never the same characteristic twice.
+ * - `promotion`: a henchman's fourth level – an increase or a talent, and the
+ *   fighter becomes a `HERO`.
+ * - `hero`: an increase or a talent.
+ * - `none`: no keyword to say what renown is worth; an increase, with a note.
+ */
+export type RenownBranch = 'henchman' | 'promotion' | 'hero' | 'none';
+
+/** A renown level earned and not yet spent. At most one per fighter and level. */
+export interface PendingRenown {
+	instanceId: string;
+	level: number;
+	branch: RenownBranch;
+}
+
+/**
+ * What a renown level was spent on. `statOverrides` holds the resulting figure
+ * without its reason, so the reason is kept here and written into `_deck`.
+ * `characteristic` is null where nothing could be raised.
+ */
+export interface RenownChoice {
+	instanceId: string;
+	level: number;
+	branch: RenownBranch;
+	characteristic: StatKey | null;
+	/** Signed, as the figure moves: −1 for Bravery, which is a roll to beat. */
+	bonus: number;
+	source: string;
+}
+
 /** Metadata of this app. The builder ignores unknown keys and hands them back. */
 export interface DeckMeta {
 	format: 'wyrdcry-warband-deck';
@@ -92,6 +127,7 @@ export interface DeckMeta {
 	selections?: Selections | null;
 	fluff?: Fluff | null;
 	history?: BattleRecord[] | null;
+	renownHistory?: RenownChoice[] | null;
 }
 
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
@@ -189,4 +225,15 @@ export interface StoredWarband {
 	fluff?: Fluff | null;
 	/** The battles fought, in the order they were entered. Kept off the warband model like `fluff`. */
 	history?: BattleRecord[] | null;
+	/**
+	 * What every renown level was spent on, cumulative: the builder cannot
+	 * regenerate it, so an import never throws it away wholesale.
+	 */
+	renownHistory?: RenownChoice[] | null;
+	/**
+	 * Levels earned and still waiting for a choice. Local to this device like
+	 * `battle`, and written without raising `revision`: it is a to-do list, not
+	 * progress. The choice that clears an entry is progress and raises it.
+	 */
+	pendingRenown?: PendingRenown[] | null;
 }

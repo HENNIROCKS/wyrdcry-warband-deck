@@ -22,6 +22,7 @@ import {
 	WEAPON_RULES
 } from './gamedata';
 import type { WeaponProfile } from './gamedata';
+import { promoted } from './renown';
 import { rolledRow } from './rules-bridge';
 import type {
 	CardEntry,
@@ -38,6 +39,7 @@ import type {
 import {
 	STAT_KEYS,
 	type BattleRecord,
+	type RenownChoice,
 	type CustomWeapon,
 	type FighterInstance,
 	type Fluff,
@@ -326,7 +328,8 @@ export function toCard(
 	warband: Warband,
 	factionName: string,
 	chosen?: string[] | null,
-	fluff = ''
+	fluff = '',
+	renownHistory: RenownChoice[] = []
 ): FighterCardData {
 	const profile = FIGHTERS.get(instance.fighterId);
 	const name = instance.customName.trim();
@@ -360,11 +363,17 @@ export function toCard(
 
 		/* The warband file holds a bare number the builder's stat editor wrote,
 		   without an origin. It becomes its own layer instead of replacing the
-		   profile value, so the card can say that much. */
+		   profile value, so the card can say that much – less what renown spent on
+		   this characteristic, which has a reason of its own to show. The number is
+		   what counts: without one, the history has nothing to explain. */
 		const override = instance.statOverrides?.[key];
-		if (override !== undefined && override !== base) {
-			layers.push({ kind: 'permanent', source: 'Warband file', amount: override - base });
-		}
+		const raised =
+			override === undefined
+				? []
+				: renownHistory.filter((c) => c.instanceId === instance.instanceId && c.characteristic === key);
+		const unexplained = override === undefined ? 0 : override - base - raised.reduce((sum, c) => sum + c.bonus, 0);
+		if (unexplained !== 0) layers.push({ kind: 'permanent', source: 'Warband file', amount: unexplained });
+		for (const choice of raised) layers.push({ kind: 'permanent', source: choice.source, amount: choice.bonus });
 
 		layers.push(...(sources.layers.get(key) ?? []));
 
@@ -518,17 +527,15 @@ export function toCard(
 	const gained = (rolled?.keywords ?? []).filter(
 		(keyword) => !profile.keywords.some((held) => held.toLowerCase() === keyword.toLowerCase())
 	);
-	const keywords = [...profile.race, ...profile.keywords, ...gained];
+	const keywords = promoted([...profile.race, ...profile.keywords, ...gained], instance.renown);
 	/* The fighter's own faction, not the warband's – a hired sword recruited into
 	   another faction still carries its own. Both data sources drop it from
 	   `profile.keywords`, so it never reaches `universalFor` by way of this list. */
 	const ownFactionName = FACTIONS.get(profile.faction)?.name ?? factionName;
-	const displayKeywords = [
-		...profile.race,
-		...(ownFactionName ? [ownFactionName] : []),
-		...profile.keywords,
-		...gained
-	];
+	const displayKeywords = promoted(
+		[...profile.race, ...(ownFactionName ? [ownFactionName] : []), ...profile.keywords, ...gained],
+		instance.renown
+	);
 
 	/* What holds for this one fighter comes first, the general reference last.
 	   Despite its name, the profile's list holds the fighter's own abilities –
@@ -718,7 +725,8 @@ export function toCards(
 	warband: Warband,
 	selections?: Selections | null,
 	fluff?: Fluff | null,
-	history?: BattleRecord[] | null
+	history?: BattleRecord[] | null,
+	renownHistory?: RenownChoice[] | null
 ): DeckCard[] {
 	/* The builder writes the faction's display name into `customAbilities.fighter`,
 	   while the warband stores its id. */
@@ -731,7 +739,14 @@ export function toCards(
 	}
 
 	const fighters = warband.fighters.map((f) =>
-		toCard(f, warband, faction?.name ?? '', selections?.fighters[f.instanceId], fluff?.fighters[f.instanceId] ?? '')
+		toCard(
+			f,
+			warband,
+			faction?.name ?? '',
+			selections?.fighters[f.instanceId],
+			fluff?.fighters[f.instanceId] ?? '',
+			renownHistory ?? []
+		)
 	);
 
 	return [toWarbandCard(warband, fighters, fluff?.warband ?? '', history ?? []), ...fighters];

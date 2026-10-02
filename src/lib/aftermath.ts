@@ -3,9 +3,10 @@
  * into. Pure warband math – the sheet that collects a player's answers lives
  * in `AftermathSheet.svelte`.
  *
- * Renown is a counter here, not yet the choice it unlocks (a Characteristics
- * Increase, a Heroic Talent, a Henchman's promotion to Hero) – that is its
- * own pass, once there is a place to keep the choice's history.
+ * Renown is a counter here. What a level is spent on – a Characteristics
+ * Increase – is `renown.ts`, which the page opens for every level this step
+ * earned. A henchman's fourth level promotes it to
+ * Hero without any choice; the card derives that from the counter.
  */
 
 import { isOut } from './battle';

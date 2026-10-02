@@ -8,7 +8,18 @@
 
 import { RULESET_VERSION } from './gamedata';
 import { deviceId, getWarband } from './storage';
-import type { BattleRecord, DeckMeta, ExportedWarband, Fluff, StoredWarband, Warband } from './types/warband';
+import {
+	STAT_KEYS,
+	type BattleRecord,
+	type DeckMeta,
+	type ExportedWarband,
+	type Fluff,
+	type RenownBranch,
+	type RenownChoice,
+	type StatKey,
+	type StoredWarband,
+	type Warband
+} from './types/warband';
 
 export const FORMAT = 'wyrdcry-warband-deck';
 
@@ -160,6 +171,64 @@ function readHistory(incoming: unknown): BattleRecord[] | null {
 	});
 }
 
+const BRANCHES: readonly string[] = ['henchman', 'promotion', 'hero', 'none'];
+const STATS: readonly string[] = STAT_KEYS;
+
+/** The entries of a file's renown history that the card can use; a damaged one is left out, not guessed at. */
+function readRenownHistory(incoming: unknown): RenownChoice[] | null {
+	if (!Array.isArray(incoming)) return null;
+	return incoming.flatMap((entry): RenownChoice[] => {
+		if (typeof entry !== 'object' || entry === null) return [];
+		const { instanceId, level, branch, characteristic, bonus, source } = entry as Record<string, unknown>;
+		if (typeof instanceId !== 'string' || typeof level !== 'number' || !Number.isInteger(level)) return [];
+		if (typeof branch !== 'string' || !BRANCHES.includes(branch)) return [];
+		if (characteristic !== null && (typeof characteristic !== 'string' || !STATS.includes(characteristic))) return [];
+		return [
+			{
+				instanceId,
+				level,
+				branch: branch as RenownBranch,
+				characteristic: characteristic as StatKey | null,
+				bonus: typeof bonus === 'number' ? bonus : 0,
+				source: typeof source === 'string' ? source : `Renown ${level}`
+			}
+		];
+	});
+}
+
+/**
+ * Renown history is cumulative and cannot be rebuilt from the file, so unlike
+ * `selections` it is not thrown away when a file lacks it. By (instanceId, level)
+ * the file wins where both have an entry, and stored entries fill the rest. An
+ * entry whose level the incoming roster has not reached describes a choice that
+ * roster never made, and goes.
+ *
+ * A deck file that is older than, or has diverged from, what is stored carries a
+ * roster without the figures the stored choices raised: only the file's own
+ * entries fit it, and the stored pending levels belong to a state it never had.
+ */
+function mergeRenown(candidate: ImportCandidate): Pick<StoredWarband, 'renownHistory' | 'pendingRenown'> {
+	const reached = new Map(candidate.warband.fighters.map((f) => [f.instanceId, f.renown]));
+	const earned = (e: { instanceId: string; level: number }) => (reached.get(e.instanceId) ?? -1) >= e.level;
+	const key = (e: { instanceId: string; level: number }) => `${e.instanceId}:${e.level}`;
+
+	const fileBehind =
+		candidate.meta !== null && (candidate.verdict.kind === 'older' || candidate.verdict.kind === 'diverged');
+	const fromFile = (readRenownHistory(candidate.meta?.renownHistory) ?? []).filter(earned);
+	const known = new Set(fromFile.map(key));
+	const fromStored = fileBehind
+		? []
+		: (candidate.existing?.renownHistory ?? []).filter((e) => earned(e) && !known.has(key(e)));
+	const history = [...fromFile, ...fromStored];
+	const spent = new Set(history.map(key));
+
+	const pending = fileBehind
+		? []
+		: (candidate.existing?.pendingRenown ?? []).filter((e) => earned(e) && !spent.has(key(e)));
+
+	return { renownHistory: history.length ? history : null, pendingRenown: pending.length ? pending : null };
+}
+
 export function toStored(candidate: ImportCandidate): StoredWarband {
 	const now = new Date().toISOString();
 	return {
@@ -178,7 +247,8 @@ export function toStored(candidate: ImportCandidate): StoredWarband {
 		/* Whole, not merged: an entry removed here would come back with every older
 		   export. A file without the field – one from the builder – keeps what is
 		   stored. */
-		history: readHistory(candidate.meta?.history) ?? candidate.existing?.history ?? null
+		history: readHistory(candidate.meta?.history) ?? candidate.existing?.history ?? null,
+		...mergeRenown(candidate)
 	};
 }
 
@@ -200,7 +270,8 @@ export async function buildExport(entry: StoredWarband): Promise<ExportedWarband
 			ruleset: entry.ruleset || RULESET_VERSION,
 			selections: entry.selections,
 			fluff: entry.fluff,
-			history: entry.history
+			history: entry.history,
+			renownHistory: entry.renownHistory
 		}
 	};
 }
