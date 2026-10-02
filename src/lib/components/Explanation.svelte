@@ -1,9 +1,15 @@
 <script lang="ts">
-	import { dismiss, explanation } from '../explanation';
+	import { page } from '$app/state';
+	import { dismiss, explanation, settle } from '../explanation';
 	import RuleText from './RuleText.svelte';
 	import type { StatLayer } from '../types/card';
 
 	const open = $derived(explanation());
+
+	$effect(() => {
+		void page.state;
+		settle();
+	});
 
 	/* The base layer carries the profile value, every other one what it adds. */
 	function amount(layer: StatLayer): string {
