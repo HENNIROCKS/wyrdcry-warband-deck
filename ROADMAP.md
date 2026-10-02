@@ -18,6 +18,7 @@
 - [x] 🛠️ Add notes to fighters, alongside the warband's own notes
 - [x] 🛠️ Add fluff to fighters and the warband
 - [x] ⚔️ Wavering: ask for the Bravery test when a fighter is first activated
+- [x] 🃏 Mark what a card already accounts for with a tick, the rolled mutation written out under Ascended and Anointed
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet

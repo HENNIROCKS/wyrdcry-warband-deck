@@ -243,6 +243,7 @@ interface Ability {
 	name: string;
 	type: string;
 	description: string;
+	note?: string;
 }
 
 /**
@@ -282,15 +283,22 @@ function sortAbilities(abilities: Ability[]): CardEntry[] {
 		.sort((a, b) => typeRank(a.type) - typeRank(b.type) || a.name.localeCompare(b.name))
 		.map((ability) => ({
 			label: ability.type ? `[${titleCase(ability.type)}] ${ability.name}` : ability.name,
-			text: ability.description
+			text: ability.description,
+			note: ability.note
 		}));
 }
 
-function abilityEntries(ids: string[], custom: Ability[]): CardEntry[] {
+/** `notes` are the card's own word on an ability, by its id. */
+function abilityEntries(ids: string[], custom: Ability[], notes = new Map<string, string>()): CardEntry[] {
 	const resolved: Ability[] = ids
-		.map((id) => ABILITIES.get(id))
-		.filter((a): a is NonNullable<typeof a> => a !== undefined)
-		.map((a) => ({ name: a.name, type: a.ability_type, description: a.description }));
+		.map((id) => ({ id, ability: ABILITIES.get(id) }))
+		.filter((a): a is { id: string; ability: NonNullable<typeof a.ability> } => a.ability !== undefined)
+		.map(({ id, ability }) => ({
+			name: ability.name,
+			type: ability.ability_type,
+			description: ability.description,
+			note: notes.get(id)
+		}));
 
 	return sortAbilities([...resolved, ...custom]);
 }
@@ -414,7 +422,7 @@ export function toCard(
 			equipmentEntries.push({
 				label: item.name,
 				text: item.description,
-				note: counted ? 'Already in the characteristics above.' : undefined
+				note: counted ? 'Already included.' : undefined
 			});
 			continue;
 		}
@@ -462,7 +470,7 @@ export function toCard(
 		equipmentEntries.push({
 			label: item.name,
 			text: item.description,
-			note: inProfile ? 'Already in the characteristics above.' : undefined
+			note: inProfile ? 'Already included.' : undefined
 		});
 	}
 
@@ -545,7 +553,16 @@ export function toCard(
 		'fighter',
 		abilityEntries(
 			picked ? profile.faction_ability_ids.filter((id) => picked.includes(id)) : profile.faction_ability_ids,
-			customAbilities(warband, ...ownNames)
+			/* The mutation is written out under the ability that rolled it, so its
+			   own entry – carried by the fighter's name – would say it twice. */
+			customAbilities(warband, ...ownNames).filter(
+				(ability) => ability.name.toLowerCase() !== rolled?.name.toLowerCase()
+			),
+			/* "It must make a roll on the mutation table" reads as a task still
+			   open. It has been done, and the note says what came of it. */
+			rolled?.source
+				? new Map([[rolled.source, `Already included: ${rolled.name}. ${rolled.text}`]])
+				: undefined
 		),
 		picked ? '' : profile.ability_preamble
 	);

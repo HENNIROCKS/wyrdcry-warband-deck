@@ -126,8 +126,12 @@ export const RULE_FACTIONS: FactionProfile[] = factions.map(toFactionProfile);
    `homebrew.json` into this map before it is built. */
 export const RULE_WEAPONS: WeaponProfile[] = [...WEAPONS.values()].map(toWeaponProfile);
 
-/** What a rolled table row adds to a fighter's card beyond its text. */
+/** A rolled table row, as the fighter's card needs it. */
 export interface RolledRow {
+	name: string;
+	text: string;
+	/** The ability that asks for the roll, such as Ascended. */
+	source: string | null;
 	/** Written as the game data writes them, in capitals. */
 	keywords: string[];
 	/** A weapon id, to look up like any other the card carries. */
@@ -154,6 +158,9 @@ export function rolledRow(factionId: string, fighterId: string, chosen?: string[
 	if (!row) return null;
 
 	return {
+		name: row.name,
+		text: row.text,
+		source: choice.source,
 		keywords: (row.keywords ?? []).map((id) => KEYWORDS.get(id)?.name ?? id.toUpperCase()),
 		weapon: row.weapon ?? null,
 		armed: row.armed ?? false

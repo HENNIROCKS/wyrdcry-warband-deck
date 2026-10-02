@@ -93,7 +93,7 @@ function factionAbilities(faction: Faction, draft: Draft): CustomAbility[] {
 			const head = picked ? `${rule.name} – ${picked.name}` : rule.name;
 			const counted =
 				carrier.effect?.kind === 'stat'
-					? ' The characteristics on the fighter cards already include this.'
+					? ' Already included.'
 					: '';
 
 			/* Some faction rules are abilities a fighter spends an activation on and

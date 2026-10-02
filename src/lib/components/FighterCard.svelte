@@ -219,7 +219,7 @@
      template would end up on the card. -->
 {#snippet paragraphs(entries: CardEntry[])}
 	{#each entries as entry, i (entry.label + i)}
-		<p class="entry"><strong>{entry.label}</strong>: <RuleText text={entry.text} />{#if entry.note}{' '}<span class="note">{entry.note}</span>{/if}</p>
+		<p class="entry"><strong>{entry.label}</strong>: <RuleText text={entry.text} />{#if entry.note}{' '}<span class="note"><span class="lead"><svg class="check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 5 9.5 10 2.5" /></svg>{entry.note.split(' ')[0]}</span><RuleText text={entry.note.slice(entry.note.split(' ')[0].length)} /></span>{/if}</p>
 	{/each}
 {/snippet}
 
@@ -302,6 +302,28 @@
 	.note {
 		color: var(--card-ink-muted);
 		font-style: italic;
+	}
+
+	/* The tick and the first word wrap as one, so the tick never ends a line
+	   on its own. */
+	.lead {
+		white-space: nowrap;
+	}
+
+	/* Drawn rather than typed, so it does not depend on the card's fonts
+	   carrying a tick. */
+	.check {
+		/* Tailwind's preflight sets every svg to block. */
+		display: inline;
+		width: 0.8em;
+		height: 0.8em;
+		margin-right: 0.25em;
+		vertical-align: -0.05em;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+		stroke-linejoin: round;
 	}
 
 	.keywords {
