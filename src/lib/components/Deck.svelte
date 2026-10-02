@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick, untrack, type Snippet } from 'svelte';
 
 	import BattleBar from './BattleBar.svelte';
 	import Explanation from './Explanation.svelte';
@@ -22,8 +22,11 @@
 		onheroic,
 		oncover,
 		onpanicked,
+		editing = false,
+		back,
 		onedit,
-		onhistory
+		ondone,
+		oncancel
 	}: {
 		cards: DeckCard[];
 		/** What each fighter counts for in the morale. Every fighter counts as one where it is left out. */
@@ -37,14 +40,20 @@
 		onheroic?: (instanceId: string) => void;
 		oncover?: (instanceId: string) => void;
 		onpanicked?: (instanceId: string) => void;
-		/** Opens the sheet to edit whichever card is on top. */
+		/** Whether the card on top is turned over to its back, to be edited. */
+		editing?: boolean;
+		/** The back of the card on top, shown while `editing`. */
+		back?: Snippet<[DeckCard]>;
+		/** Asks for the card on top to be turned over. */
 		onedit?: (instanceId: string) => void;
-		/** Opens the warband's battle history, offered from the warband card. */
-		onhistory?: () => void;
+		ondone?: () => void;
+		oncancel?: () => void;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
 	const FLY = 260;
+	/** Duration of each half of turning a card over. */
+	const TURN = 220;
 	/** Fraction of the width past which a released card flies out instead of springing back. */
 	const DISTANCE = 0.25;
 	/** Flick: from this speed in px/ms a short distance counts too. */
@@ -54,6 +63,10 @@
 	/** What the fixed battle bar takes at the foot, so the stack can leave it free. */
 	let barHeight = $state(0);
 	let current = $state(0);
+	let topPane: HTMLDivElement | undefined = $state();
+	let face: HTMLDivElement | undefined = $state();
+	/** The side of the card on top that is in view – it trails `editing` by half a turn. */
+	let shown = $state(false);
 	/** Horizontal offset of the top card under the finger. */
 	let dx = $state(0);
 	let dragging = $state(false);
@@ -107,8 +120,56 @@
 		return () => query.removeEventListener('change', sync);
 	});
 
+	/*
+	 * Turned in two halves: the front edge-on, then the back swapped in and
+	 * turned up from the other edge. Only one side is ever in the pane, so two
+	 * sides of different heights never have to share its scroll.
+	 */
+	$effect(() => {
+		void editing;
+		untrack(turn);
+	});
+
+	/** Set while the first half runs, which a second call waits out rather than overlapping. */
+	let turning = false;
+
+	/*
+	 * Each half reads `editing` as it is then, not as it was when the turn began:
+	 * Cancel tapped before the card is edge-on brings the front back up, rather
+	 * than leaving the back in view with nothing to finish it.
+	 */
+	async function turn() {
+		if (turning || editing === shown) return;
+		if (reduced || !face) {
+			shown = editing;
+			if (topPane) topPane.scrollTop = 0;
+			return;
+		}
+		turning = true;
+		/* Held edge-on once there: without the fill the front would spring back
+		   flat for a frame before the back is swapped in. */
+		const away = face.animate(
+			[{ transform: 'perspective(1200px) rotateY(0)' }, { transform: 'perspective(1200px) rotateY(90deg)' }],
+			{ duration: TURN, easing: 'ease-in', fill: 'forwards' }
+		);
+		await away.finished;
+		shown = editing;
+		if (topPane) topPane.scrollTop = 0;
+		await tick();
+		/* The curve a swiped card flies out on, so the back settles rather than lands. */
+		face?.animate(
+			[{ transform: 'perspective(1200px) rotateY(-90deg)' }, { transform: 'perspective(1200px) rotateY(0)' }],
+			{ duration: TURN, easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)' }
+		);
+		away.cancel();
+		turning = false;
+		/* Changed again while the side was being swapped. */
+		if (editing !== shown) turn();
+	}
+
 	function onPointerDown(event: PointerEvent) {
-		if (cards.length < 2 || leaving) return;
+		/* A turned card stays put: a finger scrolling through its fields is not a swipe. */
+		if (cards.length < 2 || leaving || editing) return;
 		pointer = event.pointerId;
 		startX = event.clientX;
 		startTime = event.timeStamp;
@@ -176,7 +237,8 @@
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
-		if (cards.length < 2) return;
+		/* The arrows move the caret in a field on the back, not the deck. */
+		if (cards.length < 2 || editing) return;
 		if (event.key === 'ArrowRight') fly(-1);
 		else if (event.key === 'ArrowLeft') fly(1);
 		else return;
@@ -228,8 +290,15 @@
 				onpointerup={onPointerUp}
 				onpointercancel={onPointerCancel}
 				onclickcapture={onClickCapture}
+				bind:this={topPane}
 			>
-				{@render card(cards[current])}
+				<div class="face" bind:this={face}>
+					{#if shown && back}
+						{@render back(cards[current])}
+					{:else}
+						{@render card(cards[current])}
+					{/if}
+				</div>
 			</div>
 		{/key}
 
@@ -269,8 +338,10 @@
 			onpanicked={() => topFighter && onpanicked?.(topFighter.instanceId)}
 			onwound={(delta) =>
 				topFighter && onwound?.(topFighter.instanceId, delta, healthOf(topFighter))}
+			{editing}
 			onedit={() => onedit?.(top.instanceId)}
-			onhistory={top.kind === 'warband' ? onhistory : undefined}
+			{ondone}
+			{oncancel}
 		/>
 	{/if}
 </div>
@@ -336,6 +407,18 @@
 		touch-action: pan-y;
 		will-change: transform;
 		z-index: 1;
+	}
+
+	/* Between the pane and the card, so a turn moves the card and not the scroll
+	   box. Still the card's full height: it is a column the card stretches in. */
+	.face {
+		display: flex;
+		flex-direction: column;
+		min-height: 100%;
+	}
+
+	.face > :global(.card) {
+		flex: 1;
 	}
 
 	.under {

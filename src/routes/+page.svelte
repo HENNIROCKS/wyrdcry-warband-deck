@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	import { dev } from '$app/environment';
 	import { base } from '$app/paths';
 
 	import AftermathSheet from '$lib/components/AftermathSheet.svelte';
-	import BattleHistorySheet from '$lib/components/BattleHistorySheet.svelte';
+	import CardBack, { emptyPending, finalHistory, type EditDraft } from '$lib/components/CardBack.svelte';
 	import Deck from '$lib/components/Deck.svelte';
-	import EditSheet from '$lib/components/EditSheet.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import RenownSheet from '$lib/components/RenownSheet.svelte';
@@ -34,7 +33,7 @@
 	import { RACIAL_LIMITS } from '$lib/rules';
 	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
-	import type { BattleRecord, BattleState, StatKey, StoredWarband } from '$lib/types/warband';
+	import type { BattleState, StatKey, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
@@ -42,11 +41,19 @@
 	/* Set while the aftermath sheet is up, asking what a battle just ending is
 	   worth in experience before the battle itself is thrown away. */
 	let endingBattle = $state(false);
-	/* The instanceId of the card the edit sheet is open for, 'warband' included. */
+	/* The instanceId of the card turned over to be edited, 'warband' included. */
 	let editingId = $state<string | null>(null);
+	/* What its back holds. Left in place when the card is turned again, so the
+	   back still has something to show while it turns out of view. */
+	let draft = $state<EditDraft | null>(null);
+	/* A draft belongs to the warband it was started on: another one coming up
+	   ends the edit rather than writing the draft into it. */
+	$effect(() => {
+		void activeId;
+		untrack(() => (editingId = null));
+	});
 	/* The warband a delete has been asked for, held until it is confirmed. */
 	let condemned = $state<StoredWarband | null>(null);
-	let historyOpen = $state(false);
 	/* Set while the renown sheet is up, asking what the next open level is spent on. */
 	let renownOpen = $state(false);
 	let message = $state<string | null>(null);
@@ -55,21 +62,6 @@
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
 	const cards = $derived(active ? toCards(active.warband, active.selections, active.fluff, active.history, active.renownHistory) : []);
-	const editingCard = $derived(editingId ? (cards.find((c) => c.instanceId === editingId) ?? null) : null);
-	const editingFields = $derived.by(() => {
-		if (!editingCard) return [];
-		if (editingCard.kind === 'warband') {
-			return [
-				{ key: 'notes', label: 'Notes', value: active?.warband.factionNotes ?? '' },
-				{ key: 'fluff', label: 'Fluff', value: active?.fluff?.warband ?? '' }
-			];
-		}
-		const instance = active?.warband.fighters.find((f) => f.instanceId === editingCard.instanceId);
-		return [
-			{ key: 'notes', label: 'Notes', value: instance?.notes ?? '' },
-			{ key: 'fluff', label: 'Fluff', value: active?.fluff?.fighters[editingCard.instanceId] ?? '' }
-		];
-	});
 	/* Levels waiting for a choice, minus those of a fighter an import has since removed. */
 	const pendingRenown = $derived(
 		(active?.pendingRenown ?? []).filter((e) => active?.warband.fighters.some((f) => f.instanceId === e.instanceId))
@@ -191,15 +183,33 @@
 		if (!nextRenown) renownOpen = false;
 	}
 
+	function startEdit(id: string) {
+		if (!active) return;
+		const isWarband = id === 'warband';
+		const instance = active.warband.fighters.find((f) => f.instanceId === id);
+		draft = {
+			notes: isWarband ? active.warband.factionNotes : (instance?.notes ?? ''),
+			fluff: isWarband ? (active.fluff?.warband ?? '') : (active.fluff?.fighters[id] ?? ''),
+			history: isWarband ? $state.snapshot(active.history ?? []) : null,
+			removed: [],
+			pending: emptyPending()
+		};
+		editingId = id;
+	}
+
 	/**
-	 * Writes notes and fluff in one go, the same way `applyAftermathAndEnd` writes
-	 * the aftermath: a snapshot first, `revision` up because this is campaign
-	 * progress, then one `putWarband`.
+	 * Writes everything the back of the card holds in one go, the same way
+	 * `applyAftermathAndEnd` writes the aftermath: a snapshot first, `revision`
+	 * up because this is campaign progress, then one `putWarband`.
 	 */
-	async function saveEdit(values: Record<string, string>) {
-		if (!active || !editingId) return;
+	async function saveEdit() {
+		if (!active || !editingId || !draft) return;
 		const snapshot = $state.snapshot(active);
+		const values = $state.snapshot(draft);
 		const targetId = editingId;
+		/* Ended before the write rather than after it, so a second tap on Done
+		   finds nothing to save instead of adding a pending battle twice. */
+		editingId = null;
 		const isWarband = targetId === 'warband';
 		const warband = isWarband
 			? { ...snapshot.warband, factionNotes: values.notes }
@@ -219,21 +229,7 @@
 			...snapshot,
 			warband,
 			fluff,
-			revision: snapshot.revision + 1,
-			updatedAt: new Date().toISOString()
-		};
-		await putWarband(entry);
-		editingId = null;
-		await refresh();
-	}
-
-	/** One battle more or less in the history, written like `saveEdit`: revision up, one `putWarband`. */
-	async function saveHistory(change: (history: BattleRecord[]) => BattleRecord[]) {
-		if (!active) return;
-		const snapshot = $state.snapshot(active);
-		const entry: StoredWarband = {
-			...snapshot,
-			history: change(snapshot.history ?? []),
+			history: isWarband ? finalHistory(values) : snapshot.history,
 			revision: snapshot.revision + 1,
 			updatedAt: new Date().toISOString()
 		};
@@ -317,7 +313,10 @@
 	}
 </script>
 
-<header class="bar" bind:offsetHeight={headerHeight}>
+<!-- Out of reach while a card is turned over: a draft is written on Done, and
+     what the header does – another warband, an import, a delete, the builder –
+     would leave it behind. -->
+<header class="bar" class:locked={editingId !== null} inert={editingId !== null} bind:offsetHeight={headerHeight}>
 	<div class="identity">
 		{#if warbands.length > 1}
 			<select bind:value={activeId} aria-label="Choose warband">
@@ -450,9 +449,17 @@
 		onheroic={(id) => setBattle(toggleHeroic(battle, id))}
 		oncover={(id) => setBattle(toggleCover(battle, id))}
 		onpanicked={(id) => setBattle(togglePanicked(battle, id))}
-		onedit={(id) => (editingId = id)}
-		onhistory={() => (historyOpen = true)}
-	/>
+		editing={editingId !== null}
+		onedit={startEdit}
+		ondone={saveEdit}
+		oncancel={() => (editingId = null)}
+	>
+		{#snippet back(card)}
+			{#if draft}
+				<CardBack name={card.name} bind:draft />
+			{/if}
+		{/snippet}
+	</Deck>
 {:else}
 	<div class="empty">
 		<h2>No warband yet</h2>
@@ -496,27 +503,6 @@
 	/>
 {/if}
 
-{#if editingCard}
-	<EditSheet
-		title={editingCard.name}
-		fields={editingFields}
-		onsave={saveEdit}
-		oncancel={() => (editingId = null)}
-	/>
-{/if}
-
-{#if historyOpen && active}
-	<BattleHistorySheet
-		history={active.history ?? []}
-		onadd={async (record) => {
-			await saveHistory((history) => [...history, record]);
-			historyOpen = false;
-		}}
-		onremove={(id) => saveHistory((history) => history.filter((r) => r.id !== id))}
-		onclose={() => (historyOpen = false)}
-	/>
-{/if}
-
 {#if condemned}
 	<div class="backdrop">
 		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="delete-title">
@@ -545,6 +531,10 @@
 		padding: 12px;
 		background: var(--ui-header-bg);
 		border-bottom: 1px solid var(--ui-border);
+	}
+
+	.bar.locked > * {
+		opacity: 0.4;
 	}
 
 	.identity {

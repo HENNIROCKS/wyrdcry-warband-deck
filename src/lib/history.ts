@@ -17,6 +17,14 @@ export function newestFirst(records: BattleRecord[]): BattleRecord[] {
 		.map(({ record }) => record);
 }
 
+/* Today as the phone's own calendar has it – `toISOString` is UTC and would
+   date a late game to the next morning. */
+export function today(): string {
+	const now = new Date();
+	const pad = (n: number) => String(n).padStart(2, '0');
+	return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
 /** `2026-09-19` as `260919`, the way a player writes it in the margin. */
 export function shortDate(date: string): string {
 	return date.slice(2).replaceAll('-', '');

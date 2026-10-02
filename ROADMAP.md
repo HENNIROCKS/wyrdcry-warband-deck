@@ -26,6 +26,7 @@
 - [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
+- [ ] 🛠️ Edit on the back of the card: flip it over, every field in one place
 - [ ] 🛠️ Edit the warband stash after the build
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic

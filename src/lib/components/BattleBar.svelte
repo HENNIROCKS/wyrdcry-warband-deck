@@ -16,8 +16,10 @@
 		onheroic,
 		oncover,
 		onpanicked,
+		editing = false,
 		onedit,
-		onhistory
+		ondone,
+		oncancel
 	}: {
 		battle?: BattleState | null;
 		/** The fighter on top of the stack. Null while the warband card is up. */
@@ -40,10 +42,14 @@
 		onheroic?: () => void;
 		oncover?: () => void;
 		onpanicked?: () => void;
-		/** Opens the sheet to edit the card on top of the deck. */
+		/** Whether the card on top is turned over to be edited. */
+		editing?: boolean;
+		/** Turns the card on top over to edit it. */
 		onedit?: () => void;
-		/** Opens the battle history. Passed only while the warband card is on top. */
-		onhistory?: () => void;
+		/** Writes what the back of the card holds and turns it over again. */
+		ondone?: () => void;
+		/** Turns the card over again and lets what was written fall. */
+		oncancel?: () => void;
 	} = $props();
 
 	/* What is left of Health, which is what the stepper counts – the card writes
@@ -62,7 +68,14 @@
      the layout ends up under the browser's own furniture. -->
 <div class="dock" bind:offsetHeight={height}>
 	<div class="bar">
-	{#if state}
+	{#if editing}
+		<!-- While a card is turned over the bar only finishes the edit: a state
+		     changed now would land on a card whose front is not in view. -->
+		<div class="finish">
+			<button class="ghost" onclick={() => oncancel?.()}>Cancel</button>
+			<button onclick={() => ondone?.()}>Done</button>
+		</div>
+	{:else if state}
 		<div class="wounds">
 			<button
 				class="step"
@@ -125,7 +138,7 @@
 					Panicked
 				</button>
 			</MenuButton>
-			{@render editMenu()}
+			{@render editButton()}
 		</div>
 	{:else if battle}
 		<!-- The warband card carries the battle instead of a fighter's state: the
@@ -134,12 +147,12 @@
 			Round {battle.round} · {left_to_act} to act
 		</p>
 		<div class="states">
-			{@render editMenu()}
+			{@render editButton()}
 		</div>
 	{:else}
 		<p class="summary quiet">No battle</p>
 		<div class="states">
-			{@render editMenu()}
+			{@render editButton()}
 		</div>
 	{/if}
 	</div>
@@ -151,14 +164,8 @@
 	</svg>
 {/snippet}
 
-{#snippet editMenu()}
-	<MenuButton label="Edit">
-		{#snippet icon()}{@render pencil()}{/snippet}
-		<button onclick={() => onedit?.()}>Edit…</button>
-		{#if onhistory}
-			<button onclick={() => onhistory?.()}>Battle history…</button>
-		{/if}
-	</MenuButton>
+{#snippet editButton()}
+	<button class="icon-button" aria-label="Edit" onclick={() => onedit?.()}>{@render pencil()}</button>
 {/snippet}
 
 <style>
@@ -231,10 +238,10 @@
 		color: var(--ui-text-muted);
 	}
 
-	/* The trigger belongs to `MenuButton` and carries the header's 38px from
-	   `app.css`. At the table it is aimed at with a thumb over a card, so here it
-	   takes the height the damage steppers next to it have, and the width its
-	   word asks for. */
+	/* The state menu's trigger and the edit button carry the header's 38px from
+	   `app.css`. At the table they are aimed at with a thumb over a card, so here
+	   they take the height the damage steppers next to them have, and the width
+	   their content asks for. */
 	.states :global(.icon-button) {
 		width: auto;
 		min-width: 48px;
@@ -263,5 +270,27 @@
 
 	.summary.quiet {
 		color: var(--ui-text-subtle);
+	}
+
+	.finish {
+		display: flex;
+		gap: 8px;
+		width: 100%;
+	}
+
+	.finish button {
+		flex: 1;
+		height: 44px;
+		border: 0;
+		border-radius: 10px;
+		font-size: var(--ui-t-lg);
+		font-weight: 600;
+		background: var(--ui-accent);
+		color: #fff;
+	}
+
+	.finish .ghost {
+		background: var(--ui-surface-2);
+		color: var(--ui-text);
 	}
 </style>
