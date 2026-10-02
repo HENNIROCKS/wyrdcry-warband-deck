@@ -195,7 +195,7 @@
 		   and two of them never meet in the same place. */
 		border-collapse: separate;
 		border-spacing: 0;
-		border-top: 1.5px solid rgba(0, 0, 0, 0.35);
+		border-top: 1.5px solid #000;
 		font-family: 'Alegreya', serif;
 		font-size: calc(16 * var(--t));
 		line-height: 1.3;
@@ -203,7 +203,7 @@
 
 	.battles td {
 		padding: calc(6 * var(--u)) calc(8 * var(--u)) calc(6 * var(--u)) 0;
-		border-bottom: 1px dashed rgba(0, 0, 0, 0.35);
+		border-bottom: 1px dashed #000;
 		vertical-align: baseline;
 		overflow-wrap: anywhere;
 	}

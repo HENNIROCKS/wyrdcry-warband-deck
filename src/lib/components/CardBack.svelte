@@ -178,7 +178,7 @@
 		font-weight: 600;
 		font-size: calc(34 * var(--t));
 		line-height: 1.1;
-		color: var(--card-green);
+		color: #000;
 		overflow-wrap: anywhere;
 	}
 
@@ -186,7 +186,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: calc(44 * var(--u));
+		gap: calc(66 * var(--u));
 		padding: calc(18 * var(--u)) calc(30 * var(--u)) calc(38 * var(--u));
 	}
 
@@ -196,8 +196,7 @@
 		gap: calc(10 * var(--u));
 	}
 
-	/* The front's folded sections: a word in the card's script, a rule in the
-	   same green out to the edge. */
+	/* A word in the card's script and a rule in the same black out to the edge. */
 	.heading {
 		display: flex;
 		align-items: center;
@@ -209,13 +208,13 @@
 		font-size: calc(18 * var(--t));
 		line-height: 1;
 		letter-spacing: 0.04em;
-		color: var(--card-green);
+		color: #000;
 	}
 
 	.rule {
 		flex: 1;
-		height: 1px;
-		background: var(--card-green);
+		height: 2px;
+		background: #000;
 	}
 
 	/* Written on the paper rather than into a box: no fill, no frame, one line
@@ -231,7 +230,7 @@
 		color: var(--card-ink);
 		background: transparent;
 		border: 0;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+		border-bottom: 1px solid #000;
 		border-radius: 0;
 		outline: none;
 		appearance: none;
@@ -271,19 +270,32 @@
 
 	.results {
 		display: flex;
-		gap: calc(4 * var(--u));
 	}
 
-	/* Three words to tap; the one picked is set in the banderole's green. */
+	/* Three words to tap, joined into one pill; the one picked is set in the
+	   banderole's green. */
 	.choice {
 		min-height: 40px;
 		padding: 0 calc(10 * var(--u));
 		border: 1px solid var(--card-green);
-		border-radius: 999px;
+		border-radius: 0;
 		background: transparent;
 		font-family: 'Alegreya', serif;
 		font-size: calc(17 * var(--t));
 		color: var(--card-green);
+	}
+
+	.choice:first-child {
+		border-radius: 999px 0 0 999px;
+	}
+
+	.choice:last-child {
+		border-radius: 0 999px 999px 0;
+	}
+
+	/* Two neighbouring frames share one line instead of doubling it. */
+	.choice + .choice {
+		margin-left: -1px;
 	}
 
 	.choice[aria-pressed='true'] {
@@ -295,7 +307,7 @@
 		align-self: flex-end;
 		min-height: 40px;
 		padding: 0 calc(14 * var(--u));
-		border: 0;
+		border: 1px solid var(--card-green);
 		border-radius: 999px;
 		background: var(--card-green);
 		color: var(--card-paper);
@@ -303,10 +315,11 @@
 		font-size: calc(17 * var(--t));
 	}
 
+	/* Until a result is picked, an unpicked choice, set back. */
 	.add:disabled {
 		background: transparent;
-		color: var(--card-ink-muted);
-		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+		color: var(--card-green);
+		opacity: 0.5;
 	}
 
 	/* As on the front: a solid rule above the log, a dashed one under each row. */
@@ -314,7 +327,7 @@
 		margin: calc(6 * var(--u)) 0 0;
 		padding: 0;
 		list-style: none;
-		border-top: 1.5px solid rgba(0, 0, 0, 0.35);
+		border-top: 1.5px solid #000;
 		font-family: 'Alegreya', serif;
 		font-size: calc(16 * var(--t));
 		line-height: 1.3;
@@ -325,7 +338,7 @@
 		align-items: center;
 		gap: calc(8 * var(--u));
 		padding: calc(4 * var(--u)) 0;
-		border-bottom: 1px dashed rgba(0, 0, 0, 0.35);
+		border-bottom: 1px dashed #000;
 	}
 
 	.line {
