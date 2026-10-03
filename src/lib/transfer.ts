@@ -252,8 +252,13 @@ export function toStored(candidate: ImportCandidate): StoredWarband {
 	};
 }
 
+/** The warband's name with what a file system refuses replaced. */
+export function safeName(name: string): string {
+	return name.replace(/[/\\:*?"<>|]/g, '-').trim();
+}
+
 function fileName(entry: StoredWarband, snapshot: boolean): string {
-	const safe = entry.warband.name.replace(/[/\\:*?"<>|]/g, '-').trim();
+	const safe = safeName(entry.warband.name);
 	if (!snapshot) return `${safe}.json`;
 	const date = new Date().toISOString().slice(0, 10);
 	return `${safe} – ${date} – Rev ${entry.revision}.json`;
@@ -285,12 +290,15 @@ export type ExportResult = 'shared' | 'downloaded' | 'cancelled';
  */
 export async function exportWarband(entry: StoredWarband, snapshot: boolean): Promise<ExportResult> {
 	const payload = JSON.stringify(await buildExport(entry), null, 2);
-	const name = fileName(entry, snapshot);
-	const file = new File([payload], name, { type: 'application/json' });
+	const file = new File([payload], fileName(entry, snapshot), { type: 'application/json' });
+	return shareFile(file, entry.warband.name);
+}
 
+/** The share sheet where there is one, a download where there is not. */
+export async function shareFile(file: File, title: string): Promise<ExportResult> {
 	if (navigator.canShare?.({ files: [file] })) {
 		try {
-			await navigator.share({ files: [file], title: entry.warband.name });
+			await navigator.share({ files: [file], title });
 			return 'shared';
 		} catch (error) {
 			if (error instanceof DOMException && error.name === 'AbortError') return 'cancelled';
@@ -298,10 +306,10 @@ export async function exportWarband(entry: StoredWarband, snapshot: boolean): Pr
 		}
 	}
 
-	const url = URL.createObjectURL(new Blob([payload], { type: 'application/json' }));
+	const url = URL.createObjectURL(file);
 	const anchor = document.createElement('a');
 	anchor.href = url;
-	anchor.download = name;
+	anchor.download = file.name;
 	/* The anchor has to be in the DOM and the URL may only go after the click,
 	   otherwise the download breaks in Safari. */
 	document.body.appendChild(anchor);

@@ -32,7 +32,8 @@
 	import { earnedLevels, limitFor, optionsFor, spend, type RenownOption } from '$lib/renown';
 	import { RACIAL_LIMITS } from '$lib/rules';
 	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
-	import { ImportError, exportWarband, readFile, toStored, type ImportCandidate } from '$lib/transfer';
+	import { rosterPdf } from '$lib/roster-pdf';
+	import { ImportError, exportWarband, readFile, shareFile, toStored, type ImportCandidate } from '$lib/transfer';
 	import type { BattleState, StatKey, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
@@ -291,6 +292,17 @@
 		else if (result === 'shared') notify('Shared.');
 	}
 
+	async function doRoster() {
+		if (!active) return;
+		try {
+			const result = await shareFile(await rosterPdf($state.snapshot(active) as StoredWarband), active.warband.name);
+			if (result === 'downloaded') notify('Downloaded as a file.');
+			else if (result === 'shared') notify('Shared.');
+		} catch (error) {
+			notify(`The roster could not be built: ${error instanceof Error ? error.message : error}`, 'error');
+		}
+	}
+
 	/**
 	 * The campaign lives here and in whatever was exported, so this is the one
 	 * action in the app that loses data for good. Hence the name in the question
@@ -349,7 +361,7 @@
 					<button onclick={() => doExport(true)} title="Dated copy, never overwritten">
 						Snapshot
 					</button>
-					<a href="{base}/roster?id={encodeURIComponent(active.warband.id)}">Roster (PDF)</a>
+					<button onclick={doRoster}>Roster (PDF)</button>
 					<hr />
 					<button class="danger" onclick={() => (condemned = active)}>Delete…</button>
 				{/if}

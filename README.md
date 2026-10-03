@@ -32,9 +32,9 @@ to the Warband Builder is not currently assured – see
   that is undoable
 - Export through the system share sheet, either as the current state or as a
   dated snapshot
-- Print the warband as a roster on A4 landscape, or save it as a PDF: every
-  fighter with characteristics, weapons and talents, then each rule once with
-  the fighters that carry it
+- Export the warband as a roster PDF on A4 landscape, through the same share
+  sheet: every fighter with characteristics, weapons and talents, then each
+  rule once with the fighters that carry it
 - Warn on import when the file is older than the stored state
 
 ## Warband Builder compatibility
