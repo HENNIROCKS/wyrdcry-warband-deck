@@ -22,6 +22,7 @@
 - [x] 🎨 Status messages such as "Downloaded as a file." can be closed, and confirmations disappear on their own
 - [x] 📈 A battle history on the warband card, one line per battle, e.g. "260919 Undead – Draw"
 - [x] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
+- [x] 📄 Export the warband as a roster PDF
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
@@ -38,7 +39,6 @@
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
-- [ ] 📄 Export the warband as a roster PDF
 
 ## Ideas
 
