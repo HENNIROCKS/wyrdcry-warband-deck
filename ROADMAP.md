@@ -23,6 +23,7 @@
 - [x] 📈 A battle history on the warband card, one line per battle, e.g. "260919 Undead – Draw"
 - [x] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [x] 📄 Export the warband as a roster PDF
+- [ ] 🎨 Keep the chosen warband when coming back to the deck
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
