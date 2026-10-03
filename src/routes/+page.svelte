@@ -33,7 +33,7 @@
 	import { RACIAL_LIMITS } from '$lib/rules';
 	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { rosterPdf } from '$lib/roster-pdf';
-	import { ImportError, exportWarband, readFile, shareFile, toStored, type ImportCandidate } from '$lib/transfer';
+	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
 	import type { BattleState, StatKey, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
@@ -285,21 +285,30 @@
 		notify(null);
 	}
 
-	async function doExport(snapshot: boolean) {
-		if (!active) return;
-		const result = await exportWarband(active, snapshot);
+	function reportShare(result: ExportResult) {
 		if (result === 'downloaded') notify('Downloaded as a file.');
 		else if (result === 'shared') notify('Shared.');
 	}
 
-	async function doRoster() {
+	async function doExport(snapshot: boolean) {
 		if (!active) return;
+		reportShare(await exportWarband(active, snapshot));
+	}
+
+	/* Building takes a moment on a phone, loading pdfmake and the fonts on the
+	   first run. A second tap meanwhile would build it twice. */
+	let buildingRoster = false;
+
+	async function doRoster() {
+		if (!active || buildingRoster) return;
+		buildingRoster = true;
+		notify('Building the roster…');
 		try {
-			const result = await shareFile(await rosterPdf($state.snapshot(active) as StoredWarband), active.warband.name);
-			if (result === 'downloaded') notify('Downloaded as a file.');
-			else if (result === 'shared') notify('Shared.');
+			reportShare(await shareFile(await rosterPdf($state.snapshot(active) as StoredWarband)));
 		} catch (error) {
 			notify(`The roster could not be built: ${error instanceof Error ? error.message : error}`, 'error');
+		} finally {
+			buildingRoster = false;
 		}
 	}
 
@@ -319,9 +328,7 @@
 
 	async function exportCondemned() {
 		if (!condemned) return;
-		const result = await exportWarband(condemned, false);
-		if (result === 'downloaded') notify('Downloaded as a file.');
-		else if (result === 'shared') notify('Shared.');
+		reportShare(await exportWarband(condemned, false));
 	}
 </script>
 

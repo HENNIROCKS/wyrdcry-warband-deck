@@ -146,6 +146,8 @@ export interface WarbandCardData {
 	/** Runs in the banderole under the name, where a text card names its category. */
 	faction: string;
 	tables: CardValue[][];
+	/** What the gold table shows, as figures: what is left, and what unconfirmed purchases take of it. */
+	gold: { remaining: number; pending: number };
 	/** The names alone: whoever picks a thing up has its rules on their own card. */
 	stash: string;
 	notes: string;

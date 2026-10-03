@@ -78,14 +78,10 @@ function cardValue(card: WarbandCardData, key: string): string {
 	return card.tables.flat().find((v) => v.key === key)?.value ?? '';
 }
 
-/*
- * The card writes the gold as `pending/remaining` while purchases wait for
- * confirmation, and as the bare figure otherwise.
- */
 function goldText(card: WarbandCardData): string {
-	const [first, second] = cardValue(card, 'gold').split('/');
-	if (second === undefined) return `${first} gold coins`;
-	return `${second} gold coins (${first} of them pending)`;
+	const { remaining, pending } = card.gold;
+	if (pending > 0) return `${remaining} gold coins (${pending} of them pending)`;
+	return `${remaining} gold coins`;
 }
 
 function toFighter(card: FighterCardData): RosterFighter {

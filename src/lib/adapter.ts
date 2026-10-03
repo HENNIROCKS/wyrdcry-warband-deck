@@ -704,6 +704,7 @@ export function toWarbandCard(
 		name: warband.name,
 		faction: faction?.name ?? 'Warband',
 		tables,
+		gold: { remaining, pending },
 		stash: [...stashWeapons, ...stashItems].join(', '),
 		notes: warband.factionNotes.trim(),
 		fluff,

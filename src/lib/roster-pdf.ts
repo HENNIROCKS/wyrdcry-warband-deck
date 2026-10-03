@@ -10,7 +10,7 @@ import { asset } from '$app/paths';
 import type { Content, ContentText, CustomTableLayout, TableCell, TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import { tokenize } from './markup';
-import { toRoster, type Roster, type RosterFighter } from './roster';
+import { toRoster, type Roster, type RosterFighter } from './roster-sheet';
 import { safeName } from './transfer';
 import type { StoredWarband } from './types/warband';
 

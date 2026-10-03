@@ -283,22 +283,22 @@ export async function buildExport(entry: StoredWarband): Promise<ExportedWarband
 
 export type ExportResult = 'shared' | 'downloaded' | 'cancelled';
 
-/**
- * Shares the file through the system share sheet – that is where "Save to Files",
- * Drive, AirDrop and Mail live. Where there is none (desktop), it falls back to a
- * download.
- */
+/** The warband as a JSON file, shared or downloaded. */
 export async function exportWarband(entry: StoredWarband, snapshot: boolean): Promise<ExportResult> {
 	const payload = JSON.stringify(await buildExport(entry), null, 2);
 	const file = new File([payload], fileName(entry, snapshot), { type: 'application/json' });
-	return shareFile(file, entry.warband.name);
+	return shareFile(file);
 }
 
-/** The share sheet where there is one, a download where there is not. */
-export async function shareFile(file: File, title: string): Promise<ExportResult> {
+/**
+ * The system share sheet – where "Save to Files", Drive, AirDrop and Mail live –
+ * or, where there is none (desktop), a download. The file goes alone: iOS shares a title as a text of its own, and AirDrop delivers it
+ * as a second file beside the first.
+ */
+export async function shareFile(file: File): Promise<ExportResult> {
 	if (navigator.canShare?.({ files: [file] })) {
 		try {
-			await navigator.share({ files: [file], title });
+			await navigator.share({ files: [file] });
 			return 'shared';
 		} catch (error) {
 			if (error instanceof DOMException && error.name === 'AbortError') return 'cancelled';
