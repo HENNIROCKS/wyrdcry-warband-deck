@@ -349,6 +349,7 @@
 					<button onclick={() => doExport(true)} title="Dated copy, never overwritten">
 						Snapshot
 					</button>
+					<a href="{base}/roster?id={encodeURIComponent(active.warband.id)}">Roster (PDF)</a>
 					<hr />
 					<button class="danger" onclick={() => (condemned = active)}>Delete…</button>
 				{/if}
