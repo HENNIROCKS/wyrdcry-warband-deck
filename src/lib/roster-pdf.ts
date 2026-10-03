@@ -73,6 +73,17 @@ function rich(text: string): Content[] {
 	});
 }
 
+/** What the rules table puts before a rule's text in place of a type column. */
+const RULE_PREFIX: Record<string, string> = {
+	'Faction rule': '(Faction Rule)',
+	'Weapon rule': '(Weapon Rule)',
+	Item: '(Item)',
+	Trait: '[Trait]',
+	Double: '[Double]',
+	Triple: '[Triple]',
+	Quad: '[Quad]'
+};
+
 function nameCell(name: string, type: string): TableCell {
 	return {
 		stack: [
@@ -164,14 +175,19 @@ function rulesTable(roster: Roster): Content {
 		table: {
 			headerRows: 1,
 			dontBreakRows: true,
-			widths: [120, 62, 150, '*'],
+			widths: [120, 150, '*'],
 			body: [
-				['Special Rule', 'Type', 'Fighter', 'Description'].map((text) => th(text)),
+				['Special Rule', 'Fighter', 'Description'].map((text) => th(text)),
 				...roster.rules.map((rule): TableCell[] => [
 					rule.name,
-					rule.type,
 					rule.fighters,
-					{ text: [...rich(rule.text), ...(rule.note ? [{ text: ` ${rule.note}`, italics: true }] : [])] }
+					{
+						text: [
+							...(RULE_PREFIX[rule.type] ? [{ text: `${RULE_PREFIX[rule.type]} `, bold: true }] : []),
+							...rich(rule.text),
+							...(rule.note ? [{ text: ` ${rule.note}`, italics: true }] : [])
+						]
+					}
 				])
 			]
 		},
