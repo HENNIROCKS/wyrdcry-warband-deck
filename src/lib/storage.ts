@@ -82,6 +82,20 @@ export async function putBattle(id: string, battle: BattleState | null): Promise
 }
 
 /**
+ * The warband the deck last showed, so coming back to it – from another page or
+ * after the app was closed – does not fall back to the first one by name.
+ */
+export async function chosenWarband(): Promise<string | null> {
+	if (!browser) return null;
+	return (await run<string | undefined>(META, 'readonly', (s) => s.get('chosen'))) ?? null;
+}
+
+export async function chooseWarband(id: string | null): Promise<void> {
+	if (!browser) return;
+	await run(META, 'readwrite', (s) => (id ? s.put(id, 'chosen') : s.delete('chosen')));
+}
+
+/**
  * Identifier of this device. Goes into every export so an import can tell
  * whether two states have diverged.
  */

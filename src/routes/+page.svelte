@@ -31,7 +31,7 @@
 	import { explain } from '$lib/explanation';
 	import { earnedLevels, limitFor, optionsFor, spend, type RenownOption } from '$lib/renown';
 	import { RACIAL_LIMITS } from '$lib/rules';
-	import { allWarbands, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
+	import { allWarbands, chooseWarband, chosenWarband, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { rosterPdf } from '$lib/roster-pdf';
 	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
 	import type { BattleState, StatKey, StoredWarband } from '$lib/types/warband';
@@ -239,7 +239,20 @@
 		await refresh();
 	}
 
-	onMount(refresh);
+	/* Set once the remembered warband has been read. Before that, activeId is
+	   still null and writing it would forget the choice before it was restored. */
+	let restored = $state(false);
+
+	onMount(async () => {
+		activeId = await chosenWarband().catch(() => null);
+		await refresh();
+		restored = true;
+	});
+
+	$effect(() => {
+		const id = activeId;
+		if (restored) chooseWarband(id).catch(() => {});
+	});
 
 	async function refresh() {
 		warbands = await allWarbands();

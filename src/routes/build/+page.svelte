@@ -24,7 +24,7 @@
 	import { painted } from '$lib/painted';
 	import { CAMPAIGN, FACTIONS, type Fighter } from '$lib/rules';
 	import { ruleText } from '$lib/rules/text';
-	import { putWarband, requestPersistence } from '$lib/storage';
+	import { chooseWarband, putWarband, requestPersistence } from '$lib/storage';
 	import type { StoredWarband } from '$lib/types/warband';
 
 	type Step = 'warband' | 'name' | 'roster' | 'finish';
@@ -251,6 +251,8 @@
 		try {
 			await putWarband(entry);
 			await requestPersistence();
+			/* The deck opens on the warband just built, not the first one by name. */
+			await chooseWarband(warband.id);
 			await goto(`${base}/`);
 		} catch (error) {
 			/* Storage full, or a browser that refuses IndexedDB in a private
