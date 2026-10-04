@@ -25,8 +25,8 @@
 - [x] 📄 Export the warband as a roster PDF
 - [x] 🎨 Keep the chosen warband when coming back to the deck
 - [x] 🃏 Count Mighty on weapons a fighter is born with or mutates into, not only on bought ones
+- [x] ⚙️ Cache game data for offline use at the table
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
-- [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
 - [ ] 🛠️ Edit on the back of the card: flip it over, every field in one place
