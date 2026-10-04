@@ -20,10 +20,10 @@
 - [x] ⚔️ Wavering: ask for the Bravery test when a fighter is first activated
 - [x] 🃏 Mark what a card already accounts for with a tick, the rolled mutation written out under Ascended and Anointed
 - [x] 🎨 Status messages such as "Downloaded as a file." can be closed, and confirmations disappear on their own
-- [x] 📈 A battle history on the warband card, one line per battle, e.g. "260919 Undead – Draw"
+- [x] 📈 A battle history on the warband card, one line per battle, e.g. "19 Sep 2026 Undead – Draw"
 - [x] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [x] 📄 Export the warband as a roster PDF
-- [ ] 🎨 Keep the chosen warband when coming back to the deck
+- [x] 🎨 Keep the chosen warband when coming back to the deck
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
