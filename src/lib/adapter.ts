@@ -112,9 +112,15 @@ function addTo<T>(map: Map<StatKey, T[]>, key: StatKey, entry: T): void {
  * rule does not, even where the data says `conditional: false` – Parry and
  * Mighty both name a situation in their own description, and a number that is
  * only sometimes right is worse than one the player looks up.
+ *
+ * `innate` are the weapons the fighter carries without having bought them – off
+ * its profile, or rolled as a mutation. Their rules count like those of bought
+ * ones. Items off the profile do not come in here: their bonus is already in the
+ * profile's figures.
  */
-function statSources(equipment: string[], custom: CustomWeapon[]): StatSources {
+function statSources(equipment: string[], custom: CustomWeapon[], innate: string[]): StatSources {
 	const sources: StatSources = { layers: new Map(), conditions: new Map() };
+	const carried = [...equipment, ...innate];
 
 	/* How many weapons of each kind the fighter carries – it decides whether a
 	   rule that hangs on one of them is a condition or simply the case. A weapon
@@ -122,13 +128,13 @@ function statSources(equipment: string[], custom: CustomWeapon[]): StatSources {
 	   its presence alone keeps every such rule a condition. */
 	const sameKind = new Map<string, number>();
 	let unknownKind = 0;
-	for (const id of equipment) {
+	for (const id of carried) {
 		const weapon = WEAPONS.get(id);
 		if (weapon) sameKind.set(weapon.type, (sameKind.get(weapon.type) ?? 0) + 1);
 		else if (custom.some((w) => w.id === id || w.name === id)) unknownKind++;
 	}
 
-	for (const id of equipment) {
+	for (const id of carried) {
 		const weapon = WEAPONS.get(id);
 		if (!weapon) {
 			const item = ITEMS.get(id);
@@ -362,10 +368,18 @@ export function toCard(
 		};
 	}
 
-	const sources = statSources(instance.equipment, warband.customWeapons);
 	/* A Possessed mutation: a keyword or a weapon beside its text. */
 	const rolled = rolledRow(profile.faction, profile.id, chosen);
 	const raised = raisedBy(profile.faction, profile.id, chosen);
+	/* The weapons the table below adds from the profile and the mutation, the
+	   same ids in the same order. */
+	const innate = [
+		...(profile.default_equipment ?? [])
+			.map((prefixed) => prefixed.replace(/^(weapon|item):/, ''))
+			.filter((id) => WEAPONS.has(id) && !instance.equipment.includes(id)),
+		...(rolled?.weapon && WEAPONS.has(rolled.weapon) ? [rolled.weapon] : [])
+	];
+	const sources = statSources(instance.equipment, warband.customWeapons, innate);
 
 	const stats: CardStat[] = STAT_KEYS.map((key) => {
 		const base = profile[key];
