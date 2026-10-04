@@ -742,7 +742,7 @@
 	<div class="backdrop">
 		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="abandon-title">
 			<h2 id="abandon-title">Cancel the battle?</h2>
-			<p class="count">Round {battle.round} · {fighterCount(out)} out of action</p>
+			<p class="count">Round {battle.round}{#if out > 0}{' '}· {fighterCount(out)} out of action{/if}</p>
 			<p class="note danger">
 				<strong>This cannot be undone.</strong> Wounds, activations and who is out of
 				action are dropped, and nobody earns experience.
