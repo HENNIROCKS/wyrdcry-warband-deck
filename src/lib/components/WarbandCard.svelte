@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { fitText } from '../fit-text';
 	import imageMask from '../image-mask.svg?raw';
 	import RuleText from './RuleText.svelte';
 	import type { RosterEntry, WarbandCardData } from '../types/card';
@@ -34,7 +35,7 @@
 				<dl class="stats">
 					{#each rows as row (row.key)}
 						<dt>{row.label}</dt>
-						<dd class:modified={row.modified}>{row.value}</dd>
+						<dd class:modified={row.modified} use:fitText><span data-fit>{row.value}</span></dd>
 					{/each}
 				</dl>
 			{/each}
@@ -198,11 +199,13 @@
 	}
 
 	/* Labels in a column as wide as the longest, so every value of a box starts
-	   on the same edge. Left-aligned, since Standing carries a word. */
+	   on the same edge. Left-aligned, since Standing carries a word. On the
+	   baseline, so a value set smaller still sits on the line of its label. */
 	.stats {
 		display: grid;
 		grid-template-columns: max-content minmax(0, 1fr);
 		align-content: start;
+		align-items: baseline;
 		column-gap: calc(12 * var(--u));
 		row-gap: calc(4 * var(--u));
 		font-family: 'Grenze Gotisch', serif;
@@ -218,9 +221,18 @@
 		color: var(--card-green);
 	}
 
+	/* Fitted one by one: only a value too long for its box is set smaller. */
 	.stats dd {
+		min-width: 0;
 		margin: 0;
+		font-size: calc(20 * var(--t) * var(--fit, 1));
 		color: var(--card-ink);
+	}
+
+	/* A block, so the fit action can read how wide the value wants to be. Past
+	   the floor it stops at, the value is cut rather than run out of its box. */
+	.stats dd span {
+		display: block;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -235,7 +247,7 @@
 		text-underline-offset: 0.15em;
 	}
 
-	/* Heroes above henchmen, each across the full width in three columns, as far
+	/* Heroes above henchmen, each across the full width in two columns, as far
 	   apart as the box is padded. */
 	.roster {
 		grid-column: 1 / -1;
@@ -254,7 +266,7 @@
 
 	.group ul {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		column-gap: calc(16 * var(--u));
 		row-gap: calc(6 * var(--u));
 		margin: 0;
@@ -312,11 +324,15 @@
 		background: var(--card-wash-strong);
 	}
 
-	/* A log rather than a figure of the warband: no box and no green, a solid
-	   rule under the heading and a dashed one under each row, set a step below
-	   the notes, and twice the parchment's gap away from them. */
+	/* A log rather than a figure of the warband: the boxes' light wash and
+	   padding but no border and no green, a solid rule under the heading and a
+	   dashed one between the rows, set a step below the notes, and twice the
+	   parchment's gap away from them. */
 	.battles {
 		margin-top: calc(14 * var(--u));
+		padding: calc(14 * var(--u)) calc(16 * var(--u));
+		border-radius: calc(7.5 * var(--u));
+		background: var(--card-wash);
 	}
 
 	.battles table {
@@ -337,6 +353,12 @@
 		border-bottom: 1px dashed #000;
 		vertical-align: baseline;
 		overflow-wrap: anywhere;
+	}
+
+	/* The box's padding ends the log, not a rule of its own. */
+	.battles tr:last-child td {
+		padding-bottom: 0;
+		border-bottom: 0;
 	}
 
 	.battles .date,
