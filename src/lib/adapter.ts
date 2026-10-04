@@ -77,7 +77,7 @@ const titleCase = (type: string) =>
 	type.replace(/\w\S*/g, (word) => word[0].toUpperCase() + word.slice(1).toLowerCase());
 
 /** Cost of whatever the warband stores by this id. Anything else is free. */
-function itemCost(id: string): number {
+export function itemCost(id: string): number {
 	return WEAPONS.get(id)?.cost ?? ITEMS.get(id)?.cost ?? 0;
 }
 

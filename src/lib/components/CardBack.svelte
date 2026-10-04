@@ -9,6 +9,16 @@
 		/** Every level still open, `next` included. */
 		waiting: number;
 	}
+
+	/** What dismissing the fighter on this back would mean, worked out by the page. */
+	export interface BackDismissal {
+		/** What the fighter carries, in the order it is stored – the places `toStash` names. */
+		equipment: { name: string; cost: number }[];
+		/** Why the fighter cannot be dismissed now, or null when it can. */
+		blocked: string | null;
+		/** Said when dismissing leaves fewer fighters than the faction fields. */
+		belowMinimum: string | null;
+	}
 </script>
 
 <script lang="ts">
@@ -20,8 +30,25 @@
 	let {
 		name,
 		draft = $bindable(),
-		renown = null
-	}: { name: string; draft: EditDraft; renown?: BackRenown | null } = $props();
+		renown = null,
+		dismissal = null,
+		ondismiss
+	}: {
+		name: string;
+		draft: EditDraft;
+		renown?: BackRenown | null;
+		dismissal?: BackDismissal | null;
+		/** Asks for the fighter to be dismissed, handing what goes to the stash. */
+		ondismiss?: (toStash: number[]) => void;
+	} = $props();
+
+	/* Places in the fighter's equipment ticked to go to the stash. Off the draft:
+	   dismissing is confirmed and written on its own, not by Done. */
+	let toStash = $state<number[]>([]);
+
+	function toggleStash(index: number) {
+		toStash = toStash.includes(index) ? toStash.filter((i) => i !== index) : [...toStash, index].sort((a, b) => a - b);
+	}
 
 	/* The back has a second page for spending a level: it takes the card's place
 	   rather than opening a sheet over it, so the choice is part of the draft and
@@ -215,6 +242,34 @@
 				></textarea>
 			</section>
 
+			{#if dismissal}
+				<section>
+					<h3 class="heading"><span>Dismiss</span><span class="rule"></span></h3>
+					{#if dismissal.blocked}
+						<p class="hint">{dismissal.blocked}</p>
+					{:else}
+						{#if dismissal.equipment.length}
+							<p class="hint">Tick what goes to the stash instead of leaving with the fighter.</p>
+							<ul class="list">
+								{#each dismissal.equipment as item, i (i)}
+									<li>
+										<label class="line stash">
+											<input type="checkbox" checked={toStash.includes(i)} onchange={() => toggleStash(i)} />
+											{item.name}
+										</label>
+										<span class="when">{item.cost} gc</span>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+						{#if dismissal.belowMinimum}
+							<p class="note">{dismissal.belowMinimum}</p>
+						{/if}
+						<button class="dismiss" onclick={() => ondismiss?.(toStash)}>Dismiss {name}…</button>
+					{/if}
+				</section>
+			{/if}
+
 			{#if draft.history}
 				<section>
 					<h3 class="heading"><span>Battles</span><span class="rule"></span></h3>
@@ -285,7 +340,7 @@
 		font-size: calc(18 * var(--t));
 		line-height: 1.4;
 		color: var(--card-ink);
-		background: rgb(255 255 255 / 0.45);
+		background: var(--card-field);
 		border: 0;
 		border-radius: calc(6 * var(--u));
 		outline: none;
@@ -335,7 +390,7 @@
 		padding: 0 calc(10 * var(--u));
 		border: 1px solid var(--card-green);
 		border-radius: 0;
-		background: transparent;
+		background: var(--card-field);
 		font-family: 'Alegreya', serif;
 		font-size: calc(17 * var(--t));
 		color: var(--card-green);
@@ -387,6 +442,7 @@
 		min-width: 44px;
 		border-top: 1px solid var(--card-green);
 		border-bottom: 1px solid var(--card-green);
+		background: var(--card-field);
 		font-family: 'Alegreya', serif;
 		font-size: calc(18 * var(--t));
 		font-variant-numeric: lining-nums tabular-nums;
@@ -413,7 +469,7 @@
 
 	/* Until a result is picked, an unpicked choice, set back. */
 	.add:disabled {
-		background: transparent;
+		background: var(--card-field);
 		color: var(--card-green);
 		opacity: 0.5;
 	}
@@ -481,7 +537,7 @@
 		padding: calc(6 * var(--u)) calc(18 * var(--u));
 		border: 1px solid var(--card-green);
 		border-radius: 999px;
-		background: transparent;
+		background: var(--card-field);
 		font-family: 'Alegreya', serif;
 		font-size: calc(18 * var(--t));
 		line-height: 1.25;
@@ -522,6 +578,38 @@
 		display: block;
 		font-size: calc(18 * var(--t));
 		font-style: italic;
+	}
+
+	/* A box to tick, not a field to write in: none of the field's patch. */
+	.stash {
+		display: flex;
+		align-items: center;
+		gap: calc(10 * var(--u));
+		min-height: 40px;
+	}
+
+	.stash input {
+		flex: none;
+		width: 22px;
+		height: 22px;
+		margin: 0;
+		padding: 0;
+		accent-color: var(--card-green);
+		appearance: auto;
+	}
+
+	/* The one button on the back that takes something away, in the link's red. */
+	.dismiss {
+		align-self: flex-end;
+		margin-top: calc(14 * var(--u));
+		min-height: 40px;
+		padding: 0 calc(14 * var(--u));
+		border: 1px solid var(--card-link);
+		border-radius: 999px;
+		background: var(--card-field);
+		color: var(--card-link);
+		font-family: 'Alegreya', serif;
+		font-size: calc(17 * var(--t));
 	}
 
 	.remove {

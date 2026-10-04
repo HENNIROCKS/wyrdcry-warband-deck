@@ -5,12 +5,12 @@
 	import { base } from '$app/paths';
 
 	import AftermathBack from '$lib/components/AftermathBack.svelte';
-	import CardBack, { type BackRenown } from '$lib/components/CardBack.svelte';
+	import CardBack, { type BackDismissal, type BackRenown } from '$lib/components/CardBack.svelte';
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import RenownSheet from '$lib/components/RenownSheet.svelte';
-	import { toCards } from '$lib/adapter';
+	import { hasKeyword, itemCost, toCards } from '$lib/adapter';
 	import { applyAftermath, startAftermath, type AftermathAnswer, type AftermathDraft } from '$lib/aftermath';
 	import { countedFighters } from '$lib/morale';
 	import {
@@ -28,11 +28,11 @@
 		undoRound,
 		waveringThreshold
 	} from '$lib/battle';
-	import { applyDraft, emptyPending, type EditDraft } from '$lib/edit';
+	import { applyDraft, dismiss, dismissCost, emptyPending, type EditDraft } from '$lib/edit';
 	import { explain } from '$lib/explanation';
 	import { earnedLevels, limitFor, optionsFor, spend, type RenownOption } from '$lib/renown';
-	import { FIGHTERS } from '$lib/gamedata';
-	import { RACIAL_LIMITS } from '$lib/rules';
+	import { FIGHTERS, ITEMS, WEAPONS } from '$lib/gamedata';
+	import { FACTIONS as RULESETS, RACIAL_LIMITS } from '$lib/rules';
 	import { allWarbands, chooseWarband, chosenWarband, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { rosterPdf } from '$lib/roster-pdf';
 	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
@@ -60,6 +60,10 @@
 	});
 	/* The warband a delete has been asked for, held until it is confirmed. */
 	let condemned = $state<StoredWarband | null>(null);
+	/* Set while cancelling the running battle waits to be confirmed. */
+	let abandoning = $state(false);
+	/* The fighter a dismissal has been asked for, and what goes to the stash, held until it is confirmed. */
+	let discharged = $state<{ instanceId: string; name: string; toStash: number[] } | null>(null);
 	/* Set while the renown sheet is up, asking what the next open level is spent on. */
 	let renownOpen = $state(false);
 	let message = $state<string | null>(null);
@@ -114,6 +118,47 @@
 		};
 	});
 	const battle = $derived(active?.battle ?? null);
+
+	/* Whether and how the fighter on the back can be dismissed. The leader stays:
+	   the rules then elect another, which the app does not do. */
+	const backDismissal = $derived.by((): BackDismissal | null => {
+		if (!active || !editingId || turned !== 'edit') return null;
+		const instance = active.warband.fighters.find((f) => f.instanceId === editingId);
+		const card = cards.find((c) => c.instanceId === editingId);
+		if (!instance || card?.kind !== 'fighter') return null;
+		const blocked = battle
+			? 'Not during a battle – end or cancel it first.'
+			: hasKeyword(card, 'LEADER')
+				? 'The leader stays: dismissing one means electing another, which this app does not do.'
+				: null;
+		const ruleset = active.warband.factionId ? RULESETS.get(active.warband.factionId) : undefined;
+		const after = active.warband.fighters.length - 1;
+		const min = ruleset?.warband_size.min ?? 0;
+		return {
+			equipment: instance.equipment.map((id) => ({
+				name: WEAPONS.get(id)?.name ?? ITEMS.get(id)?.name ?? id,
+				cost: itemCost(id)
+			})),
+			blocked,
+			belowMinimum: after < min ? `That leaves ${after} fighters, and ${ruleset?.name} field at least ${min}.` : null
+		};
+	});
+
+	/* What the dismissal sheet says the gold does. */
+	const dischargeCost = $derived.by(() => {
+		if (!active || !discharged) return null;
+		const id = discharged.instanceId;
+		const instance = active.warband.fighters.find((f) => f.instanceId === id);
+		const card = cards.find((c) => c.instanceId === id);
+		const warbandCard = cards[0];
+		if (!instance || card?.kind !== 'fighter' || warbandCard?.kind !== 'warband') return null;
+		return {
+			pending: instance.isPending,
+			value: dismissCost(instance, card.cost, discharged.toStash),
+			stash: discharged.toStash.map((i) => backDismissal?.equipment[i]?.name ?? instance.equipment[i]),
+			remaining: warbandCard.gold.remaining
+		};
+	});
 	const counted = $derived(active ? countedFighters(active.warband) : []);
 	const left = $derived(
 		remaining(
@@ -217,6 +262,35 @@
 		aftermath = startAftermath(active.warband, fighters, battle);
 		turned = 'aftermath';
 		editingId = 'warband';
+	}
+
+	/**
+	 * Drops the battle as if it had never started: no experience, no line in the
+	 * history, no new revision – the warband itself was never touched by it.
+	 */
+	async function cancelBattle() {
+		abandoning = false;
+		if (turned === 'aftermath') editingId = null;
+		await setBattle(null);
+		notify('Battle cancelled.');
+	}
+
+	/* Written at once rather than with Done: the back closes and the card is gone. */
+	async function confirmDismiss() {
+		if (!active || !discharged) return;
+		const { instanceId, name, toStash } = discharged;
+		const card = cards.find((c) => c.instanceId === instanceId);
+		const snapshot = $state.snapshot(active);
+		discharged = null;
+		editingId = null;
+		try {
+			await putWarband(dismiss(snapshot, instanceId, card?.kind === 'fighter' ? card.cost : 0, toStash));
+		} catch {
+			notify('The fighter could not be dismissed.', 'error');
+			return;
+		}
+		await refresh();
+		notify(`${name} dismissed.`);
 	}
 
 	/* Ended before the write, like `saveEdit`, so a second tap finds nothing to apply. */
@@ -453,6 +527,8 @@
 						<hr />
 						<button onclick={endBattle}>End battle</button>
 						<p class="hint">Asks who earned experience, then drops the wounds and who is out of action.</p>
+						<button onclick={() => (abandoning = true)}>Cancel battle</button>
+						<p class="hint">Drops the battle without experience, as if it never started.</p>
 					{:else}
 						<p>No battle</p>
 						<button onclick={() => setBattle(start())}>Start battle</button>
@@ -527,7 +603,13 @@
 			{#if turned === 'aftermath' && aftermath}
 				<AftermathBack name={card.name} bind:draft={aftermath} />
 			{:else if turned === 'edit' && draft}
-				<CardBack name={card.name} bind:draft renown={backRenown} />
+				<CardBack
+					name={card.name}
+					bind:draft
+					renown={backRenown}
+					dismissal={backDismissal}
+					ondismiss={(toStash) => (discharged = { instanceId: card.instanceId, name: card.name, toStash })}
+				/>
 			{/if}
 		{/snippet}
 	</Deck>
@@ -579,6 +661,47 @@
 				<button class="ghost" onclick={() => (condemned = null)}>Cancel</button>
 				<button class="ghost" onclick={exportCondemned}>Export</button>
 				<button class="danger" onclick={confirmDelete}>Delete</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if discharged && dischargeCost}
+	<div class="backdrop">
+		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dismiss-title">
+			<h2 id="dismiss-title">Dismiss {discharged.name}?</h2>
+			<p class="count">
+				{#if dischargeCost.stash.length}{dischargeCost.stash.join(', ')} to the stash ·{' '}{/if}
+				{#if dischargeCost.pending}
+					Not bought yet, so nothing comes off the gold
+				{:else}
+					{dischargeCost.value} gc leave the warband's value · Gold left stays {dischargeCost.remaining}
+				{/if}
+			</p>
+			<p class="note danger">
+				<strong>This cannot be undone.</strong> The fighter leaves the warband with
+				everything not sent to the stash, its experience, renown, notes and fluff.
+			</p>
+			<div class="actions">
+				<button class="ghost" onclick={() => (discharged = null)}>Keep</button>
+				<button class="danger" onclick={confirmDismiss}>Dismiss</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if abandoning && battle}
+	<div class="backdrop">
+		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="abandon-title">
+			<h2 id="abandon-title">Cancel the battle?</h2>
+			<p class="count">Round {battle.round} · {fighterCount(out)} out of action</p>
+			<p class="note danger">
+				<strong>This cannot be undone.</strong> Wounds, activations and who is out of
+				action are dropped, and nobody earns experience.
+			</p>
+			<div class="actions">
+				<button class="ghost" onclick={() => (abandoning = false)}>Keep playing</button>
+				<button class="danger" onclick={cancelBattle}>Cancel battle</button>
 			</div>
 		</div>
 	</div>

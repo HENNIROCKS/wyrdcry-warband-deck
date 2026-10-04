@@ -27,14 +27,15 @@ the Warband Builder is not currently assured – see
 - Tap a fighter on the warband card to jump straight to its card
 - Turn a card over to edit it: a fighter's name, experience, renown, notes and
   fluff, or the warband's notes and battle history. A renown level is spent on
-  a characteristic right there
+  a characteristic right there, and a fighter is dismissed there too, its
+  equipment sent to the stash if you like
 - Tap a worked-out value or a weapon to see where it comes from: which
   modifiers went into it, and which rules apply only in the right situation
 - Track a battle: mark fighters as activated or waiting, count the damage each
   one holds, see who is out of action and when the warband starts wavering,
   get reminded of each fighter's Bravery test while it does, mark who is
   panicked, count the rounds and clear the round's states for the next one – one step of
-  that is undoable
+  that is undoable, and a battle started by mistake can be cancelled
 - After a battle, award experience and spend the renown it brings
 - Export through the system share sheet, either as the current state or as a
   dated snapshot

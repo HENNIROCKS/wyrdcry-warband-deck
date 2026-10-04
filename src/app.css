@@ -55,6 +55,9 @@
 	--card-wash: rgba(255, 255, 255, 0.25);
 	/* Denser than the wash, for a surface that has to carry body copy. */
 	--card-wash-strong: rgba(255, 255, 255, 0.55);
+	/* What the backs' fields and outlined buttons sit on, so they stand out from
+	   the texture where it darkens towards the card's foot. */
+	--card-field: rgba(255, 255, 255, 0.45);
 	--card-wash-2: rgba(22, 117, 74, 0.12);
 	/*
 	 * A value that explains itself when tapped, and the weapon that carries
@@ -282,7 +285,7 @@ button {
 	margin: 0;
 	padding: calc(10 * var(--u)) calc(12 * var(--u));
 	border-radius: calc(6 * var(--u));
-	background: rgb(255 255 255 / 0.45);
+	background: var(--card-field);
 	font-family: 'Alegreya', serif;
 	font-size: calc(18 * var(--t));
 	line-height: 1.4;

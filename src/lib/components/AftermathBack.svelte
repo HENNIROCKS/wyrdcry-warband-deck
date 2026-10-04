@@ -102,7 +102,7 @@
 		padding: 0 calc(14 * var(--u));
 		border: 1px solid var(--card-green);
 		border-radius: 999px;
-		background: transparent;
+		background: var(--card-field);
 		font-family: 'Alegreya', serif;
 		font-size: calc(17 * var(--t));
 		color: var(--card-green);

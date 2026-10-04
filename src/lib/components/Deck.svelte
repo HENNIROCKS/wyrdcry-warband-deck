@@ -91,7 +91,24 @@
 
 	/* The bar below the stack belongs to the card on top of it. It is the warband
 	   card that has no fighter state, and the bar carries the battle itself there. */
-	const top = $derived(cards[current]);
+	const top = $derived(cards[current] ?? cards[0]);
+
+	/* The card on top is held by its id as well as its place. When the deck
+	   loses it – a fighter dismissed, another warband chosen – it starts again
+	   at the warband card instead of at a place past its end. */
+	let onTop: string | null = null;
+	$effect.pre(() => {
+		const index = current;
+		onTop = untrack(() => cards[index]?.instanceId ?? null);
+	});
+	$effect.pre(() => {
+		const list = cards;
+		untrack(() => {
+			if (onTop === null || list[current]?.instanceId === onTop) return;
+			const index = list.findIndex((c) => c.instanceId === onTop);
+			current = index >= 0 ? index : 0;
+		});
+	});
 	const topFighter = $derived(top.kind === 'fighter' ? top : null);
 	const fighters = $derived(
 		counted ??

@@ -7,10 +7,11 @@
  * level raised on the back is spent there before anything is stored.
  */
 
+import { itemCost } from './adapter';
 import { newId } from './id';
 import { today } from './history';
 import { earnedLevels, spend, type RenownOption } from './renown';
-import type { BattleRecord, StoredWarband } from './types/warband';
+import type { BattleRecord, FighterInstance, StoredWarband } from './types/warband';
 
 export interface PendingBattle {
 	date: string;
@@ -141,4 +142,53 @@ export function applyDraft(
 	}
 	if (!next.pendingRenown?.length) next = { ...next, pendingRenown: null };
 	return { ...next, revision: stored.revision + 1, updatedAt: new Date().toISOString() };
+}
+
+/**
+ * What dismissing a fighter takes off the gold: what it brought into the
+ * warband's value, less the pieces it hands to the stash, which stay in the
+ * value there. The gold left over is the same before and after – a dismissed
+ * fighter refunds nothing. An unconfirmed fighter was never in the value, so
+ * nothing comes off; neither does equipment still waiting to be bought.
+ *
+ * `cost` is the card's: the profile's or the override, plus all equipment.
+ */
+export function dismissCost(instance: FighterInstance, cost: number, toStash: number[]): number {
+	if (instance.isPending) return 0;
+	return cost - toStash.reduce((sum, i) => sum + itemCost(instance.equipment[i] ?? ''), 0);
+}
+
+/**
+ * The warband without the fighter, as the builder's `REMOVE_FIGHTER` leaves it
+ * after `SEND_TO_STASH` for each piece in `toStash`. What only this app keeps
+ * about the fighter goes with it.
+ */
+export function dismiss(stored: StoredWarband, instanceId: string, cost: number, toStash: number[]): StoredWarband {
+	const instance = stored.warband.fighters.find((f) => f.instanceId === instanceId);
+	if (!instance) return stored;
+	const others = <T extends { instanceId: string }>(list: T[] | null | undefined) =>
+		list ? list.filter((e) => e.instanceId !== instanceId) : list;
+	const without = <T>(record: Record<string, T>) =>
+		Object.fromEntries(Object.entries(record).filter(([id]) => id !== instanceId));
+	const pendingRenown = others(stored.pendingRenown);
+
+	return {
+		...stored,
+		warband: {
+			...stored.warband,
+			gold: stored.warband.gold - dismissCost(instance, cost, toStash),
+			stash: [...stored.warband.stash, ...toStash.map((i) => instance.equipment[i]).filter(Boolean)],
+			fighters: stored.warband.fighters.filter((f) => f.instanceId !== instanceId)
+		},
+		selections: stored.selections && {
+			...stored.selections,
+			fighters: without(stored.selections.fighters),
+			modifiers: stored.selections.modifiers.filter((m) => m.instanceId !== instanceId)
+		},
+		fluff: stored.fluff && { ...stored.fluff, fighters: without(stored.fluff.fighters) },
+		renownHistory: others(stored.renownHistory),
+		pendingRenown: pendingRenown?.length ? pendingRenown : null,
+		revision: stored.revision + 1,
+		updatedAt: new Date().toISOString()
+	};
 }
