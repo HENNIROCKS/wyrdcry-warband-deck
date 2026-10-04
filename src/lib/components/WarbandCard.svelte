@@ -187,7 +187,11 @@
 
 	/* A log rather than a figure of the warband: no box and no green, a solid
 	   rule under the heading and a dashed one under each row, set a step below
-	   the notes. */
+	   the notes, and twice the parchment's gap away from them. */
+	.battles {
+		margin-top: calc(14 * var(--u));
+	}
+
 	.battles table {
 		width: 100%;
 		margin-top: calc(6 * var(--u));
@@ -213,6 +217,10 @@
 		width: 1%;
 		white-space: nowrap;
 		font-variant-numeric: lining-nums tabular-nums;
+	}
+
+	.battles .date {
+		padding-right: calc(16 * var(--u));
 	}
 
 	.battles .result {

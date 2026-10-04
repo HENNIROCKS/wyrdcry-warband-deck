@@ -92,7 +92,8 @@
 	);
 	const out = $derived(outOfAction(battle, counted));
 	const wavering = $derived(isWavering(battle, counted));
-	/** Where the wavering bubble hangs: the tail reaches into the header's padding, up to the select. */
+	/** Where the wavering bubble hangs: the tail reaches into the header's padding, up to the select.
+	    The layout's safe-area inset above the header comes on top, in the bubble's own style. */
 	let headerHeight = $state(0);
 
 	/**
@@ -436,7 +437,7 @@
 		<!-- Over the top edge of the cards on purpose: the morale is the one state
 		     that has to be seen from every card, and the tail points at the
 		     warband's name. Tapped, it says how the count stands. -->
-		<button class="bubble" style:top="{headerHeight - 4}px" onclick={explainWavering}>
+		<button class="bubble" style:top="calc(env(safe-area-inset-top) + {headerHeight - 4}px)" onclick={explainWavering}>
 			Wavering
 		</button>
 	{/if}

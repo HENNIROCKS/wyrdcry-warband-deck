@@ -53,7 +53,7 @@
 </script>
 
 <script lang="ts">
-	import { RESULT_LABELS, newestFirst, opponent, shortDate } from '../history';
+	import { RESULT_LABELS, displayDate, newestFirst, opponent } from '../history';
 
 	let { name, draft = $bindable() }: { name: string; draft: EditDraft } = $props();
 
@@ -153,7 +153,7 @@
 							{@const removed = draft.removed.includes(record.id)}
 							<li class:removed>
 								<span class="line">
-									<span class="when">{shortDate(record.date)}</span>
+									<span class="when">{displayDate(record.date)}</span>
 									{opponent(record)} – {RESULT_LABELS[record.result]}
 								</span>
 								<button class="remove" onclick={() => toggleRemoved(record.id)}>

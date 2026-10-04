@@ -25,9 +25,14 @@ export function today(): string {
 	return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-/** `2026-09-19` as `260919`, the way a player writes it in the margin. */
-export function shortDate(date: string): string {
-	return date.slice(2).replaceAll('-', '');
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** `2026-09-19` as `19 Sep 2026`: no reader takes the day for the month. Spelled
+    out here rather than by the phone's locale, so it stays English like the app. */
+export function displayDate(date: string): string {
+	const [year, month, day] = date.split('-');
+	const name = MONTHS[Number(month) - 1];
+	return name && day ? `${Number(day)} ${name} ${year}` : date;
 }
 
 /** The opposing warband, the player behind it in brackets – either may be missing. */

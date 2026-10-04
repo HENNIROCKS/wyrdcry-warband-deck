@@ -10,7 +10,7 @@
  */
 
 import { CURATED_ITEM_EFFECTS } from './curated';
-import { RESULT_LABELS, newestFirst, opponent, shortDate, tally } from './history';
+import { RESULT_LABELS, displayDate, newestFirst, opponent, tally } from './history';
 import {
 	ABILITIES,
 	CAMPAIGN_RULES,
@@ -23,7 +23,7 @@ import {
 } from './gamedata';
 import type { WeaponProfile } from './gamedata';
 import { promoted } from './renown';
-import { rolledRow } from './rules-bridge';
+import { raisedBy, rolledRow } from './rules-bridge';
 import type {
 	CardEntry,
 	CardSection,
@@ -272,10 +272,15 @@ function customAbilities(warband: Warband, ...targets: string[]): Ability[] {
 		.map((entry) => {
 			/* Common spelling in the builder: "[Trait] Name: Description". */
 			const match = entry.ability.match(/^\s*(?:\[([^\]]+)\]\s*)?([^:]{1,60}):\s*([\s\S]+)$/);
+			const description = match ? match[3].trim() : entry.ability;
+			/* A faction rule that moved a characteristic ends on the deck's own
+			   word (`build/export.ts`), which the card sets apart from the rule. */
+			const counted = description.match(/\s*Already included\.$/);
 			return {
 				name: match ? match[2].trim() : entry.type || 'Note',
 				type: match?.[1]?.trim() ?? entry.type,
-				description: match ? match[3].trim() : entry.ability
+				description: counted ? description.slice(0, counted.index) : description,
+				note: counted ? 'Already included.' : undefined
 			};
 		});
 }
@@ -292,7 +297,7 @@ function sortAbilities(abilities: Ability[]): CardEntry[] {
 		}));
 }
 
-/** `notes` are the card's own word on an ability, by its id. */
+/** `notes` are the card's own word on an ability, by its id or its name. */
 function abilityEntries(ids: string[], custom: Ability[], notes = new Map<string, string>()): CardEntry[] {
 	const resolved: Ability[] = ids
 		.map((id) => ({ id, ability: ABILITIES.get(id) }))
@@ -301,7 +306,7 @@ function abilityEntries(ids: string[], custom: Ability[], notes = new Map<string
 			name: ability.name,
 			type: ability.ability_type,
 			description: ability.description,
-			note: notes.get(id)
+			note: notes.get(id) ?? notes.get(ability.name)
 		}));
 
 	return sortAbilities([...resolved, ...custom]);
@@ -321,7 +326,8 @@ function universalFor(keywords: string[]): Ability[] {
 
 /**
  * `chosen` is what the wizard picked for this fighter, where it had a choice to
- * make. Absent for a warband out of the builder, which records no such thing.
+ * make, and `modifiers` what it raised this fighter's characteristics by. Both
+ * are absent for a warband out of the builder, which records no such thing.
  */
 export function toCard(
 	instance: FighterInstance,
@@ -329,7 +335,8 @@ export function toCard(
 	factionName: string,
 	chosen?: string[] | null,
 	fluff = '',
-	renownHistory: RenownChoice[] = []
+	renownHistory: RenownChoice[] = [],
+	modifiers: Selections['modifiers'] = []
 ): FighterCardData {
 	const profile = FIGHTERS.get(instance.fighterId);
 	const name = instance.customName.trim();
@@ -356,24 +363,29 @@ export function toCard(
 	const sources = statSources(instance.equipment, warband.customWeapons);
 	/* A Possessed mutation: a keyword or a weapon beside its text. */
 	const rolled = rolledRow(profile.faction, profile.id, chosen);
+	const raised = raisedBy(profile.faction, profile.id, chosen);
 
 	const stats: CardStat[] = STAT_KEYS.map((key) => {
 		const base = profile[key];
 		const layers: StatLayer[] = [{ kind: 'base', source: 'Profile', amount: base }];
 
-		/* The warband file holds a bare number the builder's stat editor wrote,
-		   without an origin. It becomes its own layer instead of replacing the
-		   profile value, so the card can say that much – less what renown spent on
-		   this characteristic, which has a reason of its own to show. The number is
-		   what counts: without one, the history has nothing to explain. */
+		/* The warband file holds a bare number, without an origin. It becomes its
+		   own layer instead of replacing the profile value, so the card can say
+		   that much – less what the wizard's faction rules and recruitment choice
+		   and what renown put into this characteristic, each of which has a reason
+		   of its own to show. What is left is the builder's stat editor. The number
+		   is what counts: without one, neither list has anything to explain. */
 		const override = instance.statOverrides?.[key];
-		const raised =
+		const explained =
 			override === undefined
 				? []
-				: renownHistory.filter((c) => c.instanceId === instance.instanceId && c.characteristic === key);
-		const unexplained = override === undefined ? 0 : override - base - raised.reduce((sum, c) => sum + c.bonus, 0);
+				: [
+						...modifiers.filter((m) => m.characteristic === key),
+						...renownHistory.filter((c) => c.instanceId === instance.instanceId && c.characteristic === key)
+					];
+		const unexplained = override === undefined ? 0 : override - base - explained.reduce((sum, c) => sum + c.bonus, 0);
 		if (unexplained !== 0) layers.push({ kind: 'permanent', source: 'Warband file', amount: unexplained });
-		for (const choice of raised) layers.push({ kind: 'permanent', source: choice.source, amount: choice.bonus });
+		for (const layer of explained) layers.push({ kind: 'permanent', source: layer.source, amount: layer.bonus });
 
 		layers.push(...(sources.layers.get(key) ?? []));
 
@@ -568,10 +580,14 @@ export function toCard(
 				(ability) => ability.name.toLowerCase() !== rolled?.name.toLowerCase()
 			),
 			/* "It must make a roll on the mutation table" reads as a task still
-			   open. It has been done, and the note says what came of it. */
-			rolled?.source
-				? new Map([[rolled.source, `Already included: ${rolled.name}. ${rolled.text}`]])
-				: undefined
+			   open. It has been done, and the note says what came of it. A choice
+			   of characteristic is in the figures above and needs only saying so. */
+			new Map([
+				...(rolled?.source
+					? [[rolled.source, `Already included: ${rolled.name}. ${rolled.text}`] as const]
+					: []),
+				...(raised ? [[raised, 'Already included.'] as const] : [])
+			])
 		),
 		picked ? '' : profile.ability_preamble
 	);
@@ -710,7 +726,7 @@ export function toWarbandCard(
 		fluff,
 		battles: newestFirst(history).map((record) => ({
 			id: record.id,
-			date: shortDate(record.date),
+			date: displayDate(record.date),
 			opponent: opponent(record),
 			result: RESULT_LABELS[record.result]
 		})),
@@ -746,7 +762,8 @@ export function toCards(
 			faction?.name ?? '',
 			selections?.fighters[f.instanceId],
 			fluff?.fighters[f.instanceId] ?? '',
-			renownHistory ?? []
+			renownHistory ?? [],
+			selections?.modifiers?.filter((m) => m.instanceId === f.instanceId)
 		)
 	);
 

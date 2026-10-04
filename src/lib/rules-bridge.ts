@@ -166,3 +166,19 @@ export function rolledRow(factionId: string, fighterId: string, chosen?: string[
 		armed: row.armed ?? false
 	};
 }
+
+/**
+ * The name of the ability whose recruitment choice raised a characteristic, such
+ * as Martial Discipline. Null without such a choice, and for a warband out of
+ * the builder, which keeps none.
+ *
+ * A name rather than an id: the game data spells this ruleset's
+ * `martial-discipline` as `martial-exemplar`, and a card from a printed faction
+ * carries the game data's.
+ */
+export function raisedBy(factionId: string, fighterId: string, chosen?: string[] | null): string | null {
+	const faction = FACTIONS.get(factionId);
+	const choice = faction?.fighters.find((fighter) => fighter.id === fighterId)?.choose;
+	if (!faction || choice?.kind !== 'stat' || !choice.source || !chosen?.length) return null;
+	return faction.abilities.find((ability) => ability.id === choice.source)?.name ?? null;
+}
