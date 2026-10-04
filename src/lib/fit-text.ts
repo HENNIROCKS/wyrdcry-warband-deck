@@ -15,6 +15,21 @@ const FLOOR = 0.7;
  * `[data-fit]` span underneath is measured against its cell; the narrowest result
  * wins, so a row of labels stays one size rather than turning ragged.
  */
+/**
+ * How wide the span's text is, in the cell's own pixels. scrollWidth cannot tell:
+ * it is a whole number that can round down, and a text a third of a pixel too wide
+ * still gets cut. The range is exact but measured on screen, where a card the
+ * deck is scaling down is narrower than its layout; the cell's two widths undo
+ * that. Rounded up, and a pixel added for the rounding in clientWidth, so the
+ * error lands on the smaller factor.
+ */
+function textWidth(span: HTMLElement, cell: HTMLElement): number {
+	const range = document.createRange();
+	range.selectNodeContents(span);
+	const scale = cell.getBoundingClientRect().width / cell.offsetWidth || 1;
+	return Math.ceil(range.getBoundingClientRect().width / scale) + 1;
+}
+
 export function fitText(node: HTMLElement) {
 	function measure() {
 		/* Measured at full size: the spans below already carry the last factor. */
@@ -27,8 +42,7 @@ export function fitText(node: HTMLElement) {
 
 			const style = getComputedStyle(cell);
 			const room = cell.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-			/* scrollWidth rounds up, which errs towards the smaller factor. */
-			const needed = span.scrollWidth;
+			const needed = textWidth(span, cell);
 
 			if (room > 0 && needed > room) fit = Math.min(fit, room / needed);
 		}
