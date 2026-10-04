@@ -726,7 +726,13 @@ export function toWarbandCard(
 				modified: pending > 0
 			},
 			{ key: 'value', label: 'Value', value: String(value) },
-			{ key: 'stash', label: 'Stash', value: String(warband.stash.length) }
+			/* A count alone reads like a sum; what it counts is listed further down. */
+			{
+				key: 'stash',
+				label: 'Stash',
+				value: warband.stash.length ? `${warband.stash.length} ${warband.stash.length === 1 ? 'item' : 'items'}` : 'none',
+				target: warband.stash.length ? 'stash' : undefined
+			}
 		]
 	];
 

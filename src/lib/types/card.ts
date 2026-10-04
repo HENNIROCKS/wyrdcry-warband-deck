@@ -72,6 +72,8 @@ export interface CardValue {
 	/** Differs from the profile value – through an override or equipment. */
 	modified?: boolean;
 	explanation?: CardExplanation;
+	/** A part of the same card the value stands for, which tapping it scrolls to. */
+	target?: 'stash';
 }
 
 export interface CardWeapon {

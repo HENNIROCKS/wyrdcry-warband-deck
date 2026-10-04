@@ -9,9 +9,19 @@
 	/* The torn banner shape of the Card Creator's text card. Inlined as a data URL
 	   because a mask cannot point at a Svelte import. */
 	const mask = `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(imageMask)}")`;
+
+	let article: HTMLElement | undefined = $state();
+
+	/* Within this card only: the deck draws the card beneath as well. */
+	function jump(target: string) {
+		const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		article
+			?.querySelector(`[data-anchor="${target}"]`)
+			?.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' });
+	}
 </script>
 
-<article class="card">
+<article class="card" bind:this={article}>
 	<div class="image-section">
 		<div class="banderole">
 			<div
@@ -35,7 +45,14 @@
 				<dl class="stats">
 					{#each rows as row (row.key)}
 						<dt>{row.label}</dt>
-						<dd class:modified={row.modified} use:fitText><span data-fit>{row.value}</span></dd>
+						<dd class:modified={row.modified} use:fitText>
+							{#if row.target}
+								{@const target = row.target}
+								<button class="jump" onclick={() => jump(target)}><span data-fit>{row.value}</span></button>
+							{:else}
+								<span data-fit>{row.value}</span>
+							{/if}
+						</dd>
 					{/each}
 				</dl>
 			{/each}
@@ -47,7 +64,7 @@
 		</div>
 
 		{#if card.stash}
-			<section class="notes"><p class="entry"><strong>Stash</strong>: {card.stash}</p></section>
+			<section class="notes" data-anchor="stash"><p class="entry"><strong>Stash</strong>: {card.stash}</p></section>
 		{/if}
 
 		{#if card.notes}
@@ -240,6 +257,20 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	/* A value that leads further down the card, in the colour of what can be
+	   tapped. */
+	.jump {
+		display: block;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		font: inherit;
+		color: var(--card-link);
+		text-align: left;
 	}
 
 	/* Gold with unconfirmed purchases, marked the way a changed characteristic
