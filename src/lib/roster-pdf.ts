@@ -10,7 +10,7 @@ import { asset } from '$app/paths';
 import type { Content, ContentText, CustomTableLayout, TableCell, TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import { tokenize } from './markup';
-import { toRoster, type Roster, type RosterFighter } from './roster-sheet';
+import { toRoster, type Roster, type RosterFighter, type RosterRule } from './roster-sheet';
 import { safeName } from './transfer';
 import type { StoredWarband } from './types/warband';
 
@@ -73,7 +73,8 @@ function rich(text: string): Content[] {
 	});
 }
 
-/** What the rules table puts before a rule's text in place of a type column. */
+/** What the rules table puts before a rule's text in place of a type column. A
+    weapon rule names its weapons inside the brackets, see `prefix`. */
 const RULE_PREFIX: Record<string, string> = {
 	'Faction rule': '(Faction Rule)',
 	'Weapon rule': '(Weapon Rule)',
@@ -83,6 +84,11 @@ const RULE_PREFIX: Record<string, string> = {
 	Triple: '[Triple]',
 	Quad: '[Quad]'
 };
+
+function prefix(rule: RosterRule): Content[] {
+	const text = rule.type === 'Weapon rule' && rule.weapons ? `(Weapon Rule: ${rule.weapons})` : RULE_PREFIX[rule.type];
+	return text ? [{ text: `${text} `, bold: true }] : [];
+}
 
 function nameCell(name: string, type: string): TableCell {
 	return {
@@ -183,7 +189,7 @@ function rulesTable(roster: Roster): Content {
 					rule.fighters,
 					{
 						text: [
-							...(RULE_PREFIX[rule.type] ? [{ text: `${RULE_PREFIX[rule.type]} `, bold: true }] : []),
+							...prefix(rule),
 							...rich(rule.text),
 							...(rule.note ? [{ text: ` ${rule.note}`, italics: true }] : [])
 						]

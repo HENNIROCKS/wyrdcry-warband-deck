@@ -34,6 +34,8 @@ export interface RosterRule {
 	type: string;
 	/** "Everyone" where every fighter carries it. */
 	fighters: string;
+	/** For a weapon rule: the warband's weapons that carry it. */
+	weapons?: string;
 	text: string;
 	/** The deck's own word, such as "Already included." */
 	note?: string;
@@ -108,22 +110,27 @@ function toFighter(card: FighterCardData): RosterFighter {
  * type of the place it comes from.
  */
 function collectRules(cards: FighterCardData[]): RosterRule[] {
-	const rules = new Map<string, Omit<RosterRule, 'fighters'> & { carriers: string[] }>();
+	const rules = new Map<string, Omit<RosterRule, 'fighters' | 'weapons'> & { carriers: string[]; weapons: string[] }>();
 
-	const add = (entry: CardEntry, fallback: string, carrier: string) => {
+	const add = (entry: CardEntry, fallback: string, carrier: string, weapon?: string) => {
 		const match = entry.label.match(/^\[(\w+)\]\s*(.*)$/);
 		const type = match ? match[1][0].toUpperCase() + match[1].slice(1).toLowerCase() : fallback;
 		const name = match ? match[2] : entry.label;
 		const key = `${type}|${name}`;
-		const rule = rules.get(key) ?? { name, type, text: entry.text, note: entry.note, carriers: [] };
+		const rule = rules.get(key) ?? { name, type, text: entry.text, note: entry.note, carriers: [], weapons: [] };
 		if (!rule.carriers.includes(carrier)) rule.carriers.push(carrier);
+		if (weapon && !rule.weapons.includes(weapon)) rule.weapons.push(weapon);
 		rules.set(key, rule);
 	};
 
 	for (const card of cards) {
 		for (const e of entries(card, 'faction')) add(e, 'Faction rule', card.instanceId);
 		for (const e of entries(card, 'fighter', 'other')) add(e, 'Ability', card.instanceId);
-		for (const weapon of card.weapons) for (const e of weapon.explanation?.rules ?? []) add(e, 'Weapon rule', card.instanceId);
+		for (const weapon of card.weapons) {
+			/* The row's name carries the count, "Sword ×2"; the rule belongs to the sword. */
+			const name = weapon.name.replace(/ ×\d+$/, '');
+			for (const e of weapon.explanation?.rules ?? []) add(e, 'Weapon rule', card.instanceId, name);
+		}
 		for (const e of entries(card, 'equipment')) add(e, 'Item', card.instanceId);
 	}
 
@@ -131,9 +138,10 @@ function collectRules(cards: FighterCardData[]): RosterRule[] {
 
 	return [...rules.values()]
 		.sort((a, b) => RULE_ORDER.indexOf(a.type) - RULE_ORDER.indexOf(b.type) || a.name.localeCompare(b.name))
-		.map(({ carriers, ...rule }) => ({
+		.map(({ carriers, weapons, ...rule }) => ({
 			...rule,
-			fighters: carriers.length === cards.length ? 'Everyone' : carriers.map((id) => names.get(id)).join(', ')
+			fighters: carriers.length === cards.length ? 'Everyone' : carriers.map((id) => names.get(id)).join(', '),
+			...(weapons.length ? { weapons: weapons.sort((a, b) => a.localeCompare(b)).join(', ') } : {})
 		}));
 }
 
