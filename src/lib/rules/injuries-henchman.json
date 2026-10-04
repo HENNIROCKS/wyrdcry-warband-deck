@@ -1,0 +1,20 @@
+[
+  {
+    "id": "dead",
+    "name": "Dead",
+    "roll": { "min": 1, "max": 2 },
+    "permanent_injury": false,
+    "type": null,
+    "text": "The warrior has been killed (or badly crippled) and must be removed from the warband roster. Roll a D6 for their equipment; on a 5+, it is recovered and added to your warband stash.",
+    "effects": []
+  },
+  {
+    "id": "full-recovery",
+    "name": "Full Recovery",
+    "roll": { "min": 3, "max": 6 },
+    "permanent_injury": false,
+    "type": null,
+    "text": "The warrior suffers no lasting effects.",
+    "effects": []
+  }
+]
