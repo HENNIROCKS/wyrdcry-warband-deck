@@ -115,15 +115,22 @@ export function allows(faction: Faction, fighter: Fighter, id: string): boolean 
 	return allowance.allow === 'all' || isHero(fighter);
 }
 
+/** Why this fighter takes no equipment at all, whatever it is, or null when it takes some. */
+export function takesNothing(fighter: Fighter): string | null {
+	if (isBeast(fighter)) return 'A BEAST fights with what is on its profile and cannot be given equipment';
+	if (isThrall(fighter)) return 'A THRALL cannot be equipped with any weapons, armour or equipment';
+	if (isAscended(fighter)) return 'An Ascended fighter refuses to be equipped with any weapons, armour or equipment';
+	return null;
+}
+
 /**
  * Why this fighter cannot take that piece of equipment, or null when they can.
  * A sentence rather than a flag: the wizard shows it beside the greyed-out row,
  * where "no" alone reads as a fault in the app.
  */
 export function refuse(faction: Faction, fighter: Fighter, equipment: string[], id: string): string | null {
-	if (isBeast(fighter)) return 'A BEAST fights with what is on its profile and cannot be given equipment';
-	if (isThrall(fighter)) return 'A THRALL cannot be equipped with any weapons, armour or equipment';
-	if (isAscended(fighter)) return 'An Ascended fighter refuses to be equipped with any weapons, armour or equipment';
+	const none = takesNothing(fighter);
+	if (none) return none;
 	if (!allows(faction, fighter, id)) {
 		const allowance =
 			faction.equipment.find((entry) => entry.id === `weapon:${id}`) ??

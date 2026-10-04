@@ -10,6 +10,18 @@
 		waiting: number;
 	}
 
+	/** What the fighter on this back carries and could take from the stash, worked out by the page. */
+	export interface BackEquipment {
+		/** Why nothing can be moved now, or null when it can. */
+		blocked: string | null;
+		/** Said once for a fighter that takes nothing at all, instead of on every row. */
+		takesNothing: string | null;
+		/** Names of what the fighter has bought, in the draft's order. */
+		carried: string[];
+		/** The stash in the draft's order, each with why the fighter cannot take it. */
+		stash: { name: string; refused: string | null }[];
+	}
+
 	/** What dismissing the fighter on this back would mean, worked out by the page. */
 	export interface BackDismissal {
 		/** What the fighter carries, in the order it is stored – the places `toStash` names. */
@@ -23,7 +35,16 @@
 
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { MAX_XP, emptyPending, renownFloor, toRecord, type EditDraft, type FighterDraft } from '../edit';
+	import {
+		MAX_XP,
+		emptyPending,
+		renownFloor,
+		sendToStash,
+		takeFromStash,
+		toRecord,
+		type EditDraft,
+		type FighterDraft
+	} from '../edit';
 	import { RESULT_LABELS, displayDate, newestFirst, opponent } from '../history';
 	import { BLOCKED, LABELS, NOTES, change, offersTalent } from './RenownSheet.svelte';
 
@@ -31,12 +52,14 @@
 		name,
 		draft = $bindable(),
 		renown = null,
+		equipment = null,
 		dismissal = null,
 		ondismiss
 	}: {
 		name: string;
 		draft: EditDraft;
 		renown?: BackRenown | null;
+		equipment?: BackEquipment | null;
 		dismissal?: BackDismissal | null;
 		/** Asks for the fighter to be dismissed, handing what goes to the stash. */
 		ondismiss?: (toStash: number[]) => void;
@@ -227,6 +250,51 @@
 					{/if}
 					{#if renown?.next}
 						<button class="add" onclick={() => showSpending(true)}>Spend renown ({renown.waiting})</button>
+					{/if}
+				</section>
+			{/if}
+
+			{#if equipment && draft.fighter}
+				{@const fighter = draft.fighter}
+				<section>
+					<h3 class="heading"><span>Equipment</span><span class="rule"></span></h3>
+					{#if equipment.blocked}
+						<p class="hint">{equipment.blocked}</p>
+					{:else}
+						<p class="caption">Carried</p>
+						{#if equipment.carried.length}
+							<ul class="list">
+								{#each equipment.carried as item, i (i)}
+									<li>
+										<span class="line">{item}</span>
+										<button class="remove" onclick={() => sendToStash(fighter, i)}>To stash</button>
+									</li>
+								{/each}
+							</ul>
+						{:else}
+							<p class="hint">Nothing bought – what the profile brings stays with the fighter.</p>
+						{/if}
+
+						<p class="caption">In the stash</p>
+						{#if equipment.takesNothing}
+							<p class="hint">{equipment.takesNothing}.</p>
+						{:else if equipment.stash.length}
+							<ul class="list">
+								{#each equipment.stash as item, i (i)}
+									<li>
+										<span class="line">
+											{item.name}
+											{#if item.refused}<span class="why">{item.refused}</span>{/if}
+										</span>
+										<button class="remove" disabled={item.refused !== null} onclick={() => takeFromStash(fighter, i)}>
+											Take
+										</button>
+									</li>
+								{/each}
+							</ul>
+						{:else}
+							<p class="hint">The stash is empty.</p>
+						{/if}
 					{/if}
 				</section>
 			{/if}
@@ -621,5 +689,18 @@
 		font-family: 'Alegreya', serif;
 		font-size: calc(18 * var(--t));
 		color: var(--card-link);
+	}
+
+	.remove:disabled {
+		color: var(--card-ink-muted);
+	}
+
+	/* Names a list within a section, set like the counters' labels. */
+	.caption {
+		margin: calc(6 * var(--u)) 0 0;
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+		font-weight: 700;
+		color: var(--card-ink);
 	}
 </style>

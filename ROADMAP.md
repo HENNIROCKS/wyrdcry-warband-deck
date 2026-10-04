@@ -26,16 +26,16 @@
 - [x] 🎨 Keep the chosen warband when coming back to the deck
 - [x] 🃏 Count Mighty on weapons a fighter is born with or mutates into, not only on bought ones
 - [x] ⚙️ Cache game data for offline use at the table
+- [x] 🛠️ Edit on the back of the card: a fighter's fields, equipment and dismissal, the warband's notes and battles
+- [x] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
-- [ ] 🛠️ Edit on the back of the card: flip it over, every field in one place
-- [ ] 🛠️ Edit the warband stash after the build
+- [ ] 🛠️ Sell or discard from the warband stash after the build
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
 - [ ] 🎨 Go over the design and the interface outside the cards
 - [ ] 🎨 Light and dark mode, together with going over the design outside the cards
-- [ ] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [ ] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🛠️ Hire a Hired Sword for a single battle

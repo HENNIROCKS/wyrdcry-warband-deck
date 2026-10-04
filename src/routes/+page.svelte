@@ -5,7 +5,7 @@
 	import { base } from '$app/paths';
 
 	import AftermathBack from '$lib/components/AftermathBack.svelte';
-	import CardBack, { type BackDismissal, type BackRenown } from '$lib/components/CardBack.svelte';
+	import CardBack, { type BackDismissal, type BackEquipment, type BackRenown } from '$lib/components/CardBack.svelte';
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
@@ -30,9 +30,11 @@
 	} from '$lib/battle';
 	import { applyDraft, dismiss, dismissCost, emptyPending, type EditDraft } from '$lib/edit';
 	import { explain } from '$lib/explanation';
-	import { earnedLevels, limitFor, optionsFor, spend, type RenownOption } from '$lib/renown';
+	import { earnedLevels, limitFor, optionsFor, promoted, spend, type RenownOption } from '$lib/renown';
+	import { refuse, takesNothing } from '$lib/build/equipment';
+	import { fighterOf } from '$lib/build/roster';
 	import { FIGHTERS, ITEMS, WEAPONS } from '$lib/gamedata';
-	import { FACTIONS as RULESETS, RACIAL_LIMITS } from '$lib/rules';
+	import { FACTIONS as RULESETS, ITEMS as RULE_ITEMS, RACIAL_LIMITS } from '$lib/rules';
 	import { allWarbands, chooseWarband, chosenWarband, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { rosterPdf } from '$lib/roster-pdf';
 	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
@@ -119,6 +121,43 @@
 	});
 	const battle = $derived(active?.battle ?? null);
 
+	const IN_BATTLE = 'Not during a battle – end or cancel it first.';
+
+	const nameOf = (id: string) => WEAPONS.get(id)?.name ?? ITEMS.get(id)?.name ?? RULE_ITEMS.get(id)?.name ?? id;
+
+	/*
+	 * What the fighter on the back carries and could take from the stash, read off
+	 * the draft so a piece moved there is checked against what is left. Its
+	 * renown counts as the draft has it: a henchman raised to HERO there may
+	 * already take what only a HERO may.
+	 */
+	const backEquipment = $derived.by((): BackEquipment | null => {
+		if (!active || !editingId || turned !== 'edit' || !draft?.fighter) return null;
+		const fighter = draft.fighter;
+		const instance = active.warband.fighters.find((f) => f.instanceId === editingId);
+		if (!instance) return null;
+		const faction = active.warband.factionId ? RULESETS.get(active.warband.factionId) : undefined;
+		const profile = faction && fighterOf(faction, instance.fighterId);
+		const blocked = battle
+			? IN_BATTLE
+			: instance.isPending
+				? 'Not bought yet, so its equipment cannot change hands here.'
+				: !faction || !profile
+					? "This fighter is not in the app's own rules, so what it may carry cannot be checked."
+					: null;
+		if (blocked || !faction || !profile) return { blocked, takesNothing: null, carried: [], stash: [] };
+		const rules = { ...profile, keywords: promoted(profile.keywords, fighter.renown).map((k) => k.toLowerCase()) };
+		/* Purchases still waiting to be confirmed fill hands as well, as in the
+		   builder – they just cannot be moved until they are bought. */
+		const held = [...fighter.equipment, ...instance.pendingEquipment];
+		return {
+			blocked: null,
+			takesNothing: takesNothing(rules),
+			carried: fighter.equipment.map(nameOf),
+			stash: fighter.stash.map((id) => ({ name: nameOf(id), refused: refuse(faction, rules, held, id) }))
+		};
+	});
+
 	/* Whether and how the fighter on the back can be dismissed. The leader stays:
 	   the rules then elect another, which the app does not do. */
 	const backDismissal = $derived.by((): BackDismissal | null => {
@@ -126,17 +165,23 @@
 		const instance = active.warband.fighters.find((f) => f.instanceId === editingId);
 		const card = cards.find((c) => c.instanceId === editingId);
 		if (!instance || card?.kind !== 'fighter') return null;
+		const moved =
+			draft?.fighter &&
+			(draft.fighter.equipment.join() !== instance.equipment.join() ||
+				draft.fighter.stash.join() !== active.warband.stash.join());
 		const blocked = battle
-			? 'Not during a battle – end or cancel it first.'
+			? IN_BATTLE
 			: hasKeyword(card, 'LEADER')
 				? 'The leader stays: dismissing one means electing another, which this app does not do.'
-				: null;
+				: moved
+					? 'Equipment has been moved on this back – keep it with Done first.'
+					: null;
 		const ruleset = active.warband.factionId ? RULESETS.get(active.warband.factionId) : undefined;
 		const after = active.warband.fighters.length - 1;
 		const min = ruleset?.warband_size.min ?? 0;
 		return {
 			equipment: instance.equipment.map((id) => ({
-				name: WEAPONS.get(id)?.name ?? ITEMS.get(id)?.name ?? id,
+				name: nameOf(id),
 				cost: itemCost(id)
 			})),
 			blocked,
@@ -316,7 +361,9 @@
 						xp: instance.xp,
 						renown: instance.renown,
 						renownFloor: Math.max(0, ...levels),
-						spent: []
+						spent: [],
+						equipment: [...instance.equipment],
+						stash: [...active.warband.stash]
 					}
 				: null,
 			notes: isWarband ? active.warband.factionNotes : (instance?.notes ?? ''),
@@ -607,6 +654,7 @@
 					name={card.name}
 					bind:draft
 					renown={backRenown}
+					equipment={backEquipment}
 					dismissal={backDismissal}
 					ondismiss={(toStash) => (discharged = { instanceId: card.instanceId, name: card.name, toStash })}
 				/>

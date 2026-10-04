@@ -43,6 +43,10 @@ export interface FighterDraft {
 	 */
 	renownFloor: number;
 	spent: SpentLevel[];
+	/** What the fighter has bought, as stored – what it is born with is not in here. */
+	equipment: string[];
+	/** The warband's stash, which the fighter hands pieces to and takes them from. */
+	stash: string[];
 }
 
 export const MAX_XP = 3;
@@ -91,6 +95,22 @@ export function renownFloor(fighter: FighterDraft): number {
 	return Math.max(fighter.renownFloor, ...fighter.spent.map((s) => s.level));
 }
 
+/** A piece the fighter carries goes to the stash. No gold moves, in the builder neither. */
+export function sendToStash(fighter: FighterDraft, index: number): void {
+	const id = fighter.equipment[index];
+	if (id === undefined) return;
+	fighter.equipment = fighter.equipment.filter((_, i) => i !== index);
+	fighter.stash = [...fighter.stash, id];
+}
+
+/** A piece from the stash goes to the fighter; whether it may is `refuse()`'s to say. */
+export function takeFromStash(fighter: FighterDraft, index: number): void {
+	const id = fighter.stash[index];
+	if (id === undefined) return;
+	fighter.stash = fighter.stash.filter((_, i) => i !== index);
+	fighter.equipment = [...fighter.equipment, id];
+}
+
 /**
  * The warband as Done would store it. Renown raised on the back is a level to
  * spend like one from the aftermath, and the levels spent on the back are then
@@ -108,16 +128,26 @@ export function applyDraft(
 ): StoredWarband {
 	const isWarband = targetId === 'warband';
 	const fighter = draft.fighter;
+	const before = stored.warband.fighters.find((f) => f.instanceId === targetId);
+	/* The stash is the draft's copy from when the card was turned: written only
+	   when something moved, so a back that moved nothing leaves it as it is. */
+	const moved = fighter && before && fighter.equipment.join() !== before.equipment.join();
 	const warband = isWarband
 		? { ...stored.warband, factionNotes: draft.notes }
 		: {
 				...stored.warband,
+				...(moved && { stash: fighter.stash }),
 				fighters: stored.warband.fighters.map((f) =>
 					f.instanceId === targetId
 						? {
 								...f,
 								notes: draft.notes,
-								...(fighter && { customName: fighter.name.trim(), xp: fighter.xp, renown: fighter.renown })
+								...(fighter && {
+									customName: fighter.name.trim(),
+									xp: fighter.xp,
+									renown: fighter.renown,
+									equipment: fighter.equipment
+								})
 							}
 						: f
 				)
