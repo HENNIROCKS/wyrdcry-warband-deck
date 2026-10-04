@@ -24,6 +24,7 @@
 - [x] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [x] 📄 Export the warband as a roster PDF
 - [x] 🎨 Keep the chosen warband when coming back to the deck
+- [x] 🃏 Count Mighty on weapons a fighter is born with or mutates into, not only on bought ones
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Cache game data for offline use at the table
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
@@ -32,7 +33,6 @@
 - [ ] 🛠️ Edit the warband stash after the build
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
-- [ ] 🃏 Count Mighty on weapons a fighter is born with or mutates into, not only on bought ones
 - [ ] 🎨 Go over the design and the interface outside the cards
 - [ ] 🎨 Light and dark mode, together with going over the design outside the cards
 - [ ] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
