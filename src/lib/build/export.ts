@@ -74,6 +74,12 @@ export function toWarband(faction: Faction, draft: Draft, id = newId()): Warband
 }
 
 /**
+ * Ends the text of a faction rule that moved a characteristic. The card reads it
+ * back off the end (`adapter.ts`, `customAbilities`) and sets it apart.
+ */
+export const ALREADY_INCLUDED = 'Already included.';
+
+/**
  * The rules in play, one ability each, carried by the faction's name. That name
  * is what puts them in the "Faction Rules" section of every fighter card, beside
  * the universal abilities and reactions – the rules apply to the whole warband,
@@ -91,10 +97,7 @@ function factionAbilities(faction: Faction, draft: Draft): CustomAbility[] {
 			const picked = option ? rule.options.find((entry) => entry.id === option) : null;
 			const carrier = picked ?? rule;
 			const head = picked ? `${rule.name} – ${picked.name}` : rule.name;
-			const counted =
-				carrier.effect?.kind === 'stat'
-					? ' Already included.'
-					: '';
+			const counted = carrier.effect?.kind === 'stat' ? ` ${ALREADY_INCLUDED}` : '';
 
 			/* Some faction rules are abilities a fighter spends an activation on and
 			   open with their type: "[Trait] When this fighter…". The card puts the

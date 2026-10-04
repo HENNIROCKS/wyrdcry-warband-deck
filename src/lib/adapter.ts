@@ -9,6 +9,7 @@
  * values mirror the builder (`useWarband.ts` in jomblr/wyrdcry).
  */
 
+import { ALREADY_INCLUDED } from './build/export';
 import { CURATED_ITEM_EFFECTS } from './curated';
 import { RESULT_LABELS, displayDate, newestFirst, opponent, tally } from './history';
 import {
@@ -275,12 +276,12 @@ function customAbilities(warband: Warband, ...targets: string[]): Ability[] {
 			const description = match ? match[3].trim() : entry.ability;
 			/* A faction rule that moved a characteristic ends on the deck's own
 			   word (`build/export.ts`), which the card sets apart from the rule. */
-			const counted = description.match(/\s*Already included\.$/);
+			const counted = description.endsWith(ALREADY_INCLUDED);
 			return {
 				name: match ? match[2].trim() : entry.type || 'Note',
 				type: match?.[1]?.trim() ?? entry.type,
-				description: counted ? description.slice(0, counted.index) : description,
-				note: counted ? 'Already included.' : undefined
+				description: counted ? description.slice(0, -ALREADY_INCLUDED.length).trimEnd() : description,
+				note: counted ? ALREADY_INCLUDED : undefined
 			};
 		});
 }

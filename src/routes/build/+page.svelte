@@ -251,8 +251,9 @@
 		try {
 			await putWarband(entry);
 			await requestPersistence();
-			/* The deck opens on the warband just built, not the first one by name. */
-			await chooseWarband(warband.id);
+			/* The deck opens on the warband just built, not the first one by name.
+			   Saved it is either way, so a failure here must not read as one. */
+			await chooseWarband(warband.id).catch(() => {});
 			await goto(`${base}/`);
 		} catch (error) {
 			/* Storage full, or a browser that refuses IndexedDB in a private
