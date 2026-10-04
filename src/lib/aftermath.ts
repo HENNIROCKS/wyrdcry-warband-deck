@@ -1,7 +1,7 @@
 /**
  * Step 2 of the aftermath sequence: experience, and the renown it crosses
- * into. Pure warband math – the sheet that collects a player's answers lives
- * in `AftermathSheet.svelte`.
+ * into. Pure warband math – the back of the warband card that collects a
+ * player's answers is `AftermathBack.svelte`.
  *
  * Renown is a counter here. What a level is spent on – a Characteristics
  * Increase – is `renown.ts`, which the page opens for every level this step
@@ -58,6 +58,34 @@ export interface AftermathAnswer {
 	participated: boolean;
 	survived: boolean;
 	enemyOut: boolean;
+}
+
+/**
+ * The experience step while it is being answered on the back of the warband
+ * card. Who is asked is read once, when the battle starts ending: the back is
+ * never kept open across a change underneath it.
+ */
+export interface AftermathDraft {
+	rows: AftermathCandidate[];
+	/** Who never earns experience, named under the rows. */
+	excluded: string[];
+	/** Keyed by instanceId. */
+	answers: Record<string, AftermathAnswer>;
+	/** The one fighter given the bonus point, if any. */
+	bonus: string | null;
+}
+
+export function startAftermath(warband: Warband, cards: FighterCardData[], battle: BattleState | null): AftermathDraft {
+	const all = candidates(warband, cards, battle);
+	const rows = all.filter((c) => c.eligible);
+	return {
+		rows,
+		excluded: all.filter((c) => !c.eligible).map((c) => c.name),
+		answers: Object.fromEntries(
+			rows.map((r) => [r.instanceId, { participated: r.participated, survived: r.survived, enemyOut: false }])
+		),
+		bonus: null
+	};
 }
 
 export function xpEarned(answer: AftermathAnswer, bonus: boolean): number {

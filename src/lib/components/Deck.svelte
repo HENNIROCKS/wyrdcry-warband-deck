@@ -26,7 +26,9 @@
 		back,
 		onedit,
 		ondone,
-		oncancel
+		doneLabel,
+		oncancel,
+		turnTo = null
 	}: {
 		cards: DeckCard[];
 		/** What each fighter counts for in the morale. Every fighter counts as one where it is left out. */
@@ -40,14 +42,20 @@
 		onheroic?: (instanceId: string) => void;
 		oncover?: (instanceId: string) => void;
 		onpanicked?: (instanceId: string) => void;
-		/** Whether the card on top is turned over to its back, to be edited. */
+		/** Whether the card on top is turned over to its back – to be edited, or for what the back asks. */
 		editing?: boolean;
 		/** The back of the card on top, shown while `editing`. */
 		back?: Snippet<[DeckCard]>;
 		/** Asks for the card on top to be turned over. */
 		onedit?: (instanceId: string) => void;
 		ondone?: () => void;
+		doneLabel?: string;
 		oncancel?: () => void;
+		/**
+		 * The card to turn over when it is not the one on top – ending a battle
+		 * turns the warband card, wherever the deck stands. Brought up first.
+		 */
+		turnTo?: string | null;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
@@ -140,6 +148,13 @@
 	 */
 	async function turn() {
 		if (turning || editing === shown) return;
+		if (editing && turnTo && cards[current]?.instanceId !== turnTo) {
+			const index = cards.findIndex((c) => c.instanceId === turnTo);
+			if (index >= 0) {
+				current = index;
+				await tick();
+			}
+		}
 		if (reduced || !face) {
 			shown = editing;
 			if (topPane) topPane.scrollTop = 0;
@@ -348,6 +363,7 @@
 			{editing}
 			onedit={() => onedit?.(top.instanceId)}
 			{ondone}
+			{doneLabel}
 			{oncancel}
 		/>
 	{/if}

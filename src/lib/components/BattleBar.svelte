@@ -19,6 +19,7 @@
 		editing = false,
 		onedit,
 		ondone,
+		doneLabel = 'Done',
 		oncancel
 	}: {
 		battle?: BattleState | null;
@@ -48,6 +49,8 @@
 		onedit?: () => void;
 		/** Writes what the back of the card holds and turns it over again. */
 		ondone?: () => void;
+		/** What finishing the turned card does, on its button. */
+		doneLabel?: string;
 		/** Turns the card over again and lets what was written fall. */
 		oncancel?: () => void;
 	} = $props();
@@ -73,7 +76,7 @@
 		     changed now would land on a card whose front is not in view. -->
 		<div class="finish">
 			<button class="ghost" onclick={() => oncancel?.()}>Cancel</button>
-			<button onclick={() => ondone?.()}>Done</button>
+			<button onclick={() => ondone?.()}>{doneLabel}</button>
 		</div>
 	{:else if state}
 		<div class="wounds">

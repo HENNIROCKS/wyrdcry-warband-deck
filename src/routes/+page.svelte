@@ -4,14 +4,14 @@
 	import { dev } from '$app/environment';
 	import { base } from '$app/paths';
 
-	import AftermathSheet from '$lib/components/AftermathSheet.svelte';
+	import AftermathBack from '$lib/components/AftermathBack.svelte';
 	import CardBack, { type BackRenown } from '$lib/components/CardBack.svelte';
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import RenownSheet from '$lib/components/RenownSheet.svelte';
 	import { toCards } from '$lib/adapter';
-	import { applyAftermath, type AftermathAnswer } from '$lib/aftermath';
+	import { applyAftermath, startAftermath, type AftermathAnswer, type AftermathDraft } from '$lib/aftermath';
 	import { countedFighters } from '$lib/morale';
 	import {
 		allocate,
@@ -42,14 +42,16 @@
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
 	let candidate = $state<ImportCandidate | null>(null);
-	/* Set while the aftermath sheet is up, asking what a battle just ending is
-	   worth in experience before the battle itself is thrown away. */
-	let endingBattle = $state(false);
-	/* The instanceId of the card turned over to be edited, 'warband' included. */
+	/* The instanceId of the card turned over, 'warband' included. */
 	let editingId = $state<string | null>(null);
-	/* What its back holds. Left in place when the card is turned again, so the
-	   back still has something to show while it turns out of view. */
+	/* What the turned card's back is for: editing it, or the experience a battle
+	   just ending is worth, asked on the warband card before the battle itself
+	   is thrown away. Like the drafts below, it is left in place when the card
+	   is turned again, so the back still has something to show while it turns
+	   out of view. */
+	let turned = $state<'edit' | 'aftermath'>('edit');
 	let draft = $state<EditDraft | null>(null);
+	let aftermath = $state<AftermathDraft | null>(null);
 	/* A draft belongs to the warband it was started on: another one coming up
 	   ends the edit rather than writing the draft into it. */
 	$effect(() => {
@@ -190,7 +192,6 @@
 			updatedAt: new Date().toISOString()
 		};
 		await putWarband(entry);
-		endingBattle = false;
 		renownOpen = levels.length > 0;
 		await refresh();
 	}
@@ -207,6 +208,23 @@
 		}
 		await refresh();
 		if (!nextRenown) renownOpen = false;
+	}
+
+	/** Turns the warband card over to ask what the battle was worth in experience. */
+	function endBattle() {
+		if (!active) return;
+		const fighters = cards.filter((c) => c.kind === 'fighter');
+		aftermath = startAftermath(active.warband, fighters, battle);
+		turned = 'aftermath';
+		editingId = 'warband';
+	}
+
+	/* Ended before the write, like `saveEdit`, so a second tap finds nothing to apply. */
+	async function finishAftermath() {
+		if (!aftermath || !editingId) return;
+		const values = $state.snapshot(aftermath);
+		editingId = null;
+		await applyAftermathAndEnd(new Map(Object.entries(values.answers)), values.bonus);
 	}
 
 	function startEdit(id: string) {
@@ -233,6 +251,7 @@
 			removed: [],
 			pending: emptyPending()
 		};
+		turned = 'edit';
 		editingId = id;
 	}
 
@@ -432,7 +451,7 @@
 							</button>
 						{/if}
 						<hr />
-						<button onclick={() => (endingBattle = true)}>End battle</button>
+						<button onclick={endBattle}>End battle</button>
 						<p class="hint">Asks who earned experience, then drops the wounds and who is out of action.</p>
 					{:else}
 						<p>No battle</p>
@@ -498,12 +517,16 @@
 		oncover={(id) => setBattle(toggleCover(battle, id))}
 		onpanicked={(id) => setBattle(togglePanicked(battle, id))}
 		editing={editingId !== null}
+		turnTo={editingId}
 		onedit={startEdit}
-		ondone={saveEdit}
+		ondone={turned === 'aftermath' ? finishAftermath : saveEdit}
+		doneLabel={turned === 'aftermath' ? 'Apply and end battle' : 'Done'}
 		oncancel={() => (editingId = null)}
 	>
 		{#snippet back(card)}
-			{#if draft}
+			{#if turned === 'aftermath' && aftermath}
+				<AftermathBack name={card.name} bind:draft={aftermath} />
+			{:else if turned === 'edit' && draft}
 				<CardBack name={card.name} bind:draft renown={backRenown} />
 			{/if}
 		{/snippet}
@@ -525,16 +548,6 @@
 		{candidate}
 		onconfirm={confirmImport}
 		oncancel={() => (candidate = null)}
-	/>
-{/if}
-
-{#if endingBattle && active}
-	<AftermathSheet
-		warband={active.warband}
-		cards={cards.filter((c) => c.kind === 'fighter')}
-		{battle}
-		onconfirm={applyAftermathAndEnd}
-		oncancel={() => (endingBattle = false)}
 	/>
 {/if}
 

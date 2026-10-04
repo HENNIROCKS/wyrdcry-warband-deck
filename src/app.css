@@ -213,3 +213,78 @@ button {
 	border-radius: calc(14 * var(--u));
 	overflow: hidden;
 }
+
+/*
+ * The back of a card, wherever it is turned over to be written on: the name
+ * across the top, then sections under a word in the card's script and a rule
+ * out to the edge. Global, because more than one back is built on it.
+ */
+
+/* Clear of the strokes that mark the place in the stack across the top. */
+.card.back .name {
+	margin: 0;
+	padding: calc(44 * var(--u)) calc(30 * var(--u)) 0;
+	text-align: center;
+	font-family: 'Grenze Gotisch', serif;
+	font-weight: 600;
+	font-size: calc(34 * var(--t));
+	line-height: 1.1;
+	color: #000;
+	overflow-wrap: anywhere;
+}
+
+.card.back .parchment {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: calc(66 * var(--u));
+	padding: calc(18 * var(--u)) calc(30 * var(--u)) calc(38 * var(--u));
+}
+
+.card.back section {
+	display: flex;
+	flex-direction: column;
+	gap: calc(10 * var(--u));
+}
+
+.card.back .heading {
+	display: flex;
+	align-items: center;
+	gap: calc(8 * var(--t));
+	margin: 0;
+	padding: calc(4 * var(--t)) 0;
+	font-family: 'Grenze Gotisch', serif;
+	font-weight: 400;
+	font-size: calc(18 * var(--t));
+	line-height: 1;
+	letter-spacing: 0.04em;
+	color: #000;
+}
+
+.card.back .rule {
+	flex: 1;
+	height: 2px;
+	background: #000;
+}
+
+.card.back .hint {
+	margin: 0;
+	font-family: 'Alegreya', serif;
+	font-size: calc(18 * var(--t));
+	line-height: 1.4;
+	font-style: italic;
+	color: var(--card-ink-muted);
+}
+
+/* A longer note to be read, set apart by the light patch the back's fields
+   sit on rather than by smaller type. */
+.card.back .note {
+	margin: 0;
+	padding: calc(10 * var(--u)) calc(12 * var(--u));
+	border-radius: calc(6 * var(--u));
+	background: rgb(255 255 255 / 0.45);
+	font-family: 'Alegreya', serif;
+	font-size: calc(18 * var(--t));
+	line-height: 1.4;
+	color: var(--card-ink);
+}
