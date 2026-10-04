@@ -133,6 +133,14 @@ export interface FighterCardData {
 	fluff: string;
 }
 
+/** One fighter in the warband card's overview. `type` is empty where the name already is the profile's. */
+export interface RosterEntry {
+	instanceId: string;
+	name: string;
+	type: string;
+	leader: boolean;
+}
+
 /**
  * The warband itself as a card: what the builder's info row carries, plus the
  * stash and the warband notes. Everything on it is derived from the warband and
@@ -146,6 +154,8 @@ export interface WarbandCardData {
 	/** Runs in the banderole under the name, where a text card names its category. */
 	faction: string;
 	tables: CardValue[][];
+	/** The fighters by rank, the leader ahead of the heroes, otherwise in the order the warband stores them. */
+	roster: { heroes: RosterEntry[]; henchmen: RosterEntry[] };
 	/** What the gold table shows, as figures: what is left, and what unconfirmed purchases take of it. */
 	gold: { remaining: number; pending: number };
 	/** The names alone: whoever picks a thing up has its rules on their own card. */

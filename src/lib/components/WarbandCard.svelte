@@ -1,8 +1,7 @@
 <script lang="ts">
 	import imageMask from '../image-mask.svg?raw';
-	import ValueTable from './ValueTable.svelte';
 	import RuleText from './RuleText.svelte';
-	import type { WarbandCardData } from '../types/card';
+	import type { RosterEntry, WarbandCardData } from '../types/card';
 
 	let { card }: { card: WarbandCardData } = $props();
 
@@ -32,8 +31,18 @@
 
 		<div class="profile">
 			{#each card.tables as rows, i (i)}
-				<ValueTable {rows} />
+				<dl class="stats">
+					{#each rows as row (row.key)}
+						<dt>{row.label}</dt>
+						<dd class:modified={row.modified}>{row.value}</dd>
+					{/each}
+				</dl>
 			{/each}
+
+			<div class="roster">
+				{@render group('Heroes', card.roster.heroes)}
+				{@render group('Henchmen', card.roster.henchmen)}
+			</div>
 		</div>
 
 		{#if card.stash}
@@ -78,6 +87,25 @@
 	<p class="entry"><RuleText text={text} /></p>
 {/snippet}
 
+<!-- A group without fighters keeps its heading, so the box always names both ranks. -->
+{#snippet group(title: string, entries: RosterEntry[])}
+	<section class="group">
+		<h3>{title}</h3>
+		{#if entries.length}
+			<ul>
+				{#each entries as entry (entry.instanceId)}
+					<li>
+						<span class="fighter">{entry.name}</span>
+						{#if entry.leader || entry.type}<span class="type">{[entry.leader && 'Leader', entry.type].filter(Boolean).join(' · ')}</span>{/if}
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<p class="none">–</p>
+		{/if}
+	</section>
+{/snippet}
+
 <style>
 	/* ── Image section ─────────────────────────── */
 
@@ -87,7 +115,7 @@
 	 * more than one line grows the field instead of reaching into the parchment.
 	 *
 	 * Below it the mask matters: it paints the whole of the background box, which
-	 * overhangs the banderole by 50u. Those 50u plus the 30u the tables keep clear
+	 * overhangs the banderole by 50u. Those 50u plus the 30u the stats keep clear
 	 * – as much as they keep to the boxes below them – less the 29u the parchment
 	 * pads with, make the 51u here.
 	 */
@@ -147,13 +175,112 @@
 		padding: calc(29 * var(--u)) calc(30 * var(--u)) calc(38 * var(--u));
 	}
 
-	/* The tables read as one block: the parchment's gap between them, roughly
-	   twice that to the boxes below. */
+	/* Two boxes side by side and the roster across both below them, the
+	   parchment's gap between them and roughly twice that to the boxes further
+	   down. The two are stretched to the taller one, so a box with a row less
+	   keeps it empty at its foot. */
 	.profile {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		gap: calc(14 * var(--u));
 		margin-bottom: calc(16 * var(--u));
+	}
+
+	.stats,
+	.roster {
+		margin: 0;
+		padding: calc(14 * var(--u)) calc(16 * var(--u));
+		border: 1px solid var(--card-green);
+		border-radius: calc(7.5 * var(--u));
+		/* The fighter tables' values row: it lifts the green labels to 4.8:1
+		   over the texture's mean. */
+		background: var(--card-wash);
+	}
+
+	/* Labels in a column as wide as the longest, so every value of a box starts
+	   on the same edge. Left-aligned, since Standing carries a word. */
+	.stats {
+		display: grid;
+		grid-template-columns: max-content minmax(0, 1fr);
+		align-content: start;
+		column-gap: calc(12 * var(--u));
+		row-gap: calc(4 * var(--u));
+		font-family: 'Grenze Gotisch', serif;
+		font-size: calc(20 * var(--t));
+		line-height: 1.3;
+		/* Grenze Gotisch defaults to old-style figures, which hang below the
+		   baseline; the lining set sits on it like the labels, the tabular one
+		   keeps the digits of the column over each other. */
+		font-variant-numeric: lining-nums tabular-nums;
+	}
+
+	.stats dt {
+		color: var(--card-green);
+	}
+
+	.stats dd {
+		margin: 0;
+		color: var(--card-ink);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* Gold with unconfirmed purchases, marked the way a changed characteristic
+	   is on a fighter's card. */
+	.stats .modified {
+		color: var(--card-green);
+		text-decoration: underline;
+		text-decoration-thickness: calc(2 * var(--u));
+		text-underline-offset: 0.15em;
+	}
+
+	/* Heroes above henchmen, each across the full width in three columns, as far
+	   apart as the box is padded. */
+	.roster {
+		grid-column: 1 / -1;
+		display: grid;
+		row-gap: calc(14 * var(--u));
+	}
+
+	.group h3 {
+		margin: 0 0 calc(4 * var(--u));
+		font-family: 'Grenze Gotisch', serif;
+		font-size: calc(20 * var(--t));
+		font-weight: inherit;
+		line-height: 1.3;
+		color: var(--card-green);
+	}
+
+	.group ul {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		column-gap: calc(16 * var(--u));
+		row-gap: calc(6 * var(--u));
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.group li,
+	.none {
+		min-width: 0;
+		margin: 0;
+		font-family: 'Alegreya', serif;
+		line-height: 1.25;
+		overflow-wrap: anywhere;
+	}
+
+	.fighter {
+		display: block;
+		font-size: calc(18 * var(--t));
+	}
+
+	.type,
+	.none {
+		display: block;
+		font-size: calc(15 * var(--t));
+		color: var(--card-ink-muted);
 	}
 
 	/* Prose, not a rule: no wash, no border, set apart only by the italic. Twice

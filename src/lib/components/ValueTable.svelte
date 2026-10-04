@@ -92,8 +92,8 @@
 		color: var(--card-paper);
 	}
 
-	/* Standing carries a word where the other columns carry figures; past the
-	   floor the fit action stops at, it is cut rather than run into the next. */
+	/* Past the floor the fit action stops at, a value is cut rather than run
+	   into the next column. */
 	.value {
 		color: var(--card-ink);
 		font-size: calc(20 * var(--t) * var(--fit, 1));

@@ -33,6 +33,7 @@ import type {
 	CardWeapon,
 	DeckCard,
 	FighterCardData,
+	RosterEntry,
 	StatCondition,
 	StatLayer,
 	WarbandCardData
@@ -715,12 +716,27 @@ export function toWarbandCard(
 		]
 	];
 
+	/* Read off the card's keywords, which already carry a promotion. The leader
+	   is a hero in the rules and stands first among them; a fighter with none of
+	   the three stands with the henchmen rather than nowhere. */
+	const roster: WarbandCardData['roster'] = { heroes: [], henchmen: [] };
+
+	for (const card of cards) {
+		const leader = hasKeyword(card, 'LEADER');
+		const entry: RosterEntry = { instanceId: card.instanceId, name: card.name, type: card.subtitle, leader };
+		if (leader || hasKeyword(card, 'HERO')) roster.heroes.push(entry);
+		else roster.henchmen.push(entry);
+	}
+
+	roster.heroes.sort((a, b) => Number(b.leader) - Number(a.leader));
+
 	return {
 		kind: 'warband',
 		instanceId: 'warband',
 		name: warband.name,
 		faction: faction?.name ?? 'Warband',
 		tables,
+		roster,
 		gold: { remaining, pending },
 		stash: [...stashWeapons, ...stashItems].join(', '),
 		notes: warband.factionNotes.trim(),
