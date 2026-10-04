@@ -4,7 +4,7 @@
 	import RuleText from './RuleText.svelte';
 	import type { RosterEntry, WarbandCardData } from '../types/card';
 
-	let { card }: { card: WarbandCardData } = $props();
+	let { card, onpick }: { card: WarbandCardData; onpick?: (instanceId: string) => void } = $props();
 
 	/* The torn banner shape of the Card Creator's text card. Inlined as a data URL
 	   because a mask cannot point at a Svelte import. */
@@ -96,8 +96,12 @@
 			<ul>
 				{#each entries as entry (entry.instanceId)}
 					<li>
-						<span class="fighter">{entry.name}</span>
-						{#if entry.leader || entry.type}<span class="type">{[entry.leader && 'Leader', entry.type].filter(Boolean).join(' · ')}</span>{/if}
+						<!-- The whole entry is the way to the fighter's card, set as it
+						     reads rather than as a button. -->
+						<button class="pick" disabled={!onpick} onclick={() => onpick?.(entry.instanceId)}>
+							<span class="fighter">{entry.name}</span>
+							{#if entry.leader || entry.type}<span class="type">{[entry.leader && 'Leader', entry.type].filter(Boolean).join(' · ')}</span>{/if}
+						</button>
 					</li>
 				{/each}
 			</ul>
@@ -283,6 +287,18 @@
 		overflow-wrap: anywhere;
 	}
 
+	.pick {
+		display: block;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		font: inherit;
+		color: inherit;
+		text-align: left;
+	}
+
 	.fighter {
 		display: block;
 		font-size: calc(18 * var(--t));
@@ -316,18 +332,18 @@
 		white-space: pre-wrap;
 	}
 
-	/* The surface sets stash and notes off from the numbers above them, so neither
+	/* The boxes' light wash sets stash and notes off from the paper, so neither
 	   needs a rule of its own. */
 	.notes {
 		padding: calc(14 * var(--u)) calc(16 * var(--u));
 		border-radius: calc(7.5 * var(--u));
-		background: var(--card-wash-strong);
+		background: var(--card-wash);
 	}
 
 	/* A log rather than a figure of the warband: the boxes' light wash and
 	   padding but no border and no green, a solid rule under the heading and a
-	   dashed one between the rows, set a step below the notes, and twice the
-	   parchment's gap away from them. */
+	   dashed one between the rows, and twice the parchment's gap away from the
+	   notes. */
 	.battles {
 		margin-top: calc(14 * var(--u));
 		padding: calc(14 * var(--u)) calc(16 * var(--u));

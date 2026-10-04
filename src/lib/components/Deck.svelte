@@ -236,6 +236,13 @@
 		}, duration);
 	}
 
+	/** Straight to a fighter's card, from its name on the warband card: no flight across the stack. */
+	function jumpTo(instanceId: string) {
+		if (leaving || editing) return;
+		const index = cards.findIndex((c) => c.instanceId === instanceId);
+		if (index >= 0) current = index;
+	}
+
 	function onKeyDown(event: KeyboardEvent) {
 		/* The arrows move the caret in a field on the back, not the deck. */
 		if (cards.length < 2 || editing) return;
@@ -352,7 +359,7 @@
 
 {#snippet card(data: DeckCard)}
 	{#if data.kind === 'warband'}
-		<WarbandCard card={data} />
+		<WarbandCard card={data} onpick={jumpTo} />
 	{:else}
 		<FighterCard card={data} state={stateOf(battle, data.instanceId)} {wavering} />
 	{/if}

@@ -6,9 +6,10 @@ through the fighters.
 
 Unofficial fan project. No connection to Games Workshop.
 
-**Status: early.** The app builds a warband of any of the eight factions and
-tracks a battle; it does not yet edit a warband once it exists, and the way back
-to the Warband Builder is not currently assured – see
+**Status: early.** The app builds a warband of any of the eight factions, tracks
+a battle and corrects a fighter's name, experience and renown afterwards; it
+does not yet change a fighter's equipment or dismiss one, and the way back to
+the Warband Builder is not currently assured – see
 [Warband Builder compatibility](#warband-builder-compatibility).
 
 ## What it does
@@ -23,6 +24,10 @@ to the Warband Builder is not currently assured – see
   reputation, gold, value, stash, its heroes and henchmen at a glance, the
   warband notes and a battle history counted into won, drawn and lost
 - Show fighters as cards and swipe through them
+- Tap a fighter on the warband card to jump straight to its card
+- Turn a card over to edit it: a fighter's name, experience, renown, notes and
+  fluff, or the warband's notes and battle history. A renown level is spent on
+  a characteristic right there
 - Tap a worked-out value or a weapon to see where it comes from: which
   modifiers went into it, and which rules apply only in the right situation
 - Track a battle: mark fighters as activated or waiting, count the damage each
@@ -30,6 +35,7 @@ to the Warband Builder is not currently assured – see
   get reminded of each fighter's Bravery test while it does, mark who is
   panicked, count the rounds and clear the round's states for the next one – one step of
   that is undoable
+- After a battle, award experience and spend the renown it brings
 - Export through the system share sheet, either as the current state or as a
   dated snapshot
 - Export the warband as a roster PDF on A4 landscape, through the same share
