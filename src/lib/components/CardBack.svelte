@@ -1,61 +1,56 @@
 <script lang="ts" module>
-	import { newId } from '../id';
-	import { today } from '../history';
-	import type { BattleRecord } from '../types/warband';
+	import type { RenownOption } from '../renown';
+	import type { BattleRecord, RenownBranch } from '../types/warband';
 
-	export interface PendingBattle {
-		date: string;
-		result: BattleRecord['result'] | null;
-		opponentWarband: string;
-		opponentPlayer: string;
-	}
-
-	/**
-	 * Everything the back of a card edits, held apart from the warband until
-	 * Done writes it in one go – Cancel simply lets it fall.
-	 */
-	export interface EditDraft {
-		notes: string;
-		fluff: string;
-		/** The battles, on the warband card only. */
-		history: BattleRecord[] | null;
-		/** Battles struck out, dropped on Done and brought back until then. */
-		removed: string[];
-		/** The battle being entered and not yet added. */
-		pending: PendingBattle;
-	}
-
-	export function emptyPending(): PendingBattle {
-		return { date: today(), result: null, opponentWarband: '', opponentPlayer: '' };
-	}
-
-	export function toRecord(pending: PendingBattle): BattleRecord | null {
-		if (!pending.result || !pending.date) return null;
-		return {
-			id: newId(),
-			date: pending.date,
-			result: pending.result,
-			opponentWarband: pending.opponentWarband.trim(),
-			opponentPlayer: pending.opponentPlayer.trim()
-		};
-	}
-
-	/**
-	 * The history Done writes: the struck-out battles gone, and a battle left
-	 * filled in but not added taken in as well – its result is picked, so it was
-	 * meant, and Done is not the place to lose it.
-	 */
-	export function finalHistory(draft: EditDraft): BattleRecord[] {
-		const kept = (draft.history ?? []).filter((r) => !draft.removed.includes(r.id));
-		const pending = toRecord(draft.pending);
-		return pending ? [...kept, pending] : kept;
+	/** The levels the fighter on this back can spend, on the warband as Done would store it. */
+	export interface BackRenown {
+		/** The first level still open, and what it can be spent on. */
+		next: { level: number; branch: RenownBranch; options: RenownOption[] } | null;
+		/** Every level still open, `next` included. */
+		waiting: number;
 	}
 </script>
 
 <script lang="ts">
+	import { tick } from 'svelte';
+	import { MAX_XP, emptyPending, renownFloor, toRecord, type EditDraft, type FighterDraft } from '../edit';
 	import { RESULT_LABELS, displayDate, newestFirst, opponent } from '../history';
+	import { BLOCKED, LABELS, NOTES, change, offersTalent } from './RenownSheet.svelte';
 
-	let { name, draft = $bindable() }: { name: string; draft: EditDraft } = $props();
+	let {
+		name,
+		draft = $bindable(),
+		renown = null
+	}: { name: string; draft: EditDraft; renown?: BackRenown | null } = $props();
+
+	/* The back has a second page for spending a level: it takes the card's place
+	   rather than opening a sheet over it, so the choice is part of the draft and
+	   Cancel drops it like everything else. */
+	let spending = $state(false);
+	let article: HTMLElement | undefined = $state();
+	let campaign: HTMLElement | undefined = $state();
+
+	const next = $derived(spending ? (renown?.next ?? null) : null);
+	const open = $derived(next?.options.some((o) => o.blocked === null) ?? false);
+
+	async function showSpending(on: boolean) {
+		spending = on;
+		await tick();
+		/* The page swapped under a finger that was halfway down the card. */
+		(on ? article : campaign)?.scrollIntoView({ block: 'start' });
+	}
+
+	function choose(option: RenownOption | null) {
+		if (!draft.fighter || !next) return;
+		draft.fighter.spent = [...draft.fighter.spent, { level: next.level, option }];
+		showSpending(false);
+	}
+
+	/** Only the last: the choices after a level were offered on the figures it left. */
+	function undoLast() {
+		if (!draft.fighter) return;
+		draft.fighter.spent = draft.fighter.spent.slice(0, -1);
+	}
 
 	const sorted = $derived(draft.history ? newestFirst(draft.history) : []);
 
@@ -64,6 +59,16 @@
 		if (!record || !draft.history) return;
 		draft.history = [...draft.history, record];
 		draft.pending = emptyPending();
+	}
+
+	/** The point that would make a fourth is a level of renown instead, as in `applyXp`. */
+	function moreXp(fighter: FighterDraft) {
+		if (fighter.xp < MAX_XP) {
+			fighter.xp += 1;
+		} else {
+			fighter.xp = 0;
+			fighter.renown += 1;
+		}
 	}
 
 	function toggleRemoved(id: string) {
@@ -84,88 +89,188 @@
 	}
 </script>
 
-<article class="card back">
+<article class="card back" bind:this={article}>
 	<h2 class="name">{name}</h2>
 
-	<div class="parchment">
-		<section>
-			<label class="heading" for="back-fluff"><span>Fluff</span><span class="rule"></span></label>
-			<textarea
-				id="back-fluff"
-				class="fluff"
-				rows="2"
-				placeholder="A line or two of story"
-				bind:value={draft.fluff}
-				use:grow
-			></textarea>
-		</section>
-
-		<section>
-			<label class="heading" for="back-notes"><span>Notes</span><span class="rule"></span></label>
-			<textarea
-				id="back-notes"
-				rows="2"
-				placeholder="Anything to remember at the table"
-				bind:value={draft.notes}
-				use:grow
-			></textarea>
-		</section>
-
-		{#if draft.history}
+	{#if next}
+		<div class="parchment">
 			<section>
-				<h3 class="heading"><span>Battles</span><span class="rule"></span></h3>
+				<button class="back-link" onclick={() => showSpending(false)}>‹ Back</button>
+				<h3 class="heading"><span>Renown {next.level}</span><span class="rule"></span></h3>
+				<p class="hint">
+					{NOTES[next.branch]}{#if offersTalent(next.branch)}{' '}Talents are not offered here yet – go back to keep the level for later.{/if}
+				</p>
 
-				<div class="entry-row">
-					<input class="date" type="date" aria-label="Date" bind:value={draft.pending.date} />
-					<div class="results" role="group" aria-label="Result">
-						{#each Object.entries(RESULT_LABELS) as [key, label] (key)}
-							<button
-								class="choice"
-								aria-pressed={draft.pending.result === key}
-								onclick={() => (draft.pending.result = key as BattleRecord['result'])}
-							>
-								{label}
-							</button>
-						{/each}
-					</div>
+				<div class="options">
+					{#each next.options as option (option.characteristic)}
+						<button class="option" disabled={option.blocked !== null} onclick={() => choose(option)}>
+							<span class="line">
+								{LABELS[option.characteristic]}
+								{#if option.blocked}<span class="why">{BLOCKED[option.blocked]}</span>{/if}
+							</span>
+							<span class="change">
+								{change(option)}
+							</span>
+						</button>
+					{/each}
 				</div>
-				<input
-					type="text"
-					placeholder="Opponent's warband"
-					aria-label="Opponent's warband"
-					autocomplete="off"
-					bind:value={draft.pending.opponentWarband}
-				/>
-				<input
-					type="text"
-					placeholder="Opponent's name"
-					aria-label="Opponent's name"
-					autocomplete="off"
-					bind:value={draft.pending.opponentPlayer}
-				/>
-				<button class="add" disabled={!draft.pending.result || !draft.pending.date} onclick={add}>
-					Add battle
-				</button>
-
-				{#if sorted.length}
-					<ul class="list">
-						{#each sorted as record (record.id)}
-							{@const removed = draft.removed.includes(record.id)}
-							<li class:removed>
-								<span class="line">
-									<span class="when">{displayDate(record.date)}</span>
-									{opponent(record)} – {RESULT_LABELS[record.result]}
-								</span>
-								<button class="remove" onclick={() => toggleRemoved(record.id)}>
-									{removed ? 'Keep' : 'Remove'}
-								</button>
-							</li>
-						{/each}
-					</ul>
+				{#if !open && (next.branch === 'henchman' || next.branch === 'none')}
+					<button class="add" onclick={() => choose(null)}>Use up this level</button>
 				{/if}
 			</section>
-		{/if}
-	</div>
+		</div>
+	{:else}
+		<div class="parchment">
+			{#if draft.fighter}
+				<section>
+					<label class="heading" for="back-name"><span>Name</span><span class="rule"></span></label>
+					<input
+						id="back-name"
+						type="text"
+						autocomplete="off"
+						placeholder={draft.fighter.placeholder}
+						bind:value={draft.fighter.name}
+					/>
+				</section>
+			{/if}
+
+			<section>
+				<label class="heading" for="back-fluff"><span>Fluff</span><span class="rule"></span></label>
+				<textarea
+					id="back-fluff"
+					class="fluff"
+					rows="2"
+					placeholder="A line or two of story"
+					bind:value={draft.fluff}
+					use:grow
+				></textarea>
+			</section>
+
+			{#if draft.fighter}
+				{@const fighter = draft.fighter}
+				{@const floor = renownFloor(fighter)}
+				<section bind:this={campaign}>
+					<h3 class="heading"><span>Campaign</span><span class="rule"></span></h3>
+
+					<div class="counter">
+						<span class="label" id="back-xp">XP</span>
+						<div class="stepper" role="group" aria-labelledby="back-xp">
+							<button class="choice" aria-label="Less XP" disabled={fighter.xp <= 0} onclick={() => (fighter.xp -= 1)}>−</button>
+							<output class="figure">{fighter.xp}</output>
+							<button class="choice" aria-label="More XP" onclick={() => moreXp(fighter)}>+</button>
+						</div>
+					</div>
+
+					<div class="counter">
+						<span class="label" id="back-renown">Renown</span>
+						<div class="stepper" role="group" aria-labelledby="back-renown">
+							<button
+								class="choice"
+								aria-label="Less renown"
+								disabled={fighter.renown <= floor}
+								onclick={() => (fighter.renown -= 1)}>−</button
+							>
+							<output class="figure">{fighter.renown}</output>
+							<button class="choice" aria-label="More renown" onclick={() => (fighter.renown += 1)}>+</button>
+						</div>
+					</div>
+					{#if floor > 0 && fighter.renown <= floor}
+						<p class="hint">Not below a level already spent or waiting to be.</p>
+					{/if}
+
+					{#if fighter.spent.length}
+						<ul class="list">
+							{#each fighter.spent as spent, i (spent.level)}
+								<li>
+									<span class="line">
+										<span class="when">Renown {spent.level}</span>
+										{#if spent.option}
+											{LABELS[spent.option.characteristic]}
+											{change(spent.option)}
+										{:else}
+											used up
+										{/if}
+									</span>
+									{#if i === fighter.spent.length - 1}
+										<button class="remove" onclick={undoLast}>Undo</button>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+					{#if renown?.next}
+						<button class="add" onclick={() => showSpending(true)}>Spend renown ({renown.waiting})</button>
+					{/if}
+				</section>
+			{/if}
+
+			<section>
+				<label class="heading" for="back-notes"><span>Notes</span><span class="rule"></span></label>
+				<textarea
+					id="back-notes"
+					rows="2"
+					placeholder="Anything to remember at the table"
+					bind:value={draft.notes}
+					use:grow
+				></textarea>
+			</section>
+
+			{#if draft.history}
+				<section>
+					<h3 class="heading"><span>Battles</span><span class="rule"></span></h3>
+
+					<div class="entry-row">
+						<input class="date" type="date" aria-label="Date" bind:value={draft.pending.date} />
+						<div class="results" role="group" aria-label="Result">
+							{#each Object.entries(RESULT_LABELS) as [key, label] (key)}
+								<button
+									class="choice"
+									aria-pressed={draft.pending.result === key}
+									onclick={() => (draft.pending.result = key as BattleRecord['result'])}
+								>
+									{label}
+								</button>
+							{/each}
+						</div>
+					</div>
+					<input
+						type="text"
+						placeholder="Opponent's warband"
+						aria-label="Opponent's warband"
+						autocomplete="off"
+						bind:value={draft.pending.opponentWarband}
+					/>
+					<input
+						type="text"
+						placeholder="Opponent's name"
+						aria-label="Opponent's name"
+						autocomplete="off"
+						bind:value={draft.pending.opponentPlayer}
+					/>
+					<button class="add" disabled={!draft.pending.result || !draft.pending.date} onclick={add}>
+						Add battle
+					</button>
+
+					{#if sorted.length}
+						<ul class="list">
+							{#each sorted as record (record.id)}
+								{@const removed = draft.removed.includes(record.id)}
+								<li class:removed>
+									<span class="line">
+										<span class="when">{displayDate(record.date)}</span>
+										{opponent(record)} – {RESULT_LABELS[record.result]}
+									</span>
+									<button class="remove" onclick={() => toggleRemoved(record.id)}>
+										{removed ? 'Keep' : 'Remove'}
+									</button>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</section>
+			{/if}
+		</div>
+	{/if}
 </article>
 
 <style>
@@ -217,21 +322,20 @@
 		background: #000;
 	}
 
-	/* Written on the paper rather than into a box: no fill, no frame, one line
-	   of ink underneath that turns green while the field is being written in. */
+	/* A lighter patch of the paper rather than a box: no frame and no line,
+	   brighter and edged in green while the field is being written in. */
 	textarea,
 	input {
 		width: 100%;
 		margin: 0;
-		padding: calc(4 * var(--u)) 0;
+		padding: calc(6 * var(--u)) calc(10 * var(--u));
 		font-family: 'Alegreya', serif;
 		font-size: calc(18 * var(--t));
 		line-height: 1.4;
 		color: var(--card-ink);
-		background: transparent;
+		background: rgb(255 255 255 / 0.45);
 		border: 0;
-		border-bottom: 1px solid #000;
-		border-radius: 0;
+		border-radius: calc(6 * var(--u));
 		outline: none;
 		appearance: none;
 	}
@@ -243,8 +347,8 @@
 
 	textarea:focus,
 	input:focus {
-		border-bottom-color: var(--card-green);
-		box-shadow: 0 1px 0 var(--card-green);
+		background: rgb(255 255 255 / 0.7);
+		box-shadow: inset 0 0 0 1px var(--card-green);
 	}
 
 	::placeholder {
@@ -303,6 +407,54 @@
 		color: var(--card-paper);
 	}
 
+	/* A figure and its name on one line, the steppers lined up at the right edge. */
+	.counter {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: calc(12 * var(--u));
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+		color: var(--card-ink);
+	}
+
+	.stepper {
+		display: flex;
+	}
+
+	.stepper .choice {
+		min-width: 44px;
+		font-size: calc(20 * var(--t));
+	}
+
+	/* The figure sits inside the pill, framed above and below by the same green. */
+	.figure {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 44px;
+		border-top: 1px solid var(--card-green);
+		border-bottom: 1px solid var(--card-green);
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+		font-variant-numeric: lining-nums tabular-nums;
+		color: var(--card-ink);
+	}
+
+	/* Only the sign fades: the frame is also the figure's edge, and the pill
+	   keeps its outline whichever end is out of reach. */
+	.stepper .choice:disabled {
+		color: color-mix(in srgb, var(--card-green) 35%, transparent);
+	}
+
+	.hint {
+		margin: 0;
+		font-family: 'Alegreya', serif;
+		font-size: calc(15 * var(--t));
+		font-style: italic;
+		color: var(--card-ink-muted);
+	}
+
 	.add {
 		align-self: flex-end;
 		min-height: 40px;
@@ -355,6 +507,77 @@
 	.removed .line {
 		text-decoration: line-through;
 		color: var(--card-ink-muted);
+	}
+
+	.back-link {
+		align-self: flex-start;
+		min-height: 40px;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		font-family: 'Alegreya', serif;
+		font-size: calc(17 * var(--t));
+		color: var(--card-link);
+	}
+
+	.options {
+		display: flex;
+		flex-direction: column;
+		gap: calc(10 * var(--u));
+		margin-top: calc(6 * var(--u));
+	}
+
+	/* A characteristic to raise is a pill like every other button on the back,
+	   the whole width of the card and set as large as its fields. */
+	.option {
+		display: flex;
+		align-items: center;
+		gap: calc(8 * var(--u));
+		min-height: 48px;
+		padding: calc(6 * var(--u)) calc(18 * var(--u));
+		border: 1px solid var(--card-green);
+		border-radius: 999px;
+		background: transparent;
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+		line-height: 1.25;
+		color: var(--card-ink);
+		text-align: left;
+	}
+
+	.option:active:not(:disabled) {
+		background: var(--card-green);
+		color: var(--card-paper);
+	}
+
+	.option:active:not(:disabled) .change {
+		color: inherit;
+	}
+
+	.option:disabled {
+		border-color: color-mix(in srgb, var(--card-green) 35%, transparent);
+		color: var(--card-ink-muted);
+	}
+
+	.option .line {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.change {
+		flex: none;
+		color: var(--card-green);
+		font-variant-numeric: lining-nums tabular-nums;
+	}
+
+	.option:disabled .change {
+		color: inherit;
+	}
+
+	.why {
+		display: block;
+		font-size: calc(15 * var(--t));
+		font-style: italic;
 	}
 
 	.remove {

@@ -1,7 +1,50 @@
-<script lang="ts">
+<script lang="ts" module>
 	import type { RenownOption } from '../renown';
 	import type { RenownBranch, StatKey } from '../types/warband';
 
+	/* Shared with the back of a fighter's card, which spends a level the same way. */
+	export const LABELS: Record<StatKey, string> = {
+		move: 'Move',
+		fight: 'Fight',
+		shoot: 'Shoot',
+		defense: 'Defense',
+		health: 'Health',
+		bravery: 'Bravery'
+	};
+
+	/* Move is measured in inches, Bravery is a roll to beat. */
+	export function figure(key: StatKey, value: number): string {
+		if (key === 'move') return `${value}"`;
+		if (key === 'bravery') return `${value}+`;
+		return String(value);
+	}
+
+	/**
+	 * What picking the option does to the figure. A blocked one shows the figure
+	 * as it stands: an arrow to a value it may not reach reads as an offer.
+	 */
+	export function change(option: RenownOption): string {
+		const from = figure(option.characteristic, option.from);
+		return option.blocked ? from : `${from} → ${figure(option.characteristic, option.to)}`;
+	}
+
+	export const BLOCKED = { limit: 'At its racial limit', repeat: 'Already raised by a henchman level' } as const;
+
+	export const NOTES: Record<RenownBranch, string> = {
+		henchman: 'A henchman raises a characteristic, and never the same one twice.',
+		promotion:
+			'This level promotes the henchman to HERO – the card shows it already. A hero raises a characteristic or picks a Heroic Talent.',
+		hero: 'A hero raises a characteristic or picks a Heroic Talent.',
+		none: 'This fighter has neither the HERO nor the HENCHMAN keyword, so the rules do not say what its renown is worth. A characteristic can be raised.'
+	};
+
+	/** A level a talent could be picked for: how to keep it open is each view's own sentence. */
+	export function offersTalent(branch: RenownBranch): boolean {
+		return branch === 'hero' || branch === 'promotion';
+	}
+</script>
+
+<script lang="ts">
 	let {
 		instanceId,
 		name,
@@ -23,24 +66,6 @@
 		onspend: (option: RenownOption | null) => void | Promise<void>;
 		onclose: () => void;
 	} = $props();
-
-	const LABELS: Record<StatKey, string> = {
-		move: 'Move',
-		fight: 'Fight',
-		shoot: 'Shoot',
-		defense: 'Defense',
-		health: 'Health',
-		bravery: 'Bravery'
-	};
-
-	/* Move is measured in inches, Bravery is a roll to beat. */
-	function figure(key: StatKey, value: number): string {
-		if (key === 'move') return `${value}"`;
-		if (key === 'bravery') return `${value}+`;
-		return String(value);
-	}
-
-	const BLOCKED = { limit: 'At its racial limit', repeat: 'Already raised by a henchman level' } as const;
 
 	const open = $derived(options.some((o) => o.blocked === null));
 
@@ -66,14 +91,6 @@
 			writing = null;
 		}
 	}
-
-	const NOTES: Record<RenownBranch, string> = {
-		henchman: 'A henchman raises a characteristic, and never the same one twice.',
-		promotion:
-			'This level promotes the henchman to HERO – the card shows it already. A hero raises a characteristic or picks a Heroic Talent. Talents are not offered here yet – close this to keep the level for later.',
-		hero: 'A hero raises a characteristic or picks a Heroic Talent. Talents are not offered here yet – close this to keep the level for later.',
-		none: 'This fighter has neither the HERO nor the HENCHMAN keyword, so the rules do not say what its renown is worth. A characteristic can be raised.'
-	};
 </script>
 
 <div class="backdrop">
@@ -82,7 +99,9 @@
 		<p class="count">
 			Renown {level}{#if waiting > 0}{' '}· {waiting} more waiting{/if}
 		</p>
-		<p class="note">{NOTES[branch]}</p>
+		<p class="note">
+			{NOTES[branch]}{#if offersTalent(branch)}{' '}Talents are not offered here yet – close this to keep the level for later.{/if}
+		</p>
 
 		<div class="options">
 			{#each options as option (option.characteristic)}
@@ -95,7 +114,7 @@
 				>
 					<span class="label">{LABELS[option.characteristic]}</span>
 					<span class="change">
-						{figure(option.characteristic, option.from)} → {figure(option.characteristic, option.to)}
+						{change(option)}
 					</span>
 					{#if option.blocked}
 						<span class="why">{BLOCKED[option.blocked]}</span>

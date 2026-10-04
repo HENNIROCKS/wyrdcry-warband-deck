@@ -5,7 +5,7 @@
 	import { base } from '$app/paths';
 
 	import AftermathSheet from '$lib/components/AftermathSheet.svelte';
-	import CardBack, { emptyPending, finalHistory, type EditDraft } from '$lib/components/CardBack.svelte';
+	import CardBack, { type BackRenown } from '$lib/components/CardBack.svelte';
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
@@ -28,13 +28,16 @@
 		undoRound,
 		waveringThreshold
 	} from '$lib/battle';
+	import { applyDraft, emptyPending, type EditDraft } from '$lib/edit';
 	import { explain } from '$lib/explanation';
 	import { earnedLevels, limitFor, optionsFor, spend, type RenownOption } from '$lib/renown';
+	import { FIGHTERS } from '$lib/gamedata';
 	import { RACIAL_LIMITS } from '$lib/rules';
 	import { allWarbands, chooseWarband, chosenWarband, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
 	import { rosterPdf } from '$lib/roster-pdf';
 	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
-	import type { BattleState, StatKey, StoredWarband } from '$lib/types/warband';
+	import type { DeckCard } from '$lib/types/card';
+	import type { BattleState, PendingRenown, StatKey, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
@@ -68,19 +71,45 @@
 		(active?.pendingRenown ?? []).filter((e) => active?.warband.fighters.some((f) => f.instanceId === e.instanceId))
 	);
 	const nextRenown = $derived(pendingRenown[0] ?? null);
-	const renownView = $derived.by(() => {
-		if (!active || !nextRenown) return null;
-		const instance = active.warband.fighters.find((f) => f.instanceId === nextRenown.instanceId);
-		const card = cards.find((c) => c.instanceId === nextRenown.instanceId);
+	const renownView = $derived(active && nextRenown ? renownChoice(active, cards, nextRenown) : null);
+
+	/* The keywords a fighter has before an edit or an aftermath: they decide which
+	   rule each new level falls under. */
+	function keywordsOf(id: string): string[] {
+		const card = cards.find((c) => c.instanceId === id);
+		return card?.kind === 'fighter' ? card.keywords : [];
+	}
+
+	/** What a pending level can be spent on, read off the fighter's card in `stored`. */
+	function renownChoice(stored: StoredWarband, deck: DeckCard[], pending: PendingRenown) {
+		const instance = stored.warband.fighters.find((f) => f.instanceId === pending.instanceId);
+		const card = deck.find((c) => c.instanceId === pending.instanceId);
 		if (!instance || card?.kind !== 'fighter') return null;
 		/* The base layer is the profile's own figure; the file's override and the gear sit above it. */
 		const profile = Object.fromEntries(
 			card.stats.map((stat) => [stat.key, stat.layers.find((l) => l.kind === 'base')?.amount ?? stat.value])
 		) as Record<StatKey, number>;
 		const options = card.stats.length
-			? optionsFor(profile, instance, nextRenown.branch, active.renownHistory ?? [], limitFor(card.keywords, RACIAL_LIMITS))
+			? optionsFor(profile, instance, pending.branch, stored.renownHistory ?? [], limitFor(card.keywords, RACIAL_LIMITS))
 			: [];
 		return { name: card.name, options };
+	}
+
+	/*
+	 * The levels the fighter on the back can spend, worked out on the warband as
+	 * Done would store it – so a level raised on the back is there to spend, and
+	 * one spent there moves the figures the next one starts from.
+	 */
+	const backRenown = $derived.by((): BackRenown | null => {
+		if (!active || !editingId || !draft?.fighter) return null;
+		const provisional = applyDraft(active, editingId, draft, keywordsOf);
+		const queue = (provisional.pendingRenown ?? []).filter((e) => e.instanceId === editingId);
+		const next = queue[0] ?? null;
+		const deck = toCards(provisional.warband, provisional.selections, provisional.fluff, provisional.history, provisional.renownHistory);
+		return {
+			next: next && { level: next.level, branch: next.branch, options: renownChoice(provisional, deck, next)?.options ?? [] },
+			waiting: queue.length
+		};
 	});
 	const battle = $derived(active?.battle ?? null);
 	const counted = $derived(active ? countedFighters(active.warband) : []);
@@ -150,12 +179,7 @@
 		if (!active) return;
 		const snapshot = $state.snapshot(active);
 		const warband = applyAftermath(snapshot.warband, answers, bonusInstanceId);
-		/* The keywords as they stand now, before the aftermath changes any of them:
-		   they decide which rule each new level falls under. */
-		const levels = earnedLevels(snapshot.warband, warband, (id) => {
-			const card = cards.find((c) => c.instanceId === id);
-			return card?.kind === 'fighter' ? card.keywords : [];
-		});
+		const levels = earnedLevels(snapshot.warband, warband, keywordsOf);
 		const pending = [...(snapshot.pendingRenown ?? []), ...levels];
 		const entry: StoredWarband = {
 			...snapshot,
@@ -189,7 +213,20 @@
 		if (!active) return;
 		const isWarband = id === 'warband';
 		const instance = active.warband.fighters.find((f) => f.instanceId === id);
+		const levels = [...(active.renownHistory ?? []), ...(active.pendingRenown ?? [])]
+			.filter((e) => e.instanceId === id)
+			.map((e) => e.level);
 		draft = {
+			fighter: instance
+				? {
+						name: instance.customName,
+						placeholder: FIGHTERS.get(instance.fighterId)?.name ?? instance.fighterId,
+						xp: instance.xp,
+						renown: instance.renown,
+						renownFloor: Math.max(0, ...levels),
+						spent: []
+					}
+				: null,
 			notes: isWarband ? active.warband.factionNotes : (instance?.notes ?? ''),
 			fluff: isWarband ? (active.fluff?.warband ?? '') : (active.fluff?.fighters[id] ?? ''),
 			history: isWarband ? $state.snapshot(active.history ?? []) : null,
@@ -212,30 +249,7 @@
 		/* Ended before the write rather than after it, so a second tap on Done
 		   finds nothing to save instead of adding a pending battle twice. */
 		editingId = null;
-		const isWarband = targetId === 'warband';
-		const warband = isWarband
-			? { ...snapshot.warband, factionNotes: values.notes }
-			: {
-					...snapshot.warband,
-					fighters: snapshot.warband.fighters.map((f) =>
-						f.instanceId === targetId ? { ...f, notes: values.notes } : f
-					)
-				};
-		const fluff = {
-			warband: isWarband ? values.fluff : (snapshot.fluff?.warband ?? ''),
-			fighters: isWarband
-				? (snapshot.fluff?.fighters ?? {})
-				: { ...(snapshot.fluff?.fighters ?? {}), [targetId]: values.fluff }
-		};
-		const entry: StoredWarband = {
-			...snapshot,
-			warband,
-			fluff,
-			history: isWarband ? finalHistory(values) : snapshot.history,
-			revision: snapshot.revision + 1,
-			updatedAt: new Date().toISOString()
-		};
-		await putWarband(entry);
+		await putWarband(applyDraft(snapshot, targetId, values, keywordsOf));
 		await refresh();
 	}
 
@@ -490,7 +504,7 @@
 	>
 		{#snippet back(card)}
 			{#if draft}
-				<CardBack name={card.name} bind:draft />
+				<CardBack name={card.name} bind:draft renown={backRenown} />
 			{/if}
 		{/snippet}
 	</Deck>
