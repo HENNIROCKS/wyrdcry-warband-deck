@@ -52,3 +52,5 @@ Nothing promised, nothing planned.
 - 🃏 Faction rules on the warband card as well, not only on every fighter card
 - ⚙️ A desktop mode that really saves, over the File System Access API
 - 🎨 Keep the screen awake, or make it easy to jump back to where you were – both just soften the screen going dark
+- 🎨 Option to use a different color for each deck individually
+- 🎨 Virtual tuck box for each deck
