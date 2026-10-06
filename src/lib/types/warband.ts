@@ -237,3 +237,24 @@ export interface StoredWarband {
 	 */
 	pendingRenown?: PendingRenown[] | null;
 }
+
+/** Which part of a photo the image field shows. x and y run 0–1 (0.5 is the middle), zoom 1–2. */
+export interface PhotoCrop {
+	x: number;
+	y: number;
+	zoom: number;
+}
+
+/**
+ * A fighter's photo, kept on the device only and never exported. The bytes are
+ * stored as they are rather than as a Blob, which Safari often fails to write
+ * to IndexedDB.
+ */
+export interface StoredPhoto {
+	bytes: ArrayBuffer;
+	type: string;
+	width: number;
+	height: number;
+	crop: PhotoCrop;
+	updatedAt: string;
+}

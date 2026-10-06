@@ -1,6 +1,6 @@
 <script lang="ts" module>
 	import type { RenownOption } from '../renown';
-	import type { BattleRecord, RenownBranch } from '../types/warband';
+	import type { BattleRecord, RenownBranch, StoredPhoto } from '../types/warband';
 
 	/** The levels the fighter on this back can spend, on the warband as Done would store it. */
 	export interface BackRenown {
@@ -35,6 +35,7 @@
 
 <script lang="ts">
 	import { tick } from 'svelte';
+	import { PhotoError, photoLayout, readPhoto } from '../photo';
 	import {
 		MAX_XP,
 		emptyPending,
@@ -54,7 +55,8 @@
 		renown = null,
 		equipment = null,
 		dismissal = null,
-		ondismiss
+		ondismiss,
+		photo = $bindable(null)
 	}: {
 		name: string;
 		draft: EditDraft;
@@ -63,7 +65,44 @@
 		dismissal?: BackDismissal | null;
 		/** Asks for the fighter to be dismissed, handing what goes to the stash. */
 		ondismiss?: (toStash: number[]) => void;
+		/** The fighter's photo as it stands in the edit; `changed` says whether Done has to write it. Null on a card that takes none. */
+		photo?: { photo: StoredPhoto | null; changed: boolean } | null;
 	} = $props();
+
+	let photoInput: HTMLInputElement | undefined = $state();
+	let photoError = $state<string | null>(null);
+
+	/* The thumbnail is drawn from an object URL of the photo as it stands in the
+	   edit, handed back when the photo changes or the back goes away. */
+	const thumb = $derived.by(() => {
+		const stored = photo?.photo;
+		return stored ? { stored, ...photoLayout(stored.width, stored.height, stored.crop) } : null;
+	});
+	let thumbUrl = $state<string | null>(null);
+	$effect(() => {
+		const stored = thumb?.stored;
+		if (!stored) {
+			thumbUrl = null;
+			return;
+		}
+		const url = URL.createObjectURL(new Blob([stored.bytes], { type: stored.type }));
+		thumbUrl = url;
+		return () => URL.revokeObjectURL(url);
+	});
+
+	async function pickPhoto(event: Event) {
+		const input = event.currentTarget as HTMLInputElement;
+		const file = input.files?.[0];
+		/* Reset, otherwise the same photo does not fire a change event twice. */
+		input.value = '';
+		if (!file || !photo) return;
+		photoError = null;
+		try {
+			photo = { photo: await readPhoto(file), changed: true };
+		} catch (error) {
+			photoError = error instanceof PhotoError ? error.message : 'This photo could not be read.';
+		}
+	}
 
 	/* Places in the fighter's equipment ticked to go to the stash. Off the draft:
 	   dismissing is confirmed and written on its own, not by Done. */
@@ -181,6 +220,37 @@
 						placeholder={draft.fighter.placeholder}
 						bind:value={draft.fighter.name}
 					/>
+				</section>
+			{/if}
+
+			{#if draft.fighter && photo}
+				<section>
+					<h3 class="heading"><span>Photo</span><span class="rule"></span></h3>
+					<input bind:this={photoInput} type="file" accept="image/*" hidden onchange={pickPhoto} />
+					<div class="photo-row">
+						<div
+							class="thumb"
+							style:background-image={thumbUrl ? `url(${thumbUrl})` : null}
+							style:background-size={thumb?.size}
+							style:background-position={thumb?.position}
+							role="img"
+							aria-label={thumb ? 'The photo' : 'No photo chosen'}
+						>
+							{#if !thumb}<span>No photo</span>{/if}
+						</div>
+						<div class="photo-actions">
+							<button type="button" class="add" onclick={() => photoInput?.click()}>
+								{photo.photo ? 'Replace photo' : 'Choose photo'}
+							</button>
+							{#if photo.photo}
+								<button type="button" class="remove" onclick={() => (photo = { photo: null, changed: true })}>
+									Remove photo
+								</button>
+							{/if}
+						</div>
+					</div>
+					{#if photoError}<p class="note">{photoError}</p>{/if}
+					<p class="hint">Photos stay on this device and are not part of the export.</p>
 				</section>
 			{/if}
 
@@ -678,6 +748,36 @@
 		color: var(--card-link);
 		font-family: 'Alegreya', serif;
 		font-size: calc(17 * var(--t));
+	}
+
+	.photo-row {
+		display: flex;
+		align-items: center;
+		gap: calc(12 * var(--u));
+	}
+
+	.photo-actions {
+		flex: 1;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: calc(8 * var(--u));
+	}
+
+	/* The square the image field shows, without the runemark's cut. */
+	.thumb {
+		flex: none;
+		display: grid;
+		place-items: center;
+		width: calc(96 * var(--u));
+		aspect-ratio: 1;
+		border: 1px solid var(--card-green);
+		background-color: var(--card-field);
+		background-repeat: no-repeat;
+		font-family: 'Alegreya', serif;
+		font-size: calc(16 * var(--t));
+		color: var(--card-ink-muted);
 	}
 
 	.remove {

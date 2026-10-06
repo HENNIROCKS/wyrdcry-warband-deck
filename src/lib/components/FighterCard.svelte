@@ -5,19 +5,23 @@
 	import RuleText from './RuleText.svelte';
 	import { healthOf } from '../adapter';
 	import { FRESH } from '../battle';
+	import type { PhotoView } from '../photo';
 	import type { CardEntry, CardSection, CardStat, FighterCardData } from '../types/card';
 	import type { FighterBattleState, StatKey } from '../types/warband';
 
 	let {
 		card,
 		state = FRESH,
-		wavering = false
+		wavering = false,
+		photo = null
 	}: {
 		card: FighterCardData;
 		/** What the fighter carries in the battle. The bar below the deck sets it. */
 		state?: FighterBattleState;
 		/** Whether the warband's morale is wavering, which asks for a Bravery test. */
 		wavering?: boolean;
+		/** The photo of the painted model, shown in the image field where there is one. */
+		photo?: PhotoView | null;
 	} = $props();
 
 	/* The card names the state, the bar changes it – one band, the worst of the
@@ -151,7 +155,13 @@
 
 	<div class="image-section">
 		<div class="image-box">
-			<div class="image-inner" style="mask-image: {runemark}; -webkit-mask-image: {runemark};"></div>
+			<div
+				class="image-inner"
+				class:photo={photo !== null}
+				style="mask-image: {runemark}; -webkit-mask-image: {runemark};{photo
+					? ` --photo: url(${photo.url}); --photo-size: ${photo.size}; --photo-pos: ${photo.position};`
+					: ''}"
+			></div>
 		</div>
 		<div class="image-header">
 			<h2 class="name">{card.name}</h2>
@@ -241,7 +251,8 @@
 
 	/* Same shape as the gold coins badge, cut from the runemark SVG. The blood
 	   stands in it as high as the damage the fighter holds, with a hard edge: a
-	   level is read off at a glance, a blend has to be compared to something. */
+	   level is read off at a glance, a blend has to be compared to something.
+	   Over a photo the blood is translucent, denser the more Health is lost. */
 	.image-inner {
 		position: absolute;
 		inset: 0;
@@ -254,6 +265,17 @@
 		mask-repeat: no-repeat;
 		-webkit-mask-size: 100% 100%;
 		-webkit-mask-repeat: no-repeat;
+	}
+
+	.image-inner.photo {
+		background:
+			linear-gradient(
+				to top,
+				color-mix(in srgb, var(--card-blood) calc(30% + var(--wound, 0) * 70%), transparent) 0 calc(var(--wound, 0) * 100%),
+				transparent calc(var(--wound, 0) * 100%) 100%
+			),
+			var(--photo) var(--photo-pos) / var(--photo-size) no-repeat,
+			var(--card-green);
 	}
 
 	.image-header {

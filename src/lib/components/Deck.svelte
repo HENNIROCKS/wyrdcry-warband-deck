@@ -8,6 +8,7 @@
 	import WarbandCard from './WarbandCard.svelte';
 	import { hasKeyword, healthOf } from '../adapter';
 	import { stateOf, type Counted } from '../battle';
+	import type { PhotoView } from '../photo';
 	import type { DeckCard } from '../types/card';
 	import type { BattleState } from '../types/warband';
 
@@ -28,7 +29,8 @@
 		ondone,
 		doneLabel,
 		oncancel,
-		turnTo = null
+		turnTo = null,
+		photos
 	}: {
 		cards: DeckCard[];
 		/** What each fighter counts for in the morale. Every fighter counts as one where it is left out. */
@@ -56,6 +58,8 @@
 		 * turns the warband card, wherever the deck stands. Brought up first.
 		 */
 		turnTo?: string | null;
+		/** The fighters' photos by instanceId, for the image field. */
+		photos?: Map<string, PhotoView>;
 	} = $props();
 
 	/** Duration of the fly-out; the same number drives transition and switch point. */
@@ -394,7 +398,7 @@
 	{#if data.kind === 'warband'}
 		<WarbandCard card={data} onpick={jumpTo} />
 	{:else}
-		<FighterCard card={data} state={stateOf(battle, data.instanceId)} {wavering} />
+		<FighterCard card={data} state={stateOf(battle, data.instanceId)} {wavering} photo={photos?.get(data.instanceId) ?? null} />
 	{/if}
 {/snippet}
 

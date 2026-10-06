@@ -35,11 +35,24 @@
 	import { fighterOf } from '$lib/build/roster';
 	import { FIGHTERS, ITEMS, WEAPONS } from '$lib/gamedata';
 	import { FACTIONS as RULESETS, ITEMS as RULE_ITEMS, RACIAL_LIMITS } from '$lib/rules';
-	import { allWarbands, chooseWarband, chosenWarband, deleteWarband, putBattle, putWarband, requestPersistence } from '$lib/storage';
+	import {
+		allWarbands,
+		chooseWarband,
+		chosenWarband,
+		deletePhoto,
+		deleteWarband,
+		photosOf,
+		prunePhotos,
+		putBattle,
+		putPhoto,
+		putWarband,
+		requestPersistence
+	} from '$lib/storage';
+	import { photoLayout, type PhotoView } from '$lib/photo';
 	import { rosterPdf } from '$lib/roster-pdf';
 	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
 	import type { DeckCard } from '$lib/types/card';
-	import type { BattleState, PendingRenown, StatKey, StoredWarband } from '$lib/types/warband';
+	import type { BattleState, PendingRenown, StatKey, StoredPhoto, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
@@ -53,6 +66,14 @@
 	   out of view. */
 	let turned = $state<'edit' | 'aftermath'>('edit');
 	let draft = $state<EditDraft | null>(null);
+	/* The photo of the fighter being edited, apart from the draft: the draft is
+	   written as a whole and has to stay free of the blob. */
+	let photoDraft = $state<{ photo: StoredPhoto | null; changed: boolean } | null>(null);
+	/* The active warband's photos, and what they are shown from. The object URLs
+	   are handed back whenever the set is replaced. */
+	let photos = $state<Map<string, PhotoView>>(new Map());
+	let stored = new Map<string, StoredPhoto>();
+	let photoUrls: string[] = [];
 	let aftermath = $state<AftermathDraft | null>(null);
 	/* A draft belongs to the warband it was started on: another one coming up
 	   ends the edit rather than writing the draft into it. */
@@ -334,7 +355,9 @@
 			notify('The fighter could not be dismissed.', 'error');
 			return;
 		}
+		await deletePhoto(snapshot.warband.id, instanceId).catch(() => {});
 		await refresh();
+		await reloadPhotos();
 		notify(`${name} dismissed.`);
 	}
 
@@ -372,6 +395,7 @@
 			removed: [],
 			pending: emptyPending()
 		};
+		photoDraft = instance ? { photo: stored.get(id) ?? null, changed: false } : null;
 		turned = 'edit';
 		editingId = id;
 	}
@@ -386,10 +410,28 @@
 		const snapshot = $state.snapshot(active);
 		const values = $state.snapshot(draft);
 		const targetId = editingId;
+		/* IndexedDB trips over the reactivity proxy, so the photo is rebuilt as a plain object. */
+		const photoValues = photoDraft?.changed
+			? {
+					photo: photoDraft.photo
+						? { ...photoDraft.photo, bytes: photoDraft.photo.bytes.slice(0), crop: { ...photoDraft.photo.crop } }
+						: null
+				}
+			: null;
 		/* Ended before the write rather than after it, so a second tap on Done
 		   finds nothing to save instead of adding a pending battle twice. */
 		editingId = null;
 		await putWarband(applyDraft(snapshot, targetId, values, keywordsOf));
+		if (photoValues) {
+			try {
+				if (photoValues.photo) await putPhoto(snapshot.warband.id, targetId, photoValues.photo);
+				else await deletePhoto(snapshot.warband.id, targetId);
+			} catch (error) {
+				console.error(error);
+				notify('The photo could not be saved.', 'error');
+			}
+			await reloadPhotos();
+		}
 		await refresh();
 	}
 
@@ -406,6 +448,28 @@
 	$effect(() => {
 		const id = activeId;
 		if (restored) chooseWarband(id).catch(() => {});
+	});
+
+	/* Reads the active warband's photos again, after a write or a change of warband. */
+	async function reloadPhotos() {
+		const id = activeId;
+		const found = id ? await photosOf(id).catch(() => new Map<string, StoredPhoto>()) : new Map<string, StoredPhoto>();
+		if (id !== activeId) return;
+		photoUrls.forEach((url) => URL.revokeObjectURL(url));
+		photoUrls = [];
+		const views = new Map<string, PhotoView>();
+		for (const [instanceId, photo] of found) {
+			const url = URL.createObjectURL(new Blob([photo.bytes], { type: photo.type }));
+			photoUrls.push(url);
+			views.set(instanceId, { url, ...photoLayout(photo.width, photo.height, photo.crop) });
+		}
+		stored = found;
+		photos = views;
+	}
+
+	$effect(() => {
+		void activeId;
+		untrack(reloadPhotos);
 	});
 
 	async function refresh() {
@@ -446,6 +510,10 @@
 		   a plain object out of it first. */
 		const entry = toStored($state.snapshot(candidate) as ImportCandidate);
 		await putWarband(entry);
+		await prunePhotos(
+			entry.warband.id,
+			entry.warband.fighters.map((f) => f.instanceId)
+		).catch(() => {});
 		await requestPersistence();
 		activeId = entry.warband.id;
 		candidate = null;
@@ -633,6 +701,7 @@
 		{counted}
 		{battle}
 		{wavering}
+		{photos}
 		ontoggle={(id) => setBattle(toggle(battle, id))}
 		onwait={(id) => setBattle(toggleWaiting(battle, id))}
 		onwound={(id, delta, health) => setBattle(allocate(battle, id, delta, health))}
@@ -653,6 +722,7 @@
 				<CardBack
 					name={card.name}
 					bind:draft
+					bind:photo={photoDraft}
 					renown={backRenown}
 					equipment={backEquipment}
 					dismissal={backDismissal}
