@@ -28,6 +28,7 @@
 - [x] ⚙️ Cache game data for offline use at the table
 - [x] 🛠️ Edit on the back of the card: a fighter's fields, equipment and dismissal, the warband's notes and battles
 - [x] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
+- [x] 🃏 A photo of the painted model as the card image, kept out of the JSON export
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
@@ -46,7 +47,6 @@
 Nothing promised, nothing planned.
 
 - 📱 NFC tags under the model bases, so holding the phone to a model opens its card
-- 🃏 A photo of the painted model as the card image, kept out of the JSON export
 - 🔗 Showing an opponent the warband over a read-only link, as a QR code
 - 🔊 A sound when a fighter goes out of action, with a switch to turn it off
 - 🃏 Faction rules on the warband card as well, not only on every fighter card

@@ -103,6 +103,12 @@
 			app is uninstalled — so export even while the way back is unassured: the
 			file this app wrote, this app reads.
 		</p>
+		<p>
+			<strong>Photos</strong> of your models stay on this device as well and are
+			not part of an Export. Whatever removes the warband removes them too. The
+			photo you picked stays in your library; only one taken from inside the app
+			exists nowhere else.
+		</p>
 	</section>
 
 	<section>

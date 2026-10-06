@@ -7,9 +7,9 @@ through the fighters.
 Unofficial fan project. No connection to Games Workshop.
 
 **Status: early.** The app builds a warband of any of the eight factions, tracks
-a battle and corrects a fighter's name, experience and renown afterwards; it
-does not yet change a fighter's equipment or dismiss one, and the way back to
-the Warband Builder is not currently assured – see
+a battle and edits a fighter afterwards – name, experience, renown, equipment,
+dismissal; it does not yet roll injuries or trade at the trading post, and the
+way back to the Warband Builder is not currently assured – see
 [Warband Builder compatibility](#warband-builder-compatibility).
 
 ## What it does
@@ -30,6 +30,8 @@ the Warband Builder is not currently assured – see
   a characteristic right there. Equipment moves between a fighter and the
   stash there as well, checked against what the fighter may carry, and a
   fighter is dismissed there too, its equipment sent to the stash if you like
+- Put a photo of the painted model in a fighter's image field, moved and zoomed
+  on the back of the card; it stays on the device
 - Tap a worked-out value or a weapon to see where it comes from: which
   modifiers went into it, and which rules apply only in the right situation
 - Track a battle: mark fighters as activated or waiting, count the damage each
@@ -70,6 +72,12 @@ What is built and what comes next is a checklist in [`ROADMAP.md`](ROADMAP.md).
 
 Everything lives in IndexedDB, on this one device. No account, no server, no
 sync. Whatever has not been exported is gone after an uninstall.
+
+Photos of the painted models are kept in the same database, reduced to a copy of
+their own, and never go into an export: whatever removes the warband removes
+them too, and importing the file elsewhere brings no photos along. The photo you
+picked stays where it was – unless it was taken with the camera from inside the
+app.
 
 Adding the app to the home screen is not a convenience but a requirement: Safari
 clears the data of sites that are not installed after seven days without use.
