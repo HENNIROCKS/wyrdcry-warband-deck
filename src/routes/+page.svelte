@@ -773,7 +773,8 @@
 			</p>
 			<p class="note danger">
 				<strong>This cannot be undone.</strong> The warband and the battle it is in the
-				middle of are on this device only. Export it first if the campaign is to be kept.
+				middle of are on this device only. Export it first if the campaign is to be kept –
+				the photos of its fighters are not part of the export.
 			</p>
 			<div class="actions">
 				<button class="ghost" onclick={() => (condemned = null)}>Cancel</button>

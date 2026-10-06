@@ -37,12 +37,14 @@
 			<p class="note danger">
 				<strong>This file is older.</strong> Stored here is revision {candidate.verdict.storedRevision},
 				the file has {candidate.verdict.incomingRevision}. Importing overwrites the newer state.
+				Photos of fighters the file does not have are removed.
 			</p>
 		{:else if candidate.verdict.kind === 'diverged'}
 			<p class="note danger">
 				<strong>These states have diverged.</strong> Both carry revision
 				{candidate.verdict.incomingRevision} but come from different devices
-				(this one and {candidate.verdict.otherDevice}). What is stored here is lost on import.
+				(this one and {candidate.verdict.otherDevice}). What is stored here is lost on import,
+				and with it the photos of fighters the file does not have.
 			</p>
 		{/if}
 
