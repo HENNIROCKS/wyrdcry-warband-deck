@@ -1,6 +1,6 @@
 <script lang="ts" module>
 	import type { RenownOption } from '../renown';
-	import type { BattleRecord, RenownBranch, StoredPhoto } from '../types/warband';
+	import type { BattleRecord, PhotoCrop, RenownBranch, StoredPhoto } from '../types/warband';
 
 	/** The levels the fighter on this back can spend, on the warband as Done would store it. */
 	export interface BackRenown {
@@ -34,8 +34,9 @@
 </script>
 
 <script lang="ts">
-	import { tick } from 'svelte';
-	import { PhotoError, photoLayout, readPhoto } from '../photo';
+	import { tick, untrack } from 'svelte';
+	import { CENTRE, MAX_ZOOM, PhotoError, panCrop, photoLayout, readPhoto, zoomCrop } from '../photo';
+	import { imageFieldMask } from '../image-field-mask';
 	import {
 		MAX_XP,
 		emptyPending,
@@ -72,23 +73,51 @@
 	let photoInput: HTMLInputElement | undefined = $state();
 	let photoError = $state<string | null>(null);
 
-	/* The thumbnail is drawn from an object URL of the photo as it stands in the
-	   edit, handed back when the photo changes or the back goes away. */
-	const thumb = $derived.by(() => {
-		const stored = photo?.photo;
-		return stored ? { stored, ...photoLayout(stored.width, stored.height, stored.crop) } : null;
-	});
-	let thumbUrl = $state<string | null>(null);
+	/* The preview is drawn from an object URL of the photo as it stands in the
+	   edit, handed back when the photo is replaced or the back goes away. Moving
+	   or zooming keeps the bytes, so it keeps the URL. */
+	const stored = $derived(photo?.photo ?? null);
+	const bytes = $derived(stored?.bytes ?? null);
+	const layout = $derived(stored ? photoLayout(stored.width, stored.height, stored.crop) : null);
+	let previewUrl = $state<string | null>(null);
 	$effect(() => {
-		const stored = thumb?.stored;
-		if (!stored) {
-			thumbUrl = null;
+		if (!bytes) {
+			previewUrl = null;
 			return;
 		}
-		const url = URL.createObjectURL(new Blob([stored.bytes], { type: stored.type }));
-		thumbUrl = url;
+		const url = URL.createObjectURL(new Blob([bytes], { type: untrack(() => stored?.type) }));
+		previewUrl = url;
 		return () => URL.revokeObjectURL(url);
 	});
+
+	let preview: HTMLDivElement | undefined = $state();
+	/* The finger doing the dragging; a second one on the preview is left out. */
+	let dragFrom: { id: number; x: number; y: number } | null = null;
+
+	/* Every change of the crop is one the edit has to write. */
+	function recrop(crop: (c: PhotoCrop) => PhotoCrop) {
+		if (!photo?.photo) return;
+		photo = { photo: { ...photo.photo, crop: crop(photo.photo.crop) }, changed: true };
+	}
+
+	function startDrag(event: PointerEvent) {
+		if (dragFrom) return;
+		preview?.setPointerCapture(event.pointerId);
+		dragFrom = { id: event.pointerId, x: event.clientX, y: event.clientY };
+	}
+
+	function endDrag(event: PointerEvent) {
+		if (event.pointerId === dragFrom?.id) dragFrom = null;
+	}
+
+	function drag(event: PointerEvent) {
+		if (!dragFrom || event.pointerId !== dragFrom.id || !preview || !photo?.photo) return;
+		const { width, height } = photo.photo;
+		const dx = event.clientX - dragFrom.x;
+		const dy = event.clientY - dragFrom.y;
+		dragFrom = { id: event.pointerId, x: event.clientX, y: event.clientY };
+		recrop((c) => panCrop(c, width, height, preview!.clientWidth, dx, dy));
+	}
 
 	async function pickPhoto(event: Event) {
 		const input = event.currentTarget as HTMLInputElement;
@@ -227,28 +256,49 @@
 				<section>
 					<h3 class="heading"><span>Photo</span><span class="rule"></span></h3>
 					<input bind:this={photoInput} type="file" accept="image/*" hidden onchange={pickPhoto} />
-					<div class="photo-row">
+					{#if stored && layout}
 						<div
-							class="thumb"
-							style:background-image={thumbUrl ? `url(${thumbUrl})` : null}
-							style:background-size={thumb?.size}
-							style:background-position={thumb?.position}
+							bind:this={preview}
+							class="preview"
+							style:background-image={previewUrl ? `url(${previewUrl})` : null}
+							style:background-size={layout.size}
+							style:background-position={layout.position}
+							style:mask-image={imageFieldMask}
+							style:-webkit-mask-image={imageFieldMask}
 							role="img"
-							aria-label={thumb ? 'The photo' : 'No photo chosen'}
-						>
-							{#if !thumb}<span>No photo</span>{/if}
+							aria-label="The photo as the card shows it. Drag to move it."
+							onpointerdown={startDrag}
+							onpointermove={drag}
+							onpointerup={endDrag}
+							onpointercancel={endDrag}
+						></div>
+						<div class="zoom">
+							<label for="back-zoom">Zoom</label>
+							<input
+								id="back-zoom"
+								type="range"
+								min="1"
+								max={MAX_ZOOM}
+								step="0.05"
+								value={stored.crop.zoom}
+								oninput={(e) => recrop((c) => zoomCrop(c, e.currentTarget.valueAsNumber))}
+							/>
+							<button type="button" class="remove" onclick={() => recrop(() => ({ ...CENTRE }))}>Reset</button>
 						</div>
 						<div class="photo-actions">
-							<button type="button" class="add" onclick={() => photoInput?.click()}>
-								{photo.photo ? 'Replace photo' : 'Choose photo'}
+							<button type="button" class="add" onclick={() => photoInput?.click()}>Replace photo</button>
+							<button type="button" class="remove" onclick={() => (photo = { photo: null, changed: true })}>
+								Remove photo
 							</button>
-							{#if photo.photo}
-								<button type="button" class="remove" onclick={() => (photo = { photo: null, changed: true })}>
-									Remove photo
-								</button>
-							{/if}
 						</div>
-					</div>
+					{:else}
+						<div class="photo-row">
+							<div class="thumb" role="img" aria-label="No photo chosen"><span>No photo</span></div>
+							<div class="photo-actions">
+								<button type="button" class="add" onclick={() => photoInput?.click()}>Choose photo</button>
+							</div>
+						</div>
+					{/if}
 					{#if photoError}<p class="note">{photoError}</p>{/if}
 					<p class="hint">Photos stay on this device and are not part of the export.</p>
 				</section>
@@ -765,7 +815,37 @@
 		gap: calc(8 * var(--u));
 	}
 
-	/* The square the image field shows, without the runemark's cut. */
+	/* What the image field shows, cut by the same mask. Dragging must not
+	   scroll the back along. */
+	.preview {
+		width: calc(240 * var(--u));
+		max-width: 100%;
+		aspect-ratio: 1;
+		margin: 0 auto;
+		background-color: var(--card-green);
+		background-repeat: no-repeat;
+		mask-size: 100% 100%;
+		mask-repeat: no-repeat;
+		-webkit-mask-size: 100% 100%;
+		-webkit-mask-repeat: no-repeat;
+		touch-action: none;
+		cursor: grab;
+	}
+
+	.zoom {
+		display: flex;
+		align-items: center;
+		gap: calc(10 * var(--u));
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+	}
+
+	.zoom input {
+		flex: 1;
+		min-width: 0;
+	}
+
+	/* The empty frame while there is no photo. */
 	.thumb {
 		flex: none;
 		display: grid;
@@ -774,7 +854,6 @@
 		aspect-ratio: 1;
 		border: 1px solid var(--card-green);
 		background-color: var(--card-field);
-		background-repeat: no-repeat;
 		font-family: 'Alegreya', serif;
 		font-size: calc(16 * var(--t));
 		color: var(--card-ink-muted);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import runemarkShape from '../runemark-shape.svg?raw';
+	import { imageFieldMask } from '../image-field-mask';
 	import ValueTable from './ValueTable.svelte';
 	import WeaponTable from './WeaponTable.svelte';
 	import RuleText from './RuleText.svelte';
@@ -129,10 +129,6 @@
 		universal: 'Universal Abilities',
 		'universal-reaction': 'Universal Reactions'
 	};
-
-	/* The runemark cuts both the image field and, in the Card Creator, the badge.
-	   Inlined as a data URL because a mask cannot point at a Svelte import. */
-	const runemark = `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(runemarkShape)}")`;
 </script>
 
 <article class="card" class:dulled={band !== ''} class:out={state.out} style:--wound={wound}>
@@ -158,7 +154,7 @@
 			<div
 				class="image-inner"
 				class:photo={photo !== null}
-				style="mask-image: {runemark}; -webkit-mask-image: {runemark};{photo
+				style="mask-image: {imageFieldMask}; -webkit-mask-image: {imageFieldMask};{photo
 					? ` --photo: url(${photo.url}); --photo-size: ${photo.size}; --photo-pos: ${photo.position};`
 					: ''}"
 			></div>
@@ -249,7 +245,7 @@
 		top: calc(10 * var(--u));
 	}
 
-	/* Same shape as the gold coins badge, cut from the runemark SVG. The blood
+	/* Same shape as the gold coins badge, cut from the image field mask. The blood
 	   stands in it as high as the damage the fighter holds, with a hard edge: a
 	   level is read off at a glance, a blend has to be compared to something.
 	   Over a photo the blood is translucent, denser the more Health is lost. */

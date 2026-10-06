@@ -15,7 +15,8 @@ export interface PhotoView {
 }
 
 const SHORT_EDGE = 768;
-const CENTRE: PhotoCrop = { x: 0.5, y: 0.5, zoom: 1 };
+export const MAX_ZOOM = 2;
+export const CENTRE: PhotoCrop = { x: 0.5, y: 0.5, zoom: 1 };
 
 const UNREADABLE =
 	'This photo could not be read. A HEIC photo opens in Safari only – export it as JPEG or pick it on the iPhone.';
@@ -81,4 +82,22 @@ function extent(width: number, height: number, zoom: number): { w: number; h: nu
 export function photoLayout(width: number, height: number, crop: PhotoCrop): { size: string; position: string } {
 	const { w, h } = extent(width, height, crop.zoom);
 	return { size: `${w * 100}% ${h * 100}%`, position: `${crop.x * 100}% ${crop.y * 100}%` };
+}
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+/** The crop after the picture was dragged by dx/dy screen pixels in a field `boxPx` wide. */
+export function panCrop(crop: PhotoCrop, width: number, height: number, boxPx: number, dx: number, dy: number): PhotoCrop {
+	const { w, h } = extent(width, height, crop.zoom);
+	const bw = boxPx * w;
+	const bh = boxPx * h;
+	return {
+		...crop,
+		x: bw > boxPx ? clamp(crop.x - dx / (bw - boxPx), 0, 1) : crop.x,
+		y: bh > boxPx ? clamp(crop.y - dy / (bh - boxPx), 0, 1) : crop.y
+	};
+}
+
+export function zoomCrop(crop: PhotoCrop, zoom: number): PhotoCrop {
+	return { ...crop, zoom: clamp(zoom, 1, MAX_ZOOM) };
 }
