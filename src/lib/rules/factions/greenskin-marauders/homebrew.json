@@ -17,7 +17,6 @@
         "move": 6,
         "fight": 4,
         "shoot": 5,
-        "defense": 4,
         "health": 16,
         "bravery": 6
       }
@@ -29,7 +28,6 @@
         "move": 6,
         "fight": 6,
         "shoot": 5,
-        "defense": 4,
         "health": 24,
         "bravery": 4
       }

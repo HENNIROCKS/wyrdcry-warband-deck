@@ -83,7 +83,8 @@ export interface Keyword {
 export interface RacialLimit {
 	id: string;
 	name: string;
-	profile: Record<StatKey, number> | null;
+	/** Every characteristic renown can raise – Armour is not one of them. */
+	profile: Record<Exclude<StatKey, 'defense'>, number> | null;
 }
 
 export interface Ability {

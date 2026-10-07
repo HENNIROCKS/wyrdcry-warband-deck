@@ -77,6 +77,18 @@
 		"rules": []
 	},
 	{
+		"id": "dire-wolf",
+		"name": "DIRE WOLF",
+		"type": "race",
+		"rules": []
+	},
+	{
+		"id": "zombie",
+		"name": "ZOMBIE",
+		"type": "race",
+		"rules": []
+	},
+	{
 		"id": "dwarf",
 		"name": "DWARF",
 		"type": "race",

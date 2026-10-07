@@ -6,7 +6,6 @@
       "move": 8,
       "fight": 8,
       "shoot": 4,
-      "defense": 5,
       "health": 30,
       "bravery": 2
     }
@@ -18,7 +17,6 @@
       "move": 6,
       "fight": 6,
       "shoot": 3,
-      "defense": 4,
       "health": 24,
       "bravery": 4
     }
@@ -30,7 +28,6 @@
       "move": 6,
       "fight": 6,
       "shoot": 6,
-      "defense": 4,
       "health": 24,
       "bravery": 3
     }
@@ -42,7 +39,6 @@
       "move": 8,
       "fight": 6,
       "shoot": 6,
-      "defense": 4,
       "health": 20,
       "bravery": 5
     }
@@ -54,16 +50,16 @@
       "move": 8,
       "fight": 8,
       "shoot": 6,
-      "defense": 5,
       "health": 30,
       "bravery": 2
     }
   },
-  { "id": "beast", "name": "Beast", "profile": null },
   { "id": "beastman", "name": "Beastman", "profile": null },
+  { "id": "dire-wolf", "name": "Dire Wolf", "profile": null },
   { "id": "dwarf", "name": "Dwarf", "profile": null },
   { "id": "elf", "name": "Elf", "profile": null },
   { "id": "monster", "name": "Monster", "profile": null },
   { "id": "ogre", "name": "Ogre", "profile": null },
-  { "id": "thrall", "name": "Thrall", "profile": null }
+  { "id": "war-hound", "name": "War Hound", "profile": null },
+  { "id": "zombie", "name": "Zombie", "profile": null }
 ]

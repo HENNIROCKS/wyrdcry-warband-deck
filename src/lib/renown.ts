@@ -8,7 +8,6 @@
 
 import type { RacialLimit } from './rules/types';
 import {
-	STAT_KEYS,
 	type FighterInstance,
 	type PendingRenown,
 	type RenownBranch,
@@ -19,14 +18,21 @@ import {
 } from './types/warband';
 
 /**
+ * The characteristics renown can raise. Armour, which the app keeps under
+ * `defense`, is not among them: it comes from what a fighter wears, and the
+ * racial limits have no column for it.
+ */
+export type RaisableStat = Exclude<StatKey, 'defense'>;
+export const RAISABLE: RaisableStat[] = ['move', 'fight', 'shoot', 'health', 'bravery'];
+
+/**
  * How far one increase moves each figure. Health rises in twos; Bravery is a
  * roll to beat, so better is a lower number.
  */
-export const RENOWN_STEP: Record<StatKey, number> = {
+export const RENOWN_STEP: Record<RaisableStat, number> = {
 	move: 1,
 	fight: 1,
 	shoot: 1,
-	defense: 1,
 	health: 2,
 	bravery: -1
 };
@@ -119,7 +125,7 @@ export function optionsFor(
 			.filter((c) => c.instanceId === fighter.instanceId && c.branch === 'henchman')
 			.map((c) => c.characteristic)
 	);
-	return STAT_KEYS.map((characteristic) => {
+	return RAISABLE.map((characteristic) => {
 		const from = fighter.statOverrides?.[characteristic] ?? profile[characteristic];
 		const bonus = RENOWN_STEP[characteristic];
 		const to = from + bonus;

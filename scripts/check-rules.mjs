@@ -224,7 +224,12 @@ for (const limit of racialLimits) {
 	}
 	if (limit.profile === null) continue;
 	for (const key of STATS) {
-		if (typeof limit.profile?.[key] !== 'number') problem(where, `"${limit.id}" has no ${key} in its profile`);
+		/* Renown never raises Armour, so a limit on it would bind nothing. */
+		if (key === 'defense') {
+			if (key in (limit.profile ?? {})) problem(where, `"${limit.id}" limits defense, which renown cannot raise`);
+		} else if (typeof limit.profile?.[key] !== 'number') {
+			problem(where, `"${limit.id}" has no ${key} in its profile`);
+		}
 	}
 }
 
