@@ -100,17 +100,19 @@ as a sibling directory. If it lives elsewhere, call the script directly – the
 make target passes no arguments through:
 
 ```sh
-npm run sync:data -- --from /path/to/wyrdcry/src/data
+npm run sync:data -- --site /path/to/wyrdcry
 ```
 
-It reads two things from there. The JSON files it copies. The universal
-abilities it extracts from `rules/the-combat-phase/abilities.md`, because
-they exist nowhere else — the result becomes `universal-abilities.json`. The
-pages are looked for in the data's repo under `versioned_docs/version-0.5/`,
-the version `src/data` holds; for a data directory on its own, point at them:
+The app follows the 0.9 draft of the rules, which the site repo keeps apart from
+the stable 0.5. It reads two things from there. The JSON files under
+`src/data-versions/0.9/` it copies, writing a fighter's `armour` into the
+`defense` the app reads. The universal abilities it extracts from
+`docs/rules/the-combat-phase/abilities.md`, because they exist nowhere else —
+the result becomes `universal-abilities.json`. Either can be pointed at on its
+own:
 
 ```sh
-npm run sync:data -- --from /path/to/data --docs /path/to/wyrdcry/versioned_docs/version-0.5
+npm run sync:data -- --from /path/to/data --docs /path/to/docs
 ```
 
 Nothing is written before all of it has been read and checked, and a source that

@@ -8,7 +8,12 @@
  * Nothing is written before every source has been read and checked. A run that
  * fails halfway would leave a mixture behind that was never shipped together.
  *
- * Usage:  npm run sync:data [-- --from <path to src/data>] [--docs <path to docs>]
+ * The app follows the 0.9 draft. The site repo keeps it apart from the stable
+ * 0.5: its data under src/data-versions/0.9/, its rules pages under docs/
+ * (0.5 has src/data/ and versioned_docs/version-0.5/).
+ *
+ * Usage:  npm run sync:data [-- --site <path to the site repo>]
+ *                           [--from <path to the data>] [--docs <path to docs>]
  */
 import { mkdir, copyFile, readFile, writeFile, access } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
@@ -17,7 +22,10 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TARGET = resolve(HERE, '../src/lib/data');
 
-const DEFAULT_SOURCE = resolve(HERE, '../../wyrdcry/src/data');
+const DEFAULT_SITE = resolve(HERE, '../../wyrdcry');
+/** Where the 0.9 draft sits inside the site repo. */
+const DATA_DIR = 'src/data-versions/0.9';
+const DOCS_DIR = 'docs';
 
 /** Without these files the app does not start. */
 const REQUIRED = [
@@ -48,11 +56,10 @@ const NO_CAMPAIGN_RULES = {
 /**
  * Copied when present, and what to fall back to when not.
  *
- * `ruleset.json` is currently only on the branch feat/game-reference-print
- * (PR #9), and every export carries its version, so it gets a placeholder.
- * Both files are imported by the app, so neither may be missing from the
- * target – an empty stand-in costs a label on one card, an absent file the
- * whole build.
+ * The site repo carries no `ruleset.json`; the placeholder tells the app to
+ * take the version from its own `src/lib/rules/ruleset.json` instead. Both
+ * files are imported by the app, so neither may be missing from the target –
+ * an empty stand-in costs a label on one card, an absent file the whole build.
  */
 const OPTIONAL = {
 	'ruleset.json': UNKNOWN_RULESET,
@@ -77,6 +84,25 @@ const UNIVERSAL_DOCS = [
 const UNIVERSAL_ROW = /^\|\s*`([^`]+)`\s*\|\s*\*\*\[([^\]]+)\]\s*([^:*]+):\*\*\s*(.+?)\s*\|\s*$/;
 /** The `|---|:--:|` line below a Markdown table's header row. */
 const TABLE_SEPARATOR = /^\|[\s:|-]+\|\s*$/;
+
+/**
+ * 0.9 calls Defense "Armour", and the site's own exports have used both
+ * spellings of the key. The app reads `defense`, like the Warband Builder and
+ * the `statOverrides` in saved warbands, so an `armour` is written into it on
+ * the way in – the same mapping the site repo's gameData.ts applies.
+ */
+const NORMALISE = {
+	'fighters.json': (fighters) =>
+		fighters.map(({ armour, ...fighter }) =>
+			armour === undefined ? fighter : { ...fighter, defense: armour }
+		),
+	'items.json': (items) =>
+		items.map((item) =>
+			item.effect?.characteristic === 'armour'
+				? { ...item, effect: { ...item.effect, characteristic: 'defense' } }
+				: item
+		)
+};
 
 /** Everyone carries this one, so it is no keyword any fighter has to hold. */
 const KEYWORD_ANY = 'any';
@@ -147,16 +173,15 @@ function fail(...lines) {
 	process.exit(1);
 }
 
-const source = argument('--from') ?? DEFAULT_SOURCE;
-/* The rules pages sit in the site repo beside its src/. Its docs/ is the 0.9
-   draft; the 0.5 pages that belong to src/data are snapshotted under
-   versioned_docs/. */
-const docs = argument('--docs') ?? resolve(source, '../../versioned_docs/version-0.5');
+const site = argument('--site') ?? DEFAULT_SITE;
+const source = argument('--from') ?? join(site, DATA_DIR);
+const docs = argument('--docs') ?? join(site, DOCS_DIR);
 
 if (!(await exists(source))) {
 	fail(
 		`Source not found: ${source}`,
-		'Site repo elsewhere? npm run sync:data -- --from <path to src/data>'
+		`The 0.9 data is expected under ${DATA_DIR}. Once 0.9 is released, the site repo moves it to src/data.`,
+		'Site repo elsewhere? npm run sync:data -- --site <path to the site repo>'
 	);
 }
 
@@ -246,7 +271,12 @@ if (collisions.length) {
 await mkdir(TARGET, { recursive: true });
 
 for (const file of REQUIRED) {
-	await copyFile(join(source, file), join(TARGET, file));
+	if (NORMALISE[file]) {
+		const data = JSON.parse(await readFile(join(source, file), 'utf8'));
+		await writeFile(join(TARGET, file), JSON.stringify(NORMALISE[file](data), null, 2) + '\n');
+	} else {
+		await copyFile(join(source, file), join(TARGET, file));
+	}
 	console.log(`  ${file}`);
 }
 

@@ -36,8 +36,8 @@ jobs:
 
       - run: npm ci
 
-      # The docs are looked for beside the data, which is where they sit here.
-      - run: npm run sync:data -- --from wyrdcry-src/src/data
+      # Data and rules pages are both found from the repo's root.
+      - run: npm run sync:data -- --site wyrdcry-src
 
       # Pages serves from /<repo>/, which the links between routes have to carry.
       - run: npm run build

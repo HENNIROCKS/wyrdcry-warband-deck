@@ -12,6 +12,7 @@ import weaponRules from './data/weapon-rules.json';
 import universalAbilities from './data/universal-abilities.json';
 import ruleset from './data/ruleset.json';
 import campaignRules from './data/campaign-rules.json';
+import ownRuleset from './rules/ruleset.json';
 import {
 	RULE_ABILITIES,
 	RULE_FACTIONS,
@@ -181,5 +182,12 @@ export interface CampaignRules {
 
 export const CAMPAIGN_RULES = campaignRules as CampaignRules;
 
-/** Version of the ruleset this app was built against. Goes into every export. */
-export const RULESET_VERSION: string = (ruleset as { version: string }).version;
+/**
+ * Version of the ruleset this app was built against. Goes into every export.
+ * The synced data wins where it names one; the site repo carries none, and the
+ * sync then writes `unknown`, so this app's own ruleset says which version it
+ * was transcribed against.
+ */
+const SYNCED_VERSION = (ruleset as { version: string }).version;
+export const RULESET_VERSION: string =
+	SYNCED_VERSION === 'unknown' ? ownRuleset.version : SYNCED_VERSION;
