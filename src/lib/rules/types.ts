@@ -136,8 +136,11 @@ export interface FighterRole {
 
 /** One row of a roll table, such as the Possessed's Mutation Table. */
 export interface TableRow {
-	/** The 2d6 result this row answers to. */
-	roll: number;
+	/**
+	 * The D66 results this row answers to, as the rules print them: "11-13", or
+	 * a single result such as "25". Also what a fighter's choice keeps.
+	 */
+	roll: string;
 	name: string;
 	text: string;
 	/** Keywords the row hands the fighter, on top of its profile's. */

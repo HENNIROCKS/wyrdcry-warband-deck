@@ -3,13 +3,7 @@
 		"id": "ascended",
 		"name": "Ascended",
 		"type": "trait",
-		"text": "When this fighter is recruited to the warband, it must make a roll on the mutation table. It refuses to be equipped with any equipment, weapons or armour."
-	},
-	{
-		"id": "anointed",
-		"name": "Anointed",
-		"type": "trait",
-		"text": "When this fighter is recruited to the warband, it must make a roll on the mutation table."
+		"text": "In the aftermath sequence, this fighter is always considered to be Marked for Greatness. The Daemon within refuses to be equipped with any equipment, weapons or armour."
 	},
 	{
 		"id": "hollowed",
@@ -18,10 +12,10 @@
 		"text": "This fighter automatically passes any Bravery tests it is required to take."
 	},
 	{
-		"id": "display-of-brutality",
-		"name": "Display of Brutality",
-		"type": "triple",
-		"text": "A fighter can use this ability only if an enemy fighter has been taken down by an attack action made by them this activation. Until the end of the battle round, add 1 to the Attacks characteristic of melee attack action made by friendly fighters while they are within 6\" of this fighter."
+		"id": "baleful-challenge",
+		"name": "Baleful Challenge",
+		"type": "double",
+		"text": "Select a visible enemy fighter within 1\" of this fighter. That enemy fighter makes a free melee attack action targeting this fighter. Then, add 2 to the Attacks and Fight characteristic of melee attack actions made by this fighter that target that enemy fighter until the end of the activation."
 	},
 	{
 		"id": "puppet-master",

@@ -154,7 +154,7 @@ export function rolledRow(factionId: string, fighterId: string, chosen?: string[
 
 	const row = faction.rules
 		.find((rule) => rule.id === choice.table)
-		?.table?.find((entry) => String(entry.roll) === chosen[0]);
+		?.table?.find((entry) => entry.roll === chosen[0]);
 	if (!row) return null;
 
 	return {

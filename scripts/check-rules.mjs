@@ -19,6 +19,11 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
 const RULES = resolve(ROOT, 'src/lib/rules');
 
+/** The 36 results of a D66, tens die then units die: 11 to 16, 21 to 26 … 66. */
+const D66 = [1, 2, 3, 4, 5, 6].flatMap((tens) => [1, 2, 3, 4, 5, 6].map((units) => tens * 10 + units));
+/** "11-13", or a single result such as "25". */
+const D66_BAND = /^([1-6][1-6])(?:-([1-6][1-6]))?$/;
+
 const problems = [];
 /* Folders that are waiting for their faction. Kept apart from the problems: a
    gate that is red for six sessions in a row stops being read. */
@@ -498,14 +503,24 @@ for (const folder of folders) {
 		checkEffect(`"${rule.id}"`, rule.effect);
 
 		if (rule.table) {
-			const seen = new Set();
+			/* Every D66 result lands in exactly one row: the wizard's Roll button
+			   picks the row whose band holds the result, and a gap would leave it
+			   with nothing to pick. */
+			const covered = new Map();
 			for (const row of rule.table) {
-				if (typeof row.roll !== 'number') {
-					problem(file('rules'), `"${rule.id}" has a table row with no roll number`);
-				} else if (seen.has(row.roll)) {
-					problem(file('rules'), `"${rule.id}" has the roll ${row.roll} twice`);
+				const band = typeof row.roll === 'string' ? row.roll.match(D66_BAND) : null;
+				if (!band) {
+					problem(file('rules'), `"${rule.id}" has a table row whose roll is no D66 band like "11-13"`);
 				} else {
-					seen.add(row.roll);
+					const low = Number(band[1]);
+					const high = Number(band[2] ?? band[1]);
+					for (const result of D66.filter((r) => r >= low && r <= high)) {
+						if (covered.has(result)) {
+							problem(file('rules'), `"${rule.id}": ${result} falls in both "${covered.get(result)}" and "${row.roll}"`);
+						} else {
+							covered.set(result, row.roll);
+						}
+					}
 				}
 				if (!row.name || !row.text) {
 					problem(file('rules'), `"${rule.id}" has a table row (roll ${row.roll}) with no name or text`);
@@ -518,6 +533,10 @@ for (const folder of folders) {
 				if (row.weapon !== undefined && !weaponIds.has(row.weapon)) {
 					problem(file('rules'), `"${rule.id}" (roll ${row.roll}) is the weapon "${row.weapon}", weapons.json has none`);
 				}
+			}
+			const missing = D66.filter((result) => !covered.has(result));
+			if (missing.length) {
+				problem(file('rules'), `"${rule.id}" has no row for ${missing.join(', ')}`);
 			}
 		}
 

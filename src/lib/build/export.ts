@@ -129,7 +129,7 @@ function mutationAbilities(faction: Faction, draft: Draft): CustomAbility[] {
 
 		const row = faction.rules
 			.find((rule) => rule.id === choice.table)
-			?.table?.find((mutation) => String(mutation.roll) === entry.choice[0]);
+			?.table?.find((mutation) => mutation.roll === entry.choice[0]);
 		if (!row) return [];
 
 		/* "*Magical ability*." is the spelling the game's own abilities use for the

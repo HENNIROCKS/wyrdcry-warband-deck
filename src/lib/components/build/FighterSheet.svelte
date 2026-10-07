@@ -4,6 +4,7 @@
 	 * what it carries. A full screen rather than a row, because equipment is three
 	 * lists and a phone has no room beside them.
 	 */
+	import { tick } from 'svelte';
 	import RuleText from '$lib/components/RuleText.svelte';
 	import { ITEMS, WEAPONS, type Ability, type Faction, type Fighter } from '$lib/rules';
 	import { equipmentCost, gearOf, isAscended, isBeast, isThrall, offers, type Offer } from '$lib/build/equipment';
@@ -113,14 +114,26 @@
 	}
 
 	/** A single row, rerollable: a fresh tap simply replaces the one already held. */
-	function rollFor(roll: number) {
-		entry.choice = [String(roll)];
+	function rollFor(roll: string) {
+		entry.choice = [roll];
 	}
 
-	/** Two d6, not one d12 – 7 is the common result, 2 and 12 the rare ones. */
-	function rollDice() {
+	/**
+	 * A D66 is two d6 read as tens and units, 11 to 66, and lands in a row's band.
+	 * The row is brought into view: in a table this long it is usually below the
+	 * button that rolled it. A row tapped by hand is already where the thumb is.
+	 */
+	async function rollDice() {
 		const die = () => Math.floor(Math.random() * 6) + 1;
-		rollFor(die() + die());
+		const result = die() * 10 + die();
+		const row = table.find((candidate) => {
+			const [low, high = low] = candidate.roll.split('-').map(Number);
+			return result >= low && result <= high;
+		});
+		if (!row) return;
+		rollFor(row.roll);
+		await tick();
+		chips?.querySelector('button.on')?.scrollIntoView({ block: 'center' });
 	}
 </script>
 
@@ -187,10 +200,10 @@
 					<!-- Rolled here or at the table: either way exactly one row is held,
 					     so a tap replaces rather than toggles. -->
 					<div class="roll-choice" bind:this={chips}>
-						<button class="roll" onclick={rollDice}>Roll 2d6</button>
+						<button class="roll" onclick={rollDice}>Roll D66</button>
 						<ul class="options table">
 							{#each table as row (row.roll)}
-								{@const on = String(row.roll) === entry.choice[0]}
+								{@const on = row.roll === entry.choice[0]}
 								<li>
 									<button class:on aria-pressed={on} onclick={() => rollFor(row.roll)}>
 										<span class="name">{row.roll} – {row.name}</span>
