@@ -148,8 +148,10 @@ function fail(...lines) {
 }
 
 const source = argument('--from') ?? DEFAULT_SOURCE;
-/* The rules pages sit in the site repo's docs/, a sibling of its src/. */
-const docs = argument('--docs') ?? resolve(source, '../../docs');
+/* The rules pages sit in the site repo beside its src/. Its docs/ is the 0.9
+   draft; the 0.5 pages that belong to src/data are snapshotted under
+   versioned_docs/. */
+const docs = argument('--docs') ?? resolve(source, '../../versioned_docs/version-0.5');
 
 if (!(await exists(source))) {
 	fail(

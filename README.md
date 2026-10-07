@@ -104,13 +104,13 @@ npm run sync:data -- --from /path/to/wyrdcry/src/data
 ```
 
 It reads two things from there. The JSON files it copies. The universal
-abilities it extracts from `docs/rules/the-combat-phase/abilities.md`, because
+abilities it extracts from `rules/the-combat-phase/abilities.md`, because
 they exist nowhere else — the result becomes `universal-abilities.json`. The
-docs are looked for beside the data's repo; for a data directory on its own,
-point at them:
+pages are looked for in the data's repo under `versioned_docs/version-0.5/`,
+the version `src/data` holds; for a data directory on its own, point at them:
 
 ```sh
-npm run sync:data -- --from /path/to/data --docs /path/to/wyrdcry/docs
+npm run sync:data -- --from /path/to/data --docs /path/to/wyrdcry/versioned_docs/version-0.5
 ```
 
 Nothing is written before all of it has been read and checked, and a source that
