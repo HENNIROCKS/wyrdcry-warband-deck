@@ -38,6 +38,7 @@
 			"prompt": "When recruiting a Magister, you must select one of the following magical abilities. In addition, the Magister may select another magical ability instead of selecting a heroic talent.",
 			"kind": "ability",
 			"pick": 1,
+			"instead_of_talent": 1,
 			"abilities": ["puppet-master", "curse-of-agony", "touch-of-chaos"]
 		}
 	},

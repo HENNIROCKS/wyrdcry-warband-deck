@@ -23,7 +23,8 @@ import {
 	WEAPON_RULES
 } from './gamedata';
 import type { WeaponProfile } from './gamedata';
-import { promoted } from './renown';
+import { heldTalents, promoted } from './renown';
+import { HEROIC_TALENTS, KEYWORDS } from './rules';
 import { raisedBy, rolledRow, rulesLeftOut } from './rules-bridge';
 import type {
 	CardEntry,
@@ -528,9 +529,29 @@ export function toCard(
 		if (entries.length) sections.push({ kind, preamble, entries });
 	};
 
-	/* A rolled keyword the profile already carries is not printed twice. */
-	const gained = (rolled?.keywords ?? []).filter(
-		(keyword) => !profile.keywords.some((held) => held.toLowerCase() === keyword.toLowerCase())
+	/* A fighter named after its own faction – the Possessed – answers to every
+	   name but that one. The faction's rules are carried under the faction's
+	   name, so a fighter sharing it would claim them as its own abilities, and
+	   the faction section below prints them a second time. */
+	const ownNames = [name, profile.name].filter(
+		(target) => target.trim().toLowerCase() !== factionName.trim().toLowerCase()
+	);
+	/* The talents the fighter has, by way of its renown or written against its
+	   name by hand, and the keywords they give. The ability stays on the card
+	   with a note that the keyword is already there. */
+	const talents = heldTalents(HEROIC_TALENTS, instance.instanceId, ownNames, renownHistory, warband.customAbilities);
+	const talentKeywords = new Map<string, string>();
+	for (const talent of HEROIC_TALENTS.filter((t) => talents.has(t.id))) {
+		for (const effect of talent.effects ?? []) {
+			talentKeywords.set(talent.name.toLowerCase(), KEYWORDS.get(effect.keyword)?.name ?? effect.keyword.toUpperCase());
+		}
+	}
+	/* A keyword the profile already carries, or that two sources give, is not
+	   printed twice. */
+	const gained = [...(rolled?.keywords ?? []), ...talentKeywords.values()].filter(
+		(keyword, i, all) =>
+			![...profile.race, ...profile.keywords].some((held) => held.toLowerCase() === keyword.toLowerCase()) &&
+			all.findIndex((other) => other.toLowerCase() === keyword.toLowerCase()) === i
 	);
 	const keywords = promoted([...profile.race, ...profile.keywords, ...gained], instance.renown);
 	/* The fighter's own faction, not the warband's – a hired sword recruited into
@@ -555,23 +576,26 @@ export function toCard(
 	 * from the builder, and the list is everything its file says.
 	 */
 	const offers = Boolean(profile.ability_preamble?.trim());
-	const picked = offers && chosen?.length ? chosen : null;
-	/* A fighter named after its own faction – the Possessed – answers to every
-	   name but that one. The faction's rules are carried under the faction's
-	   name, so a fighter sharing it would claim them as its own abilities, and
-	   the faction section below prints them a second time. */
-	const ownNames = [name, profile.name].filter(
-		(target) => target.trim().toLowerCase() !== factionName.trim().toLowerCase()
-	);
+	/* An ability learned later, at a level of renown, joins the one picked at
+	   recruitment. Without that pick the card lists every ability and has no way to
+	   tell this one apart. */
+	const learned = renownHistory
+		.filter((c) => c.instanceId === instance.instanceId && c.kind === 'ability' && c.talent)
+		.map((c) => c.talent as string);
+	const picked = offers && chosen?.length ? [...chosen, ...learned] : null;
 	push(
 		'fighter',
 		abilityEntries(
 			picked ? profile.faction_ability_ids.filter((id) => picked.includes(id)) : profile.faction_ability_ids,
 			/* The mutation is written out under the ability that rolled it, so its
 			   own entry – carried by the fighter's name – would say it twice. */
-			customAbilities(warband, ...ownNames).filter(
-				(ability) => ability.name.toLowerCase() !== rolled?.name.toLowerCase()
-			),
+			customAbilities(warband, ...ownNames)
+				.filter((ability) => ability.name.toLowerCase() !== rolled?.name.toLowerCase())
+				.map((ability) =>
+					talentKeywords.has(ability.name.toLowerCase())
+						? { ...ability, note: ALREADY_INCLUDED }
+						: ability
+				),
 			/* "It must make a roll on the mutation table" reads as a task still
 			   open. It has been done, and the note says what came of it. A choice
 			   of characteristic is in the figures above and needs only saying so. */

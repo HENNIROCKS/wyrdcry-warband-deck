@@ -246,6 +246,7 @@
 					<TalentPicker
 						variant="card"
 						options={next.talents.options}
+						abilities={next.talents.abilities}
 						name={next.talents.name}
 						namePrompt={next.talents.namePrompt}
 						taken={next.talents.taken}
@@ -395,6 +396,8 @@
 										{#if spent.pick?.kind === 'stat'}
 											{LABELS[spent.pick.option.characteristic]}
 											{change(spent.pick.option)}
+										{:else if spent.pick?.kind === 'ability'}
+											{spent.pick.ability.name}
 										{:else if spent.pick?.kind === 'talent'}
 											{spent.pick.talent.name}{#if spent.pick.weapon}{' '}({spent.pick.weapon.name}){/if}
 										{:else}

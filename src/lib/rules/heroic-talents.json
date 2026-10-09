@@ -4,7 +4,8 @@
     "name": "Fearsome",
     "specialization": "strength",
     "type": "trait",
-    "text": "This fighter gains the `TERRIFYING` keyword."
+    "text": "This fighter gains the `TERRIFYING` keyword.",
+    "effects": [{ "kind": "keyword", "keyword": "terrifying" }]
   },
   {
     "id": "oppressor",

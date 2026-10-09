@@ -107,6 +107,8 @@ export interface HeroicTalent {
 	text: string;
 	/** Set where the talent asks for a weapon type of this kind to be selected. */
 	weapon?: 'melee' | 'ranged';
+	/** What the card takes over from the talent: a keyword it gains, by its id in `keywords.json`. */
+	effects?: { kind: 'keyword'; keyword: string }[];
 }
 
 export interface UniversalAbility extends Ability {
@@ -130,6 +132,11 @@ export interface FighterChoice {
 	bonus?: number;
 	/** With `kind: 'ability'`: the ids on offer. */
 	abilities?: string[];
+	/**
+	 * With `kind: 'ability'`: how many more of them the fighter may learn later,
+	 * at a level of renown, instead of selecting a heroic talent.
+	 */
+	instead_of_talent?: number;
 	/** With `kind: 'roll'`: the id of the rule carrying the `table` to roll on. */
 	table?: string;
 	/** With `kind: 'role'`: the roles on offer. */

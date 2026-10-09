@@ -59,6 +59,7 @@
       "prompt": "When recruiting an Eshin Sorcerer, you must select one of the following magical abilities. In addition, the Eshin Sorcerer may select another magical ability instead of selecting a heroic talent.",
       "kind": "ability",
       "pick": 1,
+      "instead_of_talent": 1,
       "abilities": ["enshrouding-darkness", "gnawdoom", "skitterleap"]
     }
   },

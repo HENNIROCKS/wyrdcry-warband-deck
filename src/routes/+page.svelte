@@ -34,6 +34,7 @@
 	import { applyDraft, dismiss, dismissCost, emptyPending, nameProblem, type EditDraft } from '$lib/edit';
 	import { explain } from '$lib/explanation';
 	import {
+		abilitiesFor,
 		earnedLevels,
 		heldTalents,
 		limitFor,
@@ -46,7 +47,7 @@
 	} from '$lib/renown';
 	import { allows, gearOf, refuse, takesNothing } from '$lib/build/equipment';
 	import { fighterOf } from '$lib/build/roster';
-	import { FIGHTERS, ITEMS, WEAPONS } from '$lib/gamedata';
+	import { ABILITIES, FIGHTERS, ITEMS, WEAPONS } from '$lib/gamedata';
 	import {
 		FACTIONS as RULESETS,
 		HEROIC_TALENTS,
@@ -201,7 +202,22 @@
 		);
 		const own = instance.customName.trim().toLowerCase();
 		const mustName = own === '' || names.has(own);
+		/* Learned in place of a talent: only for a fighter whose recruitment pick is on
+		   file, since the card cannot tell a further ability from the list otherwise. */
+		const choice = profile?.choose;
+		const picked = stored.selections?.fighters[instance.instanceId] ?? [];
+		const learned = (stored.renownHistory ?? [])
+			.filter((c) => c.instanceId === instance.instanceId && c.kind === 'ability' && c.talent)
+			.map((c) => c.talent as string);
+		const abilities =
+			choice?.kind === 'ability' && choice.instead_of_talent && picked.length
+				? abilitiesFor(choice.abilities ?? [], picked, learned, choice.instead_of_talent, (id) => {
+						const ability = ABILITIES.get(id);
+						return ability && { name: ability.name, text: ability.description };
+					})
+				: [];
 		return {
+			abilities,
 			options: talentsFor(HEROIC_TALENTS, held, (kind) => weaponsOffered(kind, carried, sold, RULE_WEAPONS)),
 			namePrompt: mustName ? 'The talent is saved under the fighter’s name, so no other fighter may share it' : null,
 			name: instance.customName,

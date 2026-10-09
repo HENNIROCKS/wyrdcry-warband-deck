@@ -388,6 +388,9 @@ for (const folder of folders) {
 
 		const choice = fighter.choose;
 		if (!choice) continue;
+		if (choice.instead_of_talent !== undefined && choice.kind !== 'ability') {
+			problem(file('fighters'), `"${fighter.id}" may learn more later, but its choice is of kind "${choice.kind}", not "ability"`);
+		}
 		/* Null where the profile asks for the choice itself; the sentence then comes
 		   from `prompt`, and there is no ability to resolve. */
 		if (choice.source !== null && !abilityIds.has(choice.source)) {
@@ -418,6 +421,9 @@ for (const folder of folders) {
 			}
 			if (choice.pick > offered.length) {
 				problem(file('fighters'), `the choice of "${fighter.id}" picks ${choice.pick} of ${offered.length}`);
+			}
+			if (choice.instead_of_talent !== undefined && choice.pick + choice.instead_of_talent > offered.length) {
+				problem(file('fighters'), `"${fighter.id}" picks ${choice.pick} and may learn ${choice.instead_of_talent} more, of ${offered.length} offered`);
 			}
 		} else if (choice.kind === 'roll') {
 			const table = rules.find((entry) => entry.id === choice.table);
@@ -813,6 +819,11 @@ for (const talent of talents) {
 		problem(shared.talents, `"${talent.id}" has the type "${talent.type}", which is none of ${TALENT_TYPES.join(', ')}`);
 	}
 	if (!talent.name?.trim() || !talent.text?.trim()) problem(shared.talents, `"${talent.id}" has no name or no text`);
+	for (const effect of talent.effects ?? []) {
+		if (effect.kind !== 'keyword' || !keywordIds.has(effect.keyword)) {
+			problem(shared.talents, `"${talent.id}" has an effect on "${effect.keyword}", keywords.json has none`);
+		}
+	}
 	if (talent.weapon !== undefined && !['melee', 'ranged'].includes(talent.weapon)) {
 		problem(shared.talents, `"${talent.id}" selects a "${talent.weapon}" weapon, which is neither melee nor ranged`);
 	}

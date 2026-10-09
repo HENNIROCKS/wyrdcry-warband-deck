@@ -9,12 +9,13 @@
 </script>
 
 <script lang="ts">
-	import { MAX_SPECIALIZATIONS, MAX_TALENTS, type RenownPick } from '../renown';
+	import { MAX_SPECIALIZATIONS, MAX_TALENTS, type AbilityOption, type RenownPick } from '../renown';
 	import { SPECIALIZATIONS } from '../rules/types';
 	import RuleText from './RuleText.svelte';
 
 	let {
 		options,
+		abilities,
 		variant,
 		name,
 		namePrompt,
@@ -22,6 +23,8 @@
 		onpick
 	}: {
 		options: TalentOption[];
+		/** Magical abilities to learn instead of a talent; the group is left out where there are none. */
+		abilities: AbilityOption[];
 		/** Where it sits: a sheet over the deck, or the back of a card. */
 		variant: 'sheet' | 'card';
 		/** The name the fighter carries now; empty while it only has its profile's. */
@@ -34,10 +37,12 @@
 	} = $props();
 
 	let chosen = $state<string | null>(null);
+	let chosenAbility = $state<string | null>(null);
 	let weaponId = $state<string | null>(null);
 	let typed = $state('');
 	let busy = $state(false);
 
+	const learning = $derived(abilities.find((a) => a.id === chosenAbility && a.blocked === null) ?? null);
 	const selected = $derived(options.find((o) => o.talent.id === chosen && o.blocked === null) ?? null);
 	const weapon = $derived(selected?.weapons?.find((w) => w.id === weaponId) ?? null);
 	const needsWeapon = $derived(selected?.talent.weapon !== undefined);
@@ -50,7 +55,23 @@
 
 	function select(id: string) {
 		chosen = chosen === id ? null : id;
+		chosenAbility = null;
 		weaponId = null;
+	}
+
+	function learn(id: string) {
+		chosenAbility = chosenAbility === id ? null : id;
+		chosen = null;
+	}
+
+	async function pickAbility() {
+		if (!learning || busy) return;
+		busy = true;
+		try {
+			await onpick({ kind: 'ability', ability: { id: learning.id, name: learning.name } });
+		} finally {
+			busy = false;
+		}
 	}
 
 	async function confirm() {
@@ -68,6 +89,27 @@
 	<p class="hint">
 		Up to {MAX_TALENTS} talents, from at most {MAX_SPECIALIZATIONS} specializations.
 	</p>
+	{#if abilities.length}
+		<h4 class="group">Magical ability</h4>
+		{#each abilities as ability (ability.id)}
+			{@const open = learning?.id === ability.id}
+			<div class="item" class:open>
+				<button class="head" aria-expanded={open} disabled={ability.blocked !== null} onclick={() => learn(ability.id)}>
+					<span class="line">
+						{ability.name}
+						{#if ability.blocked}<span class="why">Already learned another</span>{/if}
+					</span>
+					<span class="kind">Instead of a talent</span>
+				</button>
+				{#if open}
+					<div class="detail">
+						<p class="text"><RuleText text={ability.text} /></p>
+						<button class="confirm" disabled={busy} onclick={pickAbility}>Pick {ability.name}</button>
+					</div>
+				{/if}
+			</div>
+		{/each}
+	{/if}
 	{#each SPECIALIZATIONS as specialization (specialization)}
 		<h4 class="group">{specialization}</h4>
 		{#each options.filter((o) => o.talent.specialization === specialization) as option (option.talent.id)}

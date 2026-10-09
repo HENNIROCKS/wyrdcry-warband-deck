@@ -1,10 +1,12 @@
 <script lang="ts" module>
-	import type { RenownOption, RenownPick, TalentOption } from '../renown';
+	import type { AbilityOption, RenownOption, RenownPick, TalentOption } from '../renown';
 	import type { RenownBranch, StatKey } from '../types/warband';
 
 	/** What a level can be spent on besides a characteristic, and what the fighter's name has to do with it. */
 	export interface TalentOffer {
 		options: TalentOption[];
+		/** Magical abilities the fighter may learn instead of a talent. */
+		abilities: AbilityOption[];
 		/** Set where the fighter has no name of its own, or shares it: the label of the field asking for one. */
 		namePrompt: string | null;
 		name: string;
@@ -54,7 +56,11 @@
 
 	/** Whether any characteristic or talent is still free to take. */
 	export function anythingOpen(options: RenownOption[], talents: TalentOffer | null): boolean {
-		return options.some((o) => o.blocked === null) || (talents?.options.some((o) => o.blocked === null) ?? false);
+		return (
+			options.some((o) => o.blocked === null) ||
+			(talents?.options.some((o) => o.blocked === null) ?? false) ||
+			(talents?.abilities.some((a) => a.blocked === null) ?? false)
+		);
 	}
 </script>
 
@@ -138,6 +144,7 @@
 			<TalentPicker
 				variant="sheet"
 				options={talents.options}
+				abilities={talents.abilities}
 				name={talents.name}
 				namePrompt={talents.namePrompt}
 				taken={talents.taken}

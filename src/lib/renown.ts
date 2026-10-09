@@ -156,9 +156,38 @@ export interface TalentOption {
 	weapons: WeaponOption[] | null;
 }
 
-/** What a level is spent on: a characteristic, or a heroic talent. */
+/** A magical ability a fighter may learn instead of a talent. */
+export interface AbilityOption {
+	id: string;
+	name: string;
+	text: string;
+	/** Why it cannot be learned, or null where it can. */
+	blocked: 'limit' | null;
+}
+
+/**
+ * The abilities left to learn: those on offer at recruitment that the fighter
+ * did not pick then. `learned` are the ones it has learned since, `allowed` how
+ * many the rules let it learn in all.
+ */
+export function abilitiesFor(
+	offered: string[],
+	picked: string[],
+	learned: string[],
+	allowed: number,
+	describe: (id: string) => { name: string; text: string } | undefined
+): AbilityOption[] {
+	return offered.flatMap((id) => {
+		const ability = describe(id);
+		if (!ability || picked.includes(id) || learned.includes(id)) return [];
+		return [{ id, ...ability, blocked: learned.length >= allowed ? ('limit' as const) : null }];
+	});
+}
+
+/** What a level is spent on: a characteristic, a heroic talent, or a magical ability. */
 export type RenownPick =
 	| { kind: 'stat'; option: RenownOption }
+	| { kind: 'ability'; ability: Pick<AbilityOption, 'id' | 'name'> }
 	| {
 			kind: 'talent';
 			talent: HeroicTalent;
@@ -189,6 +218,8 @@ export function heldTalents(
 	history: RenownChoice[],
 	customAbilities: CustomAbility[]
 ): Set<string> {
+	/* An ability learned instead of a talent (`kind` 'ability') does not count: whether
+	   it counts towards the five is not settled in the rules (DEVIATIONS.md, Open upstream). */
 	const held = new Set(
 		history.filter((c) => c.instanceId === instanceId && c.kind === 'talent' && c.talent).map((c) => c.talent as string)
 	);
@@ -320,6 +351,7 @@ export function spend(
 ): StoredWarband {
 	const option = pick?.kind === 'stat' ? pick.option : null;
 	const talent = pick?.kind === 'talent' ? pick : null;
+	const ability = pick?.kind === 'ability' ? pick.ability : null;
 	const choice: RenownChoice = {
 		instanceId: pending.instanceId,
 		level: pending.level,
@@ -327,7 +359,8 @@ export function spend(
 		characteristic: option?.characteristic ?? null,
 		bonus: option?.bonus ?? 0,
 		source: `Renown ${pending.level}`,
-		...(talent && { talent: talent.talent.id, kind: 'talent' as const, choice: talent.weapon?.id ?? null })
+		...(talent && { talent: talent.talent.id, kind: 'talent' as const, choice: talent.weapon?.id ?? null }),
+		...(ability && { talent: ability.id, kind: 'ability' as const, choice: null })
 	};
 	const same = (e: { instanceId: string; level: number }) =>
 		e.instanceId === pending.instanceId && e.level === pending.level;
