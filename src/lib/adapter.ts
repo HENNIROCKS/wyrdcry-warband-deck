@@ -49,12 +49,14 @@ import {
 	type Warband
 } from './types/warband';
 
-/* Spelled out as on the printed card, "Defense" included. */
+/* Spelled out in full. `defense` holds what the 0.9 rules call Armour – damage
+   taken off each attack, not a target to roll against – and the card names it
+   so, as the Warband Builder does for 0.9. */
 const STAT_LABELS: Record<StatKey, string> = {
 	move: 'Move',
 	fight: 'Fight',
 	shoot: 'Shoot',
-	defense: 'Defense',
+	defense: 'Armour',
 	health: 'Health',
 	bravery: 'Bravery'
 };
@@ -475,10 +477,10 @@ export function toCard(
 		const item = ITEMS.get(id);
 		if (!item) continue;
 		/* No cost: the profile's own cost covers what it cannot take off. And no
-		   layer either – the Freelance Knight's Defense 6 is the value with his
-		   armour on, where 32 of 42 profiles stand at 3. Counting it again would
-		   put him at 9, which is also why the note below still holds: the bonus is
-		   in the figure, it just arrived there with the profile. */
+		   layer either – the Freelance Knight's Armour 6 is the value with his
+		   armour on. Counting it again would put him at 9, which is also why the
+		   note below still holds: the bonus is in the figure, it just arrived there
+		   with the profile. */
 		const inProfile = item.effect != null || CURATED_ITEM_EFFECTS.has(id);
 		equipmentEntries.push({
 			label: item.name,

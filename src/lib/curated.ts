@@ -71,11 +71,11 @@ export interface Condition {
 
 /**
  * What a weapon rule or an item adds in one situation only, where the game data
- * says it wrongly or not at all. Parry's data effect names Defense while its
+ * says it wrongly or not at all. Parry's data effect names `defense` while its
  * description, and the attack rules beside it, raise the defender's Fight; the
  * Shield carries no effect, though it does the same – and against a ranged
  * attack raises the attacker's difficulty rating instead, which goes under
- * Defense without a number, since a +1 there would read as Armour. Keyed
+ * Armour without a number, since a +1 there would read as a point of Armour. Keyed
  * `rule:<id>` and `item:<id>`, because a rule and an item may share an id.
  * Checked against the description like the effects above.
  */

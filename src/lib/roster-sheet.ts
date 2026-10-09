@@ -15,7 +15,7 @@ export interface RosterFighter {
 	instanceId: string;
 	name: string;
 	type: string;
-	/** Move, Fight, Shoot, Defense, Health, Bravery – spelled as the card spells them. */
+	/** Move, Fight, Shoot, Armour, Health, Bravery – spelled as the card spells them. */
 	stats: string[];
 	xp: number;
 	renown: number;

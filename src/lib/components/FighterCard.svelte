@@ -51,7 +51,7 @@
 	/* What a state of the battle does to the characteristics while it stands.
 	   Cover is not among them: it raises the difficulty rating of a ranged
 	   attack against the fighter, a number on the attacker's side, and stands
-	   under Defense as a situation without a figure – `COVER`. */
+	   under Armour as a situation without a figure – `COVER`. */
 	const BATTLE_EFFECTS: {
 		state: 'panicked';
 		source: string;

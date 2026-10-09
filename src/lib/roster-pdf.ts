@@ -142,7 +142,7 @@ const WEAPON_COLUMN = 12;
 function fighterTable(roster: Roster): Content {
 	const head: TableCell[] = [
 		th({ text: 'Name / Type', noWrap: true }),
-		...['M', 'F', 'S', 'D', 'H', 'B', 'XP', 'Ren', 'gc'].map((text) => th(figure(text))),
+		...['M', 'F', 'S', 'A', 'H', 'B', 'XP', 'Ren', 'gc'].map((text) => th(figure(text))),
 		th('Keywords'),
 		th('Talents'),
 		{

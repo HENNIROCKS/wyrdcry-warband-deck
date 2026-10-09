@@ -2,8 +2,8 @@
  * The characteristics of a fighter as recruited.
  *
  * Base profile, what the faction rules in play add, and what the player picked
- * out of the fighter's own choice. Equipment is not in it: a shield's Defense and
- * heavy armour's Move belong to the card, which derives them from the gear the
+ * out of the fighter's own choice. Equipment is not in it: body armour's Armour
+ * and heavy armour's Move belong to the card, which derives them from the gear the
  * fighter carries, and counting them here would put them in twice.
  */
 

@@ -43,7 +43,12 @@
 		{
 			question: 'Can I keep working in the Warband Builder?',
 			answer:
-				'Not reliably, not yet. The export is still written in the shape the builder reads, and for the six official factions the way back is built to hold – but it has not been checked since this app grew a builder of its own. A warband of a homebrew faction cannot go back at all: Clan Pestilens and the Greenskin Marauders exist only here, so the builder accepts the file and then finds neither the faction nor any of its fighters. Export and snapshot are the way to keep a copy meanwhile.'
+				'Not reliably, not yet. The export is still written in the shape the builder reads, and for the six official factions the way back is built to hold – but it has not been checked since this app grew a builder of its own. The builder opens on the 0.5 rules; a warband from here belongs in its 0.9 draft, which its version switch selects. A warband of a homebrew faction cannot go back at all: Clan Pestilens and the Greenskin Marauders exist only here, so the builder accepts the file and then finds neither the faction nor any of its fighters. Export and snapshot are the way to keep a copy meanwhile.'
+		},
+		{
+			question: 'Which rules does the app follow?',
+			answer:
+				'The 0.9 draft, which the group is playtesting. The rulebook PDF and the main pages of wyrdcry.net are still the stable 0.5; the 0.9 rules are on the site under /docs/next. Where the two differ, the cards here follow 0.9 – Armour, for one, is now taken off the damage of each attack rather than rolled against.'
 		},
 		{
 			question: 'Which factions can I build?',
@@ -127,6 +132,7 @@
 		<h2>Links</h2>
 		<ul class="links">
 			<li><a href="https://wyrdcry.net">Wyrdcry – rules and Warband Builder</a></li>
+			<li><a href="https://wyrdcry.net/docs/next/">The 0.9 draft rules this app follows</a></li>
 			<li><a href="{REPO}/issues">Feedback and bug reports</a></li>
 			<li><a href={REPO}>Source code</a></li>
 			<li><a href="{REPO}/blob/main/ROADMAP.md">What is planned</a></li>

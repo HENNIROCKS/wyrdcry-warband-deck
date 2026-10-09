@@ -7,7 +7,7 @@
 		move: 'Move',
 		fight: 'Fight',
 		shoot: 'Shoot',
-		defense: 'Defense',
+		defense: 'Armour',
 		health: 'Health',
 		bravery: 'Bravery'
 	};
