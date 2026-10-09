@@ -18,6 +18,26 @@ export function fighterOf(faction: Faction, fighterId: string): Fighter | undefi
 	return faction.fighters.find((entry) => entry.id === fighterId);
 }
 
+const RANKS = ['leader', 'hero', 'henchman'];
+
+/**
+ * Leader, heroes, henchmen, then whoever is none of these – a BEAST or a
+ * THRALL. The order fighters are offered in and the order the deck deals them.
+ */
+function rank(fighter: Fighter | undefined): number {
+	const at = fighter ? RANKS.findIndex((keyword) => fighter.keywords.includes(keyword)) : -1;
+	return at < 0 ? RANKS.length : at;
+}
+
+/**
+ * The recruited fighters in rank order. Stable, so within a rank they stay in
+ * the order they were recruited – the first Night Runner hired stays first.
+ */
+export function inRankOrder(faction: Faction, fighters: DraftFighter[]): DraftFighter[] {
+	const rankOf = (entry: DraftFighter) => rank(fighterOf(faction, entry.fighterId));
+	return [...fighters].sort((a, b) => rankOf(a) - rankOf(b));
+}
+
 /** How many of this profile the draft already holds. */
 export function countOf(draft: Draft, fighterId: string): number {
 	return draft.fighters.filter((entry) => entry.fighterId === fighterId).length;
@@ -82,13 +102,6 @@ export interface Recruitable {
 export function recruitable(faction: Faction, draft: Draft): Recruitable[] {
 	const left = goldLeft(faction, draft);
 	const full = draft.fighters.length >= (faction.warband_size.max ?? Infinity);
-	/* Leader, heroes, henchmen, then whoever is none of these – a BEAST or a
-	   THRALL. Within a rank the faction's own file order stands. */
-	const ranks = ['leader', 'hero', 'henchman'];
-	const rank = (fighter: Fighter) => {
-		const at = ranks.findIndex((keyword) => fighter.keywords.includes(keyword));
-		return at < 0 ? ranks.length : at;
-	};
 	const ordered = [...faction.fighters].sort((a, b) => rank(a) - rank(b));
 
 	return ordered.map((fighter) => {

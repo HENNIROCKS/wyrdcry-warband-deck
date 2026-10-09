@@ -17,7 +17,7 @@
 	import { toWarband, selectionsOf } from '$lib/build/export';
 	import { rulesInPlay } from '$lib/build/effects';
 	import { equipmentCost, gearOf } from '$lib/build/equipment';
-	import { budget, countOf, fighterOf, goldLeft, problems, recruitable, value } from '$lib/build/roster';
+	import { budget, countOf, fighterOf, goldLeft, inRankOrder, problems, recruitable, value } from '$lib/build/roster';
 	import type { Draft, DraftFighter } from '$lib/build/types';
 	import { RULESET_VERSION } from '$lib/gamedata';
 	import { newId } from '$lib/id';
@@ -189,7 +189,8 @@
 			equipment: [],
 			choice: []
 		};
-		draft.fighters = [...draft.fighters, entry];
+		const fighters = [...draft.fighters, entry];
+		draft.fighters = faction ? inRankOrder(faction, fighters) : fighters;
 		/* Straight into the sheet: a fighter without gear is not a decision anyone
 		   meant to stop at. */
 		openSheet(entry.key);
