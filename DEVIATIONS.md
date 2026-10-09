@@ -23,3 +23,4 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Daemon Great Claw: a profile in the weapons data no fighter carries, being checked as a leftover from Wyrdforge
 - [ ] Hired swords: the 0.9 data still gives them 0.5 Armour values and names four ids it no longer has
 - [ ] One With The Shadows: the ability data holds it twice, once with an empty text
+- [ ] Heroic talents: whether a second magical ability counts towards the five-talent limit, where the page says only "can never have more than five heroic talents"
