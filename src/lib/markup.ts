@@ -12,6 +12,9 @@
  * nobody typed backticks into them. Measured over the game data, where every
  * keyword is marked already, that recogniser changes nothing – it only reaches
  * text somebody typed.
+ *
+ * Lines opening with "- " are a list, as in Markdown: `blocks()` splits them
+ * from the running text, and each item then goes through `tokenize()`.
  */
 
 import { KEYWORDS } from './rules';

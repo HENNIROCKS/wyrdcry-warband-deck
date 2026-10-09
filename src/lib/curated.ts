@@ -1,8 +1,8 @@
 /**
  * Effects the game data describes but does not carry.
  *
- * An item's `effect` holds a single characteristic, so Heavy Armour's `+2
- * Defense` fits and the `-1 Move` in the same sentence does not. The card needs
+ * An item's `effect` holds a single characteristic, so Heavy Armour's `+3
+ * Armour` fits and the `-1 Move` in the same sentence does not. The card needs
  * both, and reading it out of the prose would be a parser aimed at one English
  * sentence.
  *

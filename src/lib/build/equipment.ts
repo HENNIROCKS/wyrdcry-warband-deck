@@ -158,7 +158,7 @@ export function refuse(faction: Faction, fighter: Fighter, equipment: string[], 
 	if (item && item.type === 'armour') {
 		if (isWizard(fighter)) return 'A WIZARD cannot wear armour';
 		if (isPenitent(fighter)) return 'A PENITENT fighter cannot wear armour';
-		if (isFaithful(fighter)) return 'Armour of Faith refuses any armour';
+		if (isFaithful(fighter)) return 'A fighter with Armour of Faith cannot wear armour';
 		if (carried) return 'Already worn';
 		/* One piece of body armour at a time – light or heavy, not both. */
 		if (item.slot === 'body' && held.some((worn) => ITEMS.get(worn)?.slot === 'body')) {

@@ -608,6 +608,7 @@ export function toCard(
 		picked ? '' : profile.ability_preamble
 	);
 	push('equipment', equipmentEntries);
+	const leftOut = warband.factionId ? rulesLeftOut(warband.factionId, keywords) : new Map<string, string>();
 	/*
 	 * A warband built here carries its faction's rules as `customAbilities`, out
 	 * of this app's own ruleset. Where it does, the game data's list for the same
@@ -619,10 +620,10 @@ export function toCard(
 	 * Matching by name would not catch it: the two spell the apostrophe
 	 * differently. A warband out of the builder brings no such rules, so for it
 	 * the game data's list is still the only one there is.
+	 *
+	 * A rule that leaves this fighter out keeps its line, with a hint where the
+	 * rule's text would stand – Sudden Accusation on a War Hound.
 	 */
-	/* A rule that leaves this fighter out keeps its line, with a hint where the
-	   rule's text would stand – Sudden Accusation on a War Hound. */
-	const leftOut = warband.factionId ? rulesLeftOut(warband.factionId, keywords) : new Map<string, string>();
 	const ownFactionRules = customAbilities(warband, factionName).map((rule) => {
 		const keyword = leftOut.get(rule.name);
 		return keyword ? { ...rule, description: `Does not apply to a \`${keyword}\`.`, note: undefined } : rule;
