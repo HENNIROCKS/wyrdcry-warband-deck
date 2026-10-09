@@ -3,13 +3,13 @@
     "id": "command",
     "name": "Command",
     "type": "triple",
-    "text": "Place a command token within 12\" of this fighter and select one of the effects below:\n\n- **Seize:** Until the end of the battleround, friendly fighters may increase their Fight or Shoot characteristic by 1 when attacking a target within 3\" of the token.\n- **Hold:** Until the end of the battleround, friendly fighters within 3\" of that token may increase their Defense and Bravery characteristics by 1."
+    "text": "Place an **order token** within 12\" of this fighter and select one of the effects below:\n\n- **Seize:** Until the end of the battle round, friendly fighters may increase their Fight or Shoot characteristic by 1 when attacking a target within 2\" of the token.\n- **Hold:** Until the end of the battle round, friendly fighters within 2\" of that token may increase their Armour and Bravery characteristics by 1."
   },
   {
     "id": "strategize",
     "name": "Strategize",
-    "type": "triple",
-    "text": "During this activation, when this fighter makes a wait action, roll (X) dice. For each roll of 4+, you may add 1 wyrd dice to your saved wyrd dice."
+    "type": "double",
+    "text": "The next time this fighter makes a wait action this activation, roll (X) dice. For each roll of 5+, you may add 1 wyrd dice to your saved wyrd dice."
   },
   {
     "id": "martial-discipline",

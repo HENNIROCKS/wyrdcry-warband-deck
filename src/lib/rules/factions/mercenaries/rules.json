@@ -85,16 +85,14 @@
         "text": "Roll 7 initiative dice in each initiative phase instead of 6.",
         "phase": "battle",
         "effect": null
+      },
+      {
+        "id": "well-connected",
+        "name": "Well-connected",
+        "text": "When setting up a battle, you may recruit one Hired Sword for half its normal hiring fee.",
+        "phase": "battle",
+        "effect": null
       }
     ]
-  },
-  {
-    "id": "well-connected",
-    "name": "Well-connected",
-    "phase": "battle",
-    "text": "`MERCENARIES` warbands maintain vast networks of contacts. When setting up a battle, a `MERCENARIES` warband may recruit one Hired Sword for half its normal hiring fee.",
-    "pick": null,
-    "options": [],
-    "effect": null
   }
 ]
