@@ -29,6 +29,7 @@
 - [x] 🛠️ Edit on the back of the card: a fighter's fields, equipment and dismissal, the warband's notes and battles
 - [x] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [x] 🃏 A photo of the painted model as the card image, kept out of the JSON export
+- [ ] ⚙️ Follow the 0.9 draft: the remaining four factions, Pierce, hired swords, Armour on the cards and the info page
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
