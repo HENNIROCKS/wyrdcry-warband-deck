@@ -1,6 +1,6 @@
 # Deviations
 
-Where the deck deliberately differs from the site repo. A sync must not undo these; the rest of the game data stays as synced. Ticked: confirmed by the rules author. Below them, questions for the rules author that change nothing in the deck yet.
+Where the deck deliberately differs from the site repo. A sync must not undo these; the rest of the game data stays as synced. Ticked: confirmed by the rules author. Below them, what waits on the site repo and changes nothing in the deck yet – ticked where the rules author has answered.
 
 - [x] Possessed: the Stability test's New Mutation rolls a D66 on the Mutation Table, where the page says 2d6
 - [x] Possessed: Tentacles carry Whipcrack, where the page says Whiplash
@@ -16,10 +16,10 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Strike Them Down answers a Retreat action, where the page names a disengage action 0.9 no longer has
 - [ ] Trading Post costs follow the game data where the page prints others: Dark Venom, Familiar, Healing Draught, Smoke Bomb
 
-## Open questions
+## Open upstream
 
-- [ ] Daemon Great Claw: a profile in the weapons data no fighter carries, possibly left over from Wyrdforge
-- [ ] Blood of Von Carstein: the group of Vampire choices and one trait in it share the name, and the trait is to be renamed
+- [x] Blood of Von Carstein: the trait is to be renamed, the group keeps the name
+- [x] Pierce: one rule, Pierce X, in place of Pierce 1 and Pierce 2
+- [ ] Daemon Great Claw: a profile in the weapons data no fighter carries, being checked as a leftover from Wyrdforge
 - [ ] Hired swords: the 0.9 data still gives them 0.5 Armour values and names four ids it no longer has
 - [ ] One With The Shadows: the ability data holds it twice, once with an empty text
-- [ ] Pierce: one rule, Pierce X, in place of Pierce 1 and Pierce 2
