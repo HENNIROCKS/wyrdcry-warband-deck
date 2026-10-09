@@ -123,6 +123,22 @@
 }
 
 /*
+ * A list inside a rules text, such as the three Blessings of Sigmar. `RuleText`
+ * writes it as spans, so the list shape comes from here: a bullet hanging left
+ * of the text, the lines it wraps onto aligned under the first.
+ */
+.rule-list {
+	display: block;
+	margin: 0.3em 0;
+	padding-left: 1.1em;
+}
+
+.rule-item {
+	display: list-item;
+	list-style: disc outside;
+}
+
+/*
  * Fonts – SIL Open Font License 1.1, see static/fonts/*-OFL.txt
  * Grenze Gotisch: https://fonts.google.com/specimen/Grenze+Gotisch
  * Alegreya: copyright 2011 The Alegreya Project Authors

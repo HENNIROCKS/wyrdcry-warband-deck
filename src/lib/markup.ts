@@ -89,3 +89,35 @@ export function tokenize(text: string): MarkupToken[] {
 	if (last < text.length) pushText(tokens, text.slice(last));
 	return tokens;
 }
+
+export type MarkupBlock = { kind: 'text'; value: string } | { kind: 'list'; items: string[] };
+
+/**
+ * Splits a rules text into running text and lists. Consecutive lines that open
+ * with "- " are one list, as Markdown reads them; the blank lines around it are
+ * dropped, because the list brings its own spacing.
+ */
+export function blocks(text: string): MarkupBlock[] {
+	const result: MarkupBlock[] = [];
+	let run: string[] = [];
+
+	const flush = () => {
+		const value = run.join('\n').replace(/^\s*\n|\n\s*$/g, '').trimEnd();
+		if (value.trim()) result.push({ kind: 'text', value });
+		run = [];
+	};
+
+	for (const line of text.split('\n')) {
+		const item = line.match(/^\s*-\s+(.*)$/);
+		if (!item) {
+			run.push(line);
+			continue;
+		}
+		flush();
+		const last = result.at(-1);
+		if (last?.kind === 'list') last.items.push(item[1]);
+		else result.push({ kind: 'list', items: [item[1]] });
+	}
+	flush();
+	return result;
+}
