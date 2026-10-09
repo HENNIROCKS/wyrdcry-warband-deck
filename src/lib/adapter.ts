@@ -24,7 +24,7 @@ import {
 } from './gamedata';
 import type { WeaponProfile } from './gamedata';
 import { promoted } from './renown';
-import { raisedBy, rolledRow } from './rules-bridge';
+import { raisedBy, rolledRow, rulesLeftOut } from './rules-bridge';
 import type {
 	CardEntry,
 	CardSection,
@@ -620,7 +620,13 @@ export function toCard(
 	 * differently. A warband out of the builder brings no such rules, so for it
 	 * the game data's list is still the only one there is.
 	 */
-	const ownFactionRules = customAbilities(warband, factionName);
+	/* A rule that leaves this fighter out keeps its line, with a hint where the
+	   rule's text would stand – Sudden Accusation on a War Hound. */
+	const leftOut = warband.factionId ? rulesLeftOut(warband.factionId, keywords) : new Map<string, string>();
+	const ownFactionRules = customAbilities(warband, factionName).map((rule) => {
+		const keyword = leftOut.get(rule.name);
+		return keyword ? { ...rule, description: `Does not apply to a \`${keyword}\`.`, note: undefined } : rule;
+	});
 	push(
 		'faction',
 		abilityEntries(ownFactionRules.length ? [] : (faction?.faction_ability_ids ?? []), ownFactionRules)

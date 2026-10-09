@@ -31,6 +31,7 @@
 		"name": "Sudden Accusation",
 		"phase": "battle",
 		"text": "[Reaction] All `WITCH HUNTERS` fighters without the `BEAST` keyword have this reaction. A fighter can make this reaction when a visible friendly fighter is taken out of action by a visible enemy fighter. That enemy fighter is condemned. Then, increase Zeal by 1.",
+		"except": "beast",
 		"pick": null,
 		"options": [],
 		"effect": null

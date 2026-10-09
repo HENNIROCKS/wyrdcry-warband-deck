@@ -241,6 +241,11 @@ export interface FactionRule {
 	 * of `kind: 'roll'` and the rule's own display text read the same eleven rows.
 	 */
 	table?: TableRow[];
+	/**
+	 * A keyword id whose carriers the rule leaves out, such as Sudden Accusation
+	 * for every Witch Hunter but a BEAST. The card prints a hint in its place.
+	 */
+	except?: string;
 }
 
 export interface Allowance {

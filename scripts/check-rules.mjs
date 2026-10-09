@@ -506,6 +506,9 @@ for (const folder of folders) {
 			problem(file('rules'), `"${rule.id}" takes hold in "${rule.phase}", which is not a phase`);
 		}
 		checkEffect(`"${rule.id}"`, rule.effect);
+		if (rule.except !== undefined && !keywordIds.has(rule.except)) {
+			problem(file('rules'), `"${rule.id}" leaves out "${rule.except}", which is not a keyword`);
+		}
 
 		if (rule.table) {
 			/* Every D66 result lands in exactly one row: the wizard's Roll button
