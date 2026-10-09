@@ -7,12 +7,14 @@
 	import { FRESH } from '../battle';
 	import type { PhotoView } from '../photo';
 	import type { CardEntry, CardSection, CardStat, FighterCardData, StatCondition } from '../types/card';
+	import type { ZealRuleEffect } from '../rules';
 	import type { FighterBattleState, StatKey } from '../types/warband';
 
 	let {
 		card,
 		state = FRESH,
 		wavering = false,
+		zeal = [],
 		photo = null
 	}: {
 		card: FighterCardData;
@@ -20,6 +22,8 @@
 		state?: FighterBattleState;
 		/** Whether the warband's morale is wavering, which asks for a Bravery test. */
 		wavering?: boolean;
+		/** The Zeal stages the warband has reached, which change every fighter's figures. */
+		zeal?: ZealRuleEffect[];
 		/** The photo of the painted model, shown in the image field where there is one. */
 		photo?: PhotoView | null;
 	} = $props();
@@ -88,12 +92,20 @@
 	const characteristics = $derived(
 		card.stats.map((stat) => {
 			const damage = stat.key === 'health' ? Math.min(state.damage, stat.value) : 0;
-			const effects = BATTLE_EFFECTS.flatMap((effect) => {
-				const amount = effect.amounts[stat.key];
-				return state[effect.state] && amount
-					? [{ kind: 'battle' as const, source: effect.source, amount }]
-					: [];
-			});
+			const effects = [
+				...BATTLE_EFFECTS.flatMap((effect) => {
+					const amount = effect.amounts[stat.key];
+					return state[effect.state] && amount
+						? [{ kind: 'battle' as const, source: effect.source, amount }]
+						: [];
+				}),
+				...zeal.flatMap((stage) => {
+					const amount = stage.amounts[stat.key];
+					return amount
+						? [{ kind: 'battle' as const, source: `Zeal ${stage.at}: ${stage.label}`, amount }]
+						: [];
+				})
+			];
 			const bonus = effects.reduce((sum, layer) => sum + layer.amount, 0);
 			const shown = format({ ...stat, value: stat.value - damage + bonus });
 			const layers = [
@@ -101,7 +113,23 @@
 				...(damage ? [{ kind: 'damage' as const, source: 'Damage', amount: -damage }] : []),
 				...effects
 			];
-			const conditions = state.cover && stat.key === 'defense' ? [COVER, ...stat.conditions] : stat.conditions;
+			const staged = zeal.flatMap((stage) =>
+				stage.conditions?.stats.includes(stat.key)
+					? [
+							{
+								source: `Zeal ${stage.at}: ${stage.label}`,
+								name: stage.label,
+								text: stage.conditions.text,
+								amount: stage.conditions.amount
+							}
+						]
+					: []
+			);
+			const conditions = [
+				...(state.cover && stat.key === 'defense' ? [COVER] : []),
+				...staged,
+				...stat.conditions
+			];
 			return {
 				key: stat.key,
 				label: stat.label,

@@ -496,6 +496,37 @@ for (const folder of folders) {
 					}
 				}
 			}
+		} else if (effect.kind === 'zeal') {
+			if (!Number.isInteger(effect.at) || effect.at < 0) {
+				problem(file('rules'), `${where} holds from Zeal "${effect.at}", which is not a whole number from 0`);
+			}
+			if (typeof effect.label !== 'string' || !effect.label) {
+				problem(file('rules'), `${where} has a Zeal stage without a label`);
+			}
+			if (effect.conditions) {
+				for (const key of effect.conditions.stats ?? []) {
+					if (!STATS.includes(key)) {
+						problem(file('rules'), `${where} is conditional on "${key}", which is not a characteristic`);
+					}
+				}
+				if (effect.conditions.amount !== undefined && typeof effect.conditions.amount !== 'number') {
+					problem(file('rules'), `${where} has a condition worth "${effect.conditions.amount}", which is not a number`);
+				}
+				if (typeof effect.conditions.text !== 'string' || !effect.conditions.text) {
+					problem(file('rules'), `${where} has a condition without a text`);
+				}
+			}
+			if (effect.except !== undefined && !keywordIds.has(effect.except)) {
+				problem(file('rules'), `${where} leaves out "${effect.except}", which is not a keyword`);
+			}
+			for (const [key, amount] of Object.entries(effect.amounts ?? {})) {
+				if (!STATS.includes(key)) {
+					problem(file('rules'), `${where} changes "${key}", which is not a characteristic`);
+				}
+				if (typeof amount !== 'number') {
+					problem(file('rules'), `${where} changes "${key}" by "${amount}", which is not a number`);
+				}
+			}
 		} else {
 			problem(file('rules'), `${where} has an effect of kind "${effect.kind}"`);
 		}

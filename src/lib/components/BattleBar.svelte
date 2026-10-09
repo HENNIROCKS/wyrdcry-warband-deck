@@ -1,6 +1,8 @@
 <script lang="ts">
 	import MenuButton from './MenuButton.svelte';
 	import { remaining, type Counted } from '../battle';
+	import { reached } from '../zeal';
+	import type { ZealRuleEffect } from '../rules';
 	import type { BattleState, FighterBattleState } from '../types/warband';
 
 	let {
@@ -9,6 +11,9 @@
 		health = 0,
 		hero = false,
 		fighters = [],
+		stages = [],
+		zeal = 0,
+		onzeal,
 		height = $bindable(0),
 		ontoggle,
 		onwait,
@@ -31,6 +36,11 @@
 		hero?: boolean;
 		/** Every fighter of the warband with its weight, for the count and the morale. */
 		fighters?: Counted[];
+		/** The faction's Zeal stages. The warband card counts Zeal in place of the round where there are any. */
+		stages?: ZealRuleEffect[];
+		/** The Zeal counted so far. */
+		zeal?: number;
+		onzeal?: (delta: number) => void;
 		/**
 		 * What the bar occupies at the foot of the window, read back by the deck:
 		 * the bar is out of the flow, so the cards have to be kept clear of it by
@@ -59,6 +69,9 @@
 	   damage over critical damage with a slash, and that pairing is the weapon's. */
 	const left = $derived(state ? Math.max(0, health - state.damage) : 0);
 	const unknown = $derived(health <= 0);
+
+	/* The highest stage reached; there is none below the first threshold. */
+	const stage = $derived(reached(stages, zeal).at(-1) ?? null);
 
 	const left_to_act = $derived(remaining(
 			battle,
@@ -141,6 +154,27 @@
 					Panicked
 				</button>
 			</MenuButton>
+			{@render editButton()}
+		</div>
+	{:else if stages.length}
+		<!-- A faction that counts Zeal has the count where a fighter has its wounds,
+		     under the same thumb; the round is in the battle menu. -->
+		<div class="wounds">
+			<button
+				class="step"
+				disabled={zeal === 0}
+				aria-label="Take back a point of Zeal"
+				onclick={() => onzeal?.(-1)}
+			>
+				&minus;
+			</button>
+			<span class="readout wide" aria-live="polite">
+				<span class="of">Zeal</span> {zeal}
+			</span>
+			<button class="step" aria-label="Count a point of Zeal" onclick={() => onzeal?.(1)}>+</button>
+			<span class="stage" aria-live="polite">{stage?.label ?? ''}</span>
+		</div>
+		<div class="states">
 			{@render editButton()}
 		</div>
 	{:else if battle}
@@ -233,6 +267,11 @@
 		font-variant-numeric: tabular-nums;
 	}
 
+	/* Wide enough for two digits, so the + under the thumb stays where it is. */
+	.readout.wide {
+		min-width: 7ch;
+	}
+
 	/* The ceiling, not the reading: it is there to say what the figure counts down
 	   from. */
 	.of {
@@ -261,7 +300,13 @@
 	.tick {
 		display: inline-block;
 		width: 1.2em;
-		color: var(--ui-accent);
+		color: var(--ui-accent-text);
+	}
+
+	.stage {
+		font-size: var(--ui-t-md);
+		font-weight: 600;
+		color: var(--ui-accent-text);
 	}
 
 	.summary {

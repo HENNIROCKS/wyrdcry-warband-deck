@@ -8,6 +8,8 @@
 	import WarbandCard from './WarbandCard.svelte';
 	import { hasKeyword, healthOf } from '../adapter';
 	import { stateOf, type Counted } from '../battle';
+	import { holdingFor } from '../zeal';
+	import type { ZealRuleEffect } from '../rules';
 	import type { PhotoView } from '../photo';
 	import type { DeckCard } from '../types/card';
 	import type { BattleState } from '../types/warband';
@@ -17,6 +19,9 @@
 		counted,
 		battle = null,
 		wavering = false,
+		stages = [],
+		zeal = 0,
+		onzeal,
 		ontoggle,
 		onwait,
 		onwound,
@@ -38,6 +43,11 @@
 		battle?: BattleState | null;
 		/** Whether the warband's morale is wavering, for the fighters' Bravery tests. */
 		wavering?: boolean;
+		/** The faction's Zeal stages; empty where the faction does not count Zeal. */
+		stages?: ZealRuleEffect[];
+		/** The Zeal the warband has counted so far in the battle. */
+		zeal?: number;
+		onzeal?: (delta: number) => void;
 		ontoggle?: (instanceId: string) => void;
 		onwait?: (instanceId: string) => void;
 		onwound?: (instanceId: string, delta: number, health: number) => void;
@@ -373,6 +383,9 @@
 			state={topFighter ? stateOf(battle, topFighter.instanceId) : null}
 			health={topFighter ? healthOf(topFighter) : 0}
 			{fighters}
+			{stages}
+			{zeal}
+			{onzeal}
 			hero={topFighter ? hasKeyword(topFighter, 'hero') : false}
 			ontoggle={() => topFighter && ontoggle?.(topFighter.instanceId)}
 			onwait={() => topFighter && onwait?.(topFighter.instanceId)}
@@ -398,7 +411,7 @@
 	{#if data.kind === 'warband'}
 		<WarbandCard card={data} onpick={jumpTo} />
 	{:else}
-		<FighterCard card={data} state={stateOf(battle, data.instanceId)} {wavering} photo={photos?.get(data.instanceId) ?? null} />
+		<FighterCard card={data} state={stateOf(battle, data.instanceId)} {wavering} zeal={battle ? holdingFor(stages, zeal, data.keywords) : []} photo={photos?.get(data.instanceId) ?? null} />
 	{/if}
 {/snippet}
 

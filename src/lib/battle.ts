@@ -138,6 +138,19 @@ export function allocate(
 	return write(battle, instanceId, { damage, out: health > 0 && damage >= health });
 }
 
+export function zealOf(battle: BattleState | null): number {
+	return battle?.zeal ?? 0;
+}
+
+/**
+ * Counts Zeal up or down, starting a battle if none is running. It belongs to
+ * the battle, not to the round, and cannot fall below nothing.
+ */
+export function adjustZeal(battle: BattleState | null, delta: number): BattleState {
+	const current = battle ?? start();
+	return { ...current, zeal: Math.max(0, zealOf(current) + delta), undo: null };
+}
+
 /**
  * The next round clears what belongs to a round and keeps what belongs to the
  * battle: the wounds, whoever is out of action and whoever is in cover carry
