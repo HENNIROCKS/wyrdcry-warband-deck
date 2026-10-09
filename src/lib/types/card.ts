@@ -26,11 +26,7 @@ export interface StatCondition {
 	source: string;
 	name: string;
 	text: string;
-	/**
-	 * What it would add, where the rule says a number. Mighty names Fight or
-	 * Shoot depending on the weapon, and the weapon is known – so the card
-	 * settles that much rather than leaving the player to read it off again.
-	 */
+	/** What it would add, where the rule says a number. */
 	amount?: number;
 }
 

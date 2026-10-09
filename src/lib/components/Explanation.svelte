@@ -108,7 +108,7 @@
 					<div class="condition">
 						<p class="name">
 							{condition.name}
-							<span class="from">{condition.source}</span>
+							{#if condition.source !== condition.name}<span class="from">{condition.source}</span>{/if}
 							{#if condition.amount !== undefined}
 								<span class="amount">+{condition.amount}</span>
 							{/if}

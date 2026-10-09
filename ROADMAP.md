@@ -24,7 +24,6 @@
 - [x] 📈 Spend renown: raise a characteristic, or promote a henchman to HERO
 - [x] 📄 Export the warband as a roster PDF
 - [x] 🎨 Keep the chosen warband when coming back to the deck
-- [x] 🃏 Count Mighty on weapons a fighter is born with or mutates into, not only on bought ones
 - [x] ⚙️ Cache game data for offline use at the table
 - [x] 🛠️ Edit on the back of the card: a fighter's fields, equipment and dismissal, the warband's notes and battles
 - [x] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values

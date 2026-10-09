@@ -10,7 +10,7 @@
  */
 
 import { ALREADY_INCLUDED } from './build/export';
-import { CURATED_ITEM_EFFECTS } from './curated';
+import { CURATED_CONDITIONS, CURATED_ITEM_EFFECTS } from './curated';
 import { RESULT_LABELS, displayDate, newestFirst, opponent, tally } from './history';
 import {
 	ABILITIES,
@@ -42,7 +42,6 @@ import {
 	STAT_KEYS,
 	type BattleRecord,
 	type RenownChoice,
-	type CustomWeapon,
 	type FighterInstance,
 	type Fluff,
 	type Selections,
@@ -81,16 +80,8 @@ export function itemCost(id: string): number {
 	return WEAPONS.get(id)?.cost ?? ITEMS.get(id)?.cost ?? 0;
 }
 
-/**
- * Which characteristic an effect touches. `fight_shoot` is the weapon's own
- * attack characteristic – Fight for a melee weapon, Shoot for a ranged one –
- * and appears only on rules that hang on a weapon.
- */
-function affected(characteristic: string, weapon?: WeaponProfile): StatKey | undefined {
-	if (characteristic === 'fight_shoot') {
-		if (!weapon) return undefined;
-		return weapon.type === 'ranged' ? 'shoot' : 'fight';
-	}
+/** Which characteristic an effect touches; Pierce, which works on the target, touches none. */
+function affected(characteristic: string): StatKey | undefined {
 	return STAT_KEYS.includes(characteristic as StatKey) ? (characteristic as StatKey) : undefined;
 }
 
@@ -109,32 +100,22 @@ function addTo<T>(map: Map<StatKey, T[]>, key: StatKey, entry: T): void {
  * What the gear does to the characteristics.
  *
  * Armour counts in: it applies whenever the fighter is on the table. A weapon
- * rule does not, even where the data says `conditional: false` – Parry and
- * Mighty both name a situation in their own description, and a number that is
- * only sometimes right is worse than one the player looks up.
+ * rule does not, even where the data says `conditional: false` – Parry names a
+ * situation in its own description, and a number that is only sometimes right
+ * is worse than one the player looks up. Neither does the Shield's +1 Fight,
+ * which holds only against a melee attack. What such a rule or item adds, and
+ * to which characteristic, comes from `CURATED_CONDITIONS` where it has an
+ * entry there.
  *
  * `innate` are the weapons the fighter carries without having bought them – off
  * its profile, or rolled as a mutation. Their rules count like those of bought
  * ones. Items off the profile do not come in here: their bonus is already in the
  * profile's figures.
  */
-function statSources(equipment: string[], custom: CustomWeapon[], innate: string[]): StatSources {
+function statSources(equipment: string[], innate: string[]): StatSources {
 	const sources: StatSources = { layers: new Map(), conditions: new Map() };
-	const carried = [...equipment, ...innate];
 
-	/* How many weapons of each kind the fighter carries – it decides whether a
-	   rule that hangs on one of them is a condition or simply the case. A weapon
-	   the warband typed in itself has no kind to read: it counts as neither, and
-	   its presence alone keeps every such rule a condition. */
-	const sameKind = new Map<string, number>();
-	let unknownKind = 0;
-	for (const id of carried) {
-		const weapon = WEAPONS.get(id);
-		if (weapon) sameKind.set(weapon.type, (sameKind.get(weapon.type) ?? 0) + 1);
-		else if (custom.some((w) => w.id === id || w.name === id)) unknownKind++;
-	}
-
-	for (const id of carried) {
+	for (const id of [...equipment, ...innate]) {
 		const weapon = WEAPONS.get(id);
 		if (!weapon) {
 			const item = ITEMS.get(id);
@@ -153,46 +134,39 @@ function statSources(equipment: string[], custom: CustomWeapon[], innate: string
 					amount: effect.bonus
 				});
 			}
+			for (const condition of CURATED_CONDITIONS.get(`item:${id}`) ?? []) {
+				if (sources.conditions.get(condition.characteristic)?.some((c) => c.name === item.name)) continue;
+				addTo(sources.conditions, condition.characteristic, {
+					source: item.name,
+					name: item.name,
+					text: item.description,
+					amount: condition.bonus
+				});
+			}
 			continue;
 		}
 
 		for (const ruleId of weapon.special_rules) {
 			const rule = WEAPON_RULES.get(ruleId);
-			if (!rule?.effect) continue;
-			const key = affected(rule.effect.characteristic, weapon);
-			if (!key) continue;
+			if (!rule) continue;
+			const effects = CURATED_CONDITIONS.get(`rule:${ruleId}`) ?? (rule.effect ? [rule.effect] : []);
+			for (const effect of effects) {
+				const key = affected(effect.characteristic);
+				if (!key) continue;
 
-			/*
-			 * A rule on the fighter's only weapon of its kind has nothing left to
-			 * depend on: whenever Fight is rolled, it is rolled with that weapon.
-			 * Carrying a second one of the same kind brings the choice back, and
-			 * with it the condition.
-			 */
-			if (
-				rule.effect.characteristic === 'fight_shoot' &&
-				sameKind.get(weapon.type) === 1 &&
-				unknownKind === 0
-			) {
-				addTo(sources.layers, key, {
-					kind: 'equipment',
-					source: `${rule.name} (${weapon.name})`,
-					amount: rule.effect.bonus
+				/* Two of the same weapon carry the same rule twice, and reading it twice
+				   tells the player nothing the first line did not. */
+				const known = sources.conditions
+					.get(key)
+					?.some((c) => c.name === rule.name && c.source === weapon.name);
+				if (known) continue;
+				addTo(sources.conditions, key, {
+					source: weapon.name,
+					name: rule.name,
+					text: rule.description,
+					amount: effect.bonus
 				});
-				continue;
 			}
-
-			/* Two of the same weapon carry the same rule twice, and reading it twice
-			   tells the player nothing the first line did not. */
-			const known = sources.conditions
-				.get(key)
-				?.some((c) => c.name === rule.name && c.source === weapon.name);
-			if (known) continue;
-			addTo(sources.conditions, key, {
-				source: weapon.name,
-				name: rule.name,
-				text: rule.description,
-				amount: rule.effect.bonus
-			});
 		}
 	}
 
@@ -379,7 +353,7 @@ export function toCard(
 			.filter((id) => WEAPONS.has(id) && !instance.equipment.includes(id)),
 		...(rolled?.weapon && WEAPONS.has(rolled.weapon) ? [rolled.weapon] : [])
 	];
-	const sources = statSources(instance.equipment, warband.customWeapons, innate);
+	const sources = statSources(instance.equipment, innate);
 
 	const stats: CardStat[] = STAT_KEYS.map((key) => {
 		const base = profile[key];

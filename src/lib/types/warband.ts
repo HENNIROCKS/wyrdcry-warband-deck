@@ -160,9 +160,10 @@ export interface FighterBattleState {
 	 */
 	heroic: boolean;
 	/**
-	 * In cover, worth +1 Defense while it stands. A stance rather than a round's
-	 * action, so it survives `nextRound` the same way `damage` does – nobody has
-	 * moved just because the round turned over.
+	 * In cover, worth +1 to the difficulty rating of a ranged attack against the
+	 * fighter while it stands – shown on the card, counted by nobody. A stance
+	 * rather than a round's action, so it survives `nextRound` the same way
+	 * `damage` does – nobody has moved just because the round turned over.
 	 */
 	cover: boolean;
 	/**

@@ -12,8 +12,9 @@
  * either wrong or no longer needed.
  */
 
+import conditions from './curated/conditions.json';
 import extra from './curated/item-effects.json';
-import { ITEMS } from './gamedata';
+import { ITEMS, WEAPON_RULES } from './gamedata';
 import { STAT_KEYS, type StatKey } from './types/warband';
 
 interface CuratedEffect {
@@ -53,3 +54,61 @@ function build(): Map<string, { characteristic: StatKey; bonus: number }[]> {
 }
 
 export const CURATED_ITEM_EFFECTS = build();
+
+interface CuratedCondition {
+	weaponRule?: string;
+	item?: string;
+	characteristic: string;
+	/** Null where the situation changes the attacker's numbers, not this one. */
+	bonus: number | null;
+	expect: string;
+}
+
+export interface Condition {
+	characteristic: StatKey;
+	bonus?: number;
+}
+
+/**
+ * What a weapon rule or an item adds in one situation only, where the game data
+ * says it wrongly or not at all. Parry's data effect names Defense while its
+ * description, and the attack rules beside it, raise the defender's Fight; the
+ * Shield carries no effect, though it does the same – and against a ranged
+ * attack raises the attacker's difficulty rating instead, which goes under
+ * Defense without a number, since a +1 there would read as Armour. Keyed
+ * `rule:<id>` and `item:<id>`, because a rule and an item may share an id.
+ * Checked against the description like the effects above.
+ */
+function buildConditions(): Map<string, Condition[]> {
+	const map = new Map<string, Condition[]>();
+
+	for (const entry of conditions as CuratedCondition[]) {
+		const source = entry.weaponRule
+			? WEAPON_RULES.get(entry.weaponRule)
+			: entry.item
+				? ITEMS.get(entry.item)
+				: undefined;
+		const key = entry.characteristic as StatKey;
+		const name = entry.weaponRule ? `rule:${entry.weaponRule}` : `item:${entry.item}`;
+
+		if (import.meta.env.DEV) {
+			if (!source) console.warn(`curated conditions: no "${name}" in the game data`);
+			else if (!source.description.includes(entry.expect)) {
+				console.warn(`curated conditions: "${name}" no longer reads "${entry.expect}"`);
+			}
+			if (!STAT_KEYS.includes(key)) {
+				console.warn(`curated conditions: "${entry.characteristic}" is not a characteristic`);
+			}
+		}
+
+		if (!source || !STAT_KEYS.includes(key)) continue;
+		const condition = { characteristic: key, bonus: entry.bonus ?? undefined };
+		const list = map.get(name);
+		if (list) list.push(condition);
+		else map.set(name, [condition]);
+	}
+
+	return map;
+}
+
+export const CURATED_CONDITIONS = buildConditions();

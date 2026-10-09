@@ -1,0 +1,20 @@
+[
+	{
+		"weaponRule": "parry",
+		"characteristic": "fight",
+		"bonus": 1,
+		"expect": "increase their Fight characteristic by 1"
+	},
+	{
+		"item": "shield",
+		"characteristic": "fight",
+		"bonus": 1,
+		"expect": "Fight characteristic by 1 when defending against a melee attack action"
+	},
+	{
+		"item": "shield",
+		"characteristic": "defense",
+		"bonus": null,
+		"expect": "When defending against a ranged attack action, increase the Difficulty Rating by 1 instead"
+	}
+]

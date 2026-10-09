@@ -6,7 +6,7 @@
 	import { healthOf } from '../adapter';
 	import { FRESH } from '../battle';
 	import type { PhotoView } from '../photo';
-	import type { CardEntry, CardSection, CardStat, FighterCardData } from '../types/card';
+	import type { CardEntry, CardSection, CardStat, FighterCardData, StatCondition } from '../types/card';
 	import type { FighterBattleState, StatKey } from '../types/warband';
 
 	let {
@@ -48,15 +48,21 @@
 		].filter(Boolean)
 	);
 
-	/* What a state of the battle does to the characteristics while it stands. */
+	/* What a state of the battle does to the characteristics while it stands.
+	   Cover is not among them: it raises the difficulty rating of a ranged
+	   attack against the fighter, a number on the attacker's side, and stands
+	   under Defense as a situation without a figure – `COVER`. */
 	const BATTLE_EFFECTS: {
-		state: 'cover' | 'panicked';
+		state: 'panicked';
 		source: string;
 		amounts: Partial<Record<StatKey, number>>;
-	}[] = [
-		{ state: 'cover', source: 'In Cover', amounts: { defense: 1 } },
-		{ state: 'panicked', source: 'Panicked', amounts: { fight: -1, shoot: -1 } }
-	];
+	}[] = [{ state: 'panicked', source: 'Panicked', amounts: { fight: -1, shoot: -1 } }];
+
+	const COVER: StatCondition = {
+		source: 'In Cover',
+		name: 'In Cover',
+		text: 'A ranged attack action against this fighter has its difficulty rating (DR) increased by 1.'
+	};
 
 	/* How high the blood stands in the image field: a fighter at half its Health is
 	   red to half its height. */
@@ -95,19 +101,20 @@
 				...(damage ? [{ kind: 'damage' as const, source: 'Damage', amount: -damage }] : []),
 				...effects
 			];
+			const conditions = state.cover && stat.key === 'defense' ? [COVER, ...stat.conditions] : stat.conditions;
 			return {
 				key: stat.key,
 				label: stat.label,
 				/* The star says the figure can still rise – the tag alone would say only
 				   that it was worked out, and those are two different promises. */
-				value: shown + (stat.conditions.length ? '*' : ''),
+				value: shown + (conditions.length ? '*' : ''),
 				explanation:
-					layers.length > 1 || stat.conditions.length
+					layers.length > 1 || conditions.length
 						? {
 								title: stat.label,
 								result: shown,
 								layers,
-								conditions: stat.conditions
+								conditions
 							}
 						: undefined
 			};
