@@ -496,7 +496,12 @@
 						spent: [],
 						equipment: [...instance.equipment],
 						stash: [...active.warband.stash],
-						reserved: reservedFor(active, id)
+						/* Their own names too: `nameProblem` refuses a talent's name another
+						   fighter already has, and reads nothing else. */
+						reserved: [
+							...reservedFor(active, id),
+							...active.warband.fighters.filter((f) => f.instanceId !== id).map((f) => f.customName.trim())
+						].filter(Boolean)
 					}
 				: null,
 			notes: isWarband ? active.warband.factionNotes : (instance?.notes ?? ''),

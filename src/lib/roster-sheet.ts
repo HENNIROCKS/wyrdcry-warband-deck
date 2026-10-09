@@ -60,9 +60,9 @@ const STAT_ORDER = ['move', 'fight', 'shoot', 'defense', 'health', 'bravery'] as
 
 /*
  * The cards' order: whatever has no type of its own first, then trait, double,
- * triple and quad, then what the gear brings. Each group by name.
+ * triple, quad and reaction, then what the gear brings. Each group by name.
  */
-const RULE_ORDER = ['Faction rule', 'Ability', 'Trait', 'Double', 'Triple', 'Quad', 'Weapon rule', 'Item'];
+const RULE_ORDER = ['Faction rule', 'Ability', 'Trait', 'Double', 'Triple', 'Quad', 'Reaction', 'Weapon rule', 'Item'];
 
 function entries(card: FighterCardData, ...kinds: string[]): CardEntry[] {
 	return card.sections.filter((s) => kinds.includes(s.kind)).flatMap((s) => s.entries);

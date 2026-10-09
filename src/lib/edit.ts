@@ -49,7 +49,7 @@ export interface FighterDraft {
 	equipment: string[];
 	/** The warband's stash, which the fighter hands pieces to and takes them from. */
 	stash: string[];
-	/** The names other fighters and the faction answer to, besides their own names. */
+	/** Every name the faction and the other fighters answer to, their own names included. */
 	reserved: string[];
 }
 
