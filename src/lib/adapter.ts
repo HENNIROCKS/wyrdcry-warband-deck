@@ -431,7 +431,7 @@ export function toCard(
 			/* Armour reads as a bonus waiting to be applied. It has been – the
 			   characteristics above already carry it, and without the note a player
 			   adds it a second time. */
-			const counted = item.effect !== undefined || CURATED_ITEM_EFFECTS.has(id);
+			const counted = item.effect != null || CURATED_ITEM_EFFECTS.has(id);
 			equipmentEntries.push({
 				label: item.name,
 				text: item.description,
@@ -479,7 +479,7 @@ export function toCard(
 		   armour on, where 32 of 42 profiles stand at 3. Counting it again would
 		   put him at 9, which is also why the note below still holds: the bonus is
 		   in the figure, it just arrived there with the profile. */
-		const inProfile = item.effect !== undefined || CURATED_ITEM_EFFECTS.has(id);
+		const inProfile = item.effect != null || CURATED_ITEM_EFFECTS.has(id);
 		equipmentEntries.push({
 			label: item.name,
 			text: item.description,

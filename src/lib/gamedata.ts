@@ -58,7 +58,8 @@ export interface ItemProfile {
 	name: string;
 	type: string;
 	description: string;
-	effect?: { characteristic: string; bonus: number };
+	/** Null on an item that changes no characteristic, which is most of them. */
+	effect?: { characteristic: string; bonus: number } | null;
 	cost: number;
 }
 
