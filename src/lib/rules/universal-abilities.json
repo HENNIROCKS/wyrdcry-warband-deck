@@ -7,18 +7,11 @@
 		"text": "Add 1 to the Shoot characteristic of this fighter for its next Ranged Attack action this activation."
 	},
 	{
-		"id": "diving-charge",
-		"name": "Diving Charge",
-		"type": "double",
-		"keyword": "any",
-		"text": "A fighter can use this ability after making a move action where it fell more than 2\" vertically. Until the end of their activation, you may add 1 to their Fight characteristic for every full 2\" they fell."
-	},
-	{
 		"id": "respite",
 		"name": "Respite",
-		"type": "double",
+		"type": "triple",
 		"keyword": "any",
-		"text": "A fighter cannot use this ability while within 1\" of an enemy fighter. Remove (X) damage points from this fighter."
+		"text": "A fighter cannot use this ability while within 1\" of an enemy fighter. Remove D3+3 damage points from this fighter."
 	},
 	{
 		"id": "rush",
@@ -37,36 +30,36 @@
 	{
 		"id": "onslaught",
 		"name": "Onslaught",
-		"type": "triple",
+		"type": "double",
 		"keyword": "any",
-		"text": "Add 1 to the Attacks characteristic of melee attack actions made by this fighter until the end of their activation."
+		"text": "Add 1 to the Attacks characteristic for this fighter's next Melee Attack action this activation."
 	},
 	{
 		"id": "rampage",
 		"name": "Rampage",
 		"type": "quad",
 		"keyword": "any",
-		"text": "This fighter makes a bonus move action. Then, they can make a bonus attack action."
+		"text": "This fighter makes a bonus move action up to (X)\". Then, they can make a bonus attack action."
 	},
 	{
 		"id": "counter",
 		"name": "Counter",
 		"type": "reaction",
 		"keyword": "any",
-		"text": "Use this reaction when targeted by a melee attack action but before the hit rolls are made. If one or more hit rolls from that attack action misses, inflict 2 damage points to the attacking fighter. If any hit rolls from that attack action is a 1, inflict 3 damage to the attacking fighter instead."
+		"text": "Use this reaction when targeted by a melee attack action but before the hit rolls are made. If one or more hit rolls from that attack action misses, allocate 2 damage points to the attacking fighter. If any hit rolls from that attack action results in a 1, allocate 3 damage points to the attacking fighter instead."
 	},
 	{
 		"id": "hunker-down",
 		"name": "Hunker Down",
 		"type": "reaction",
 		"keyword": "any",
-		"text": "A fighter that is in cover can make this reaction after they are targeted by a ranged attack action but before the hit rolls are made. For that attack action, increase this fighter's Defense characteristic by 2 (on top of their cover bonus)."
+		"text": "A fighter that is in cover can make this reaction after they are targeted by a ranged attack action but before the hit rolls are made. For that attack action, increase the difficulty rating (DR) granted by the cover by 1 (for a total of 2)."
 	},
 	{
 		"id": "strike-them-down",
-		"name": "Strike them down",
+		"name": "Strike Them Down",
 		"type": "reaction",
 		"keyword": "any",
-		"text": "A fighter can make this reaction when a visible enemy fighter within 1\" of them makes a disengage action but before that fighter moves away. Roll a dice. On a 4+, allocate D6 damage points to that enemy fighter."
+		"text": "A fighter can make this reaction when a visible enemy fighter within 1\" of them makes a Retreat action but before that fighter moves away. Roll a dice. On a 4+, allocate D6 damage points to that enemy fighter."
 	}
 ]
