@@ -41,7 +41,7 @@
 		"hit": 2,
 		"crit": 3,
 		"rules": [],
-		"cost": 15
+		"cost": 10
 	},
 	{
 		"id": "halberd",
@@ -52,7 +52,7 @@
 		"hit": 2,
 		"crit": 4,
 		"rules": ["two-handed"],
-		"cost": 20
+		"cost": 15
 	},
 	{
 		"id": "sword",
@@ -63,17 +63,17 @@
 		"hit": 2,
 		"crit": 3,
 		"rules": ["parry"],
-		"cost": 20
+		"cost": 15
 	},
 	{
 		"id": "flail",
 		"name": "Flail",
 		"type": "melee",
-		"range": { "min": 0, "max": 2 },
+		"range": { "min": 0, "max": 1 },
 		"attacks": 3,
-		"hit": 2,
-		"crit": 3,
-		"rules": ["mighty-1", "two-handed"],
+		"hit": 3,
+		"crit": 4,
+		"rules": ["two-handed", "cumbersome"],
 		"cost": 25
 	},
 	{
@@ -81,22 +81,22 @@
 		"name": "Warhammer",
 		"type": "melee",
 		"range": { "min": 0, "max": 1 },
-		"attacks": 2,
-		"hit": 3,
-		"crit": 4,
-		"rules": ["mighty-2"],
-		"cost": 30
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": ["pierce-2"],
+		"cost": 20
 	},
 	{
 		"id": "great-weapon",
 		"name": "Great Weapon",
 		"type": "melee",
 		"range": { "min": 0, "max": 1 },
-		"attacks": 2,
-		"hit": 4,
-		"crit": 7,
-		"rules": ["mighty-2", "two-handed"],
-		"cost": 55
+		"attacks": 3,
+		"hit": 3,
+		"crit": 5,
+		"rules": ["two-handed", "pierce-2"],
+		"cost": 45
 	},
 	{
 		"id": "fighting-claws",
@@ -182,9 +182,9 @@
 		"range": { "min": 0, "max": 3 },
 		"attacks": 3,
 		"hit": 1,
-		"crit": 4,
+		"crit": 3,
 		"rules": ["whipcrack"],
-		"cost": 25
+		"cost": 15
 	},
 	{
 		"id": "possessed-daemonic-appendage",
@@ -235,11 +235,11 @@
 		"name": "Sigmarite Warhammer",
 		"type": "melee",
 		"range": { "min": 0, "max": 1 },
-		"attacks": 2,
-		"hit": 3,
-		"crit": 5,
-		"rules": ["mighty-2", "blessed"],
-		"cost": 45
+		"attacks": 3,
+		"hit": 2,
+		"crit": 3,
+		"rules": ["blessed", "pierce-2"],
+		"cost": 30
 	},
 	{
 		"id": "bow",
@@ -250,7 +250,7 @@
 		"hit": 2,
 		"crit": 3,
 		"rules": [],
-		"cost": 20
+		"cost": 25
 	},
 	{
 		"id": "crossbow",
@@ -259,9 +259,9 @@
 		"range": { "min": 3, "max": 24 },
 		"attacks": 2,
 		"hit": 3,
-		"crit": 5,
-		"rules": ["mighty-1", "reload"],
-		"cost": 35
+		"crit": 6,
+		"rules": ["reload", "pierce-1"],
+		"cost": 40
 	},
 	{
 		"id": "pistol",
@@ -271,7 +271,7 @@
 		"attacks": 2,
 		"hit": 4,
 		"crit": 6,
-		"rules": ["mighty-2", "reload", "unreliable", "brace"],
+		"rules": ["reload", "unreliable", "brace", "pierce-2"],
 		"cost": 35
 	},
 	{
@@ -281,9 +281,9 @@
 		"range": { "min": 0, "max": 6 },
 		"attacks": 2,
 		"hit": 3,
-		"crit": 5,
-		"rules": ["mighty-1", "reload", "brace"],
-		"cost": 20
+		"crit": 6,
+		"rules": ["reload", "brace", "pierce-1"],
+		"cost": 25
 	},
 	{
 		"id": "blunderbuss",
@@ -294,7 +294,7 @@
 		"hit": 2,
 		"crit": 3,
 		"rules": ["blast", "one-use"],
-		"cost": 55
+		"cost": 40
 	},
 	{
 		"id": "handgun",
@@ -304,7 +304,7 @@
 		"attacks": 2,
 		"hit": 4,
 		"crit": 8,
-		"rules": ["mighty-2", "reload", "unreliable"],
+		"rules": ["reload", "unreliable", "pierce-2"],
 		"cost": 60
 	},
 	{
@@ -313,10 +313,10 @@
 		"type": "ranged",
 		"range": { "min": 3, "max": 12 },
 		"attacks": 3,
-		"hit": 2,
+		"hit": 1,
 		"crit": 3,
 		"rules": [],
-		"cost": 15
+		"cost": 5
 	},
 	{
 		"id": "throwing-stars",

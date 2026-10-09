@@ -8,13 +8,19 @@
   {
     "id": "blessed",
     "name": "BLESSED",
-    "text": "Increase the Fight characteristic of the wielder by 1 when making attack actions against fighters with the `VAMPIRE`, `DAEMON` or `THRALL` keyword.",
+    "text": "When making attack actions against a `VAMPIRE`, `DAEMON` or `THRALL`, increase the Critical Damage characteristic by 1.",
     "effect": null
   },
   {
     "id": "brace",
     "name": "BRACE",
     "text": "When determining how many ranged weapons a fighter is equipped with, two weapons with this special rule count as one.",
+    "effect": null
+  },
+  {
+    "id": "cumbersome",
+    "name": "CUMBERSOME",
+    "text": "When a fighter armed with this weapon is the target of a melee attack action, decrease its Fight characteristic by 1.",
     "effect": null
   },
   {
@@ -46,9 +52,9 @@
   {
     "id": "parry",
     "name": "PARRY",
-    "text": "When a fighter armed with this weapon is the target of a melee attack action, increase its Defense characteristic by 1.",
+    "text": "When the bearer is the target of a melee attack action, increase their Fight characteristic by 1.",
     "effect": {
-      "characteristic": "defense",
+      "characteristic": "fight",
       "bonus": 1,
       "applies": "when-targeted"
     }
@@ -92,7 +98,7 @@
   {
     "id": "whipcrack",
     "name": "WHIPCRACK",
-    "text": "When making melee attack actions with this weapon, the target cannot make reactions.",
+    "text": "When this weapon is selected as the main-hand weapon for a melee attack action, the target cannot make reactions.",
     "effect": null
   }
 ]

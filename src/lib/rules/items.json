@@ -14,7 +14,7 @@
     "slot": null,
     "name": "Crimson Shade",
     "type": "single-use",
-    "text": "Use this item in the 'Present Warbands' step. Until the end of the battle, increase this fighter's Move and Fight characteristics by 1. In the aftermath sequence, roll a dice. On a 1-2, the fighter gains the Kleptomaniac trait.",
+    "text": "Use this item in the 'Present Warbands' step. Until the end of the battle, increase this fighter's Move and Fight characteristics by 1. In the aftermath sequence, roll a dice. On a 1-2, the fighter gains the Kleptomania injury.",
     "effects": [],
     "cost": 20,
     "rarity": "common"
@@ -24,7 +24,7 @@
     "slot": null,
     "name": "Dark Venom",
     "type": "single-use",
-    "text": "Use this item after allocating damage to an enemy fighter with a critical hit. That fighter must forfeit one action or suffer d6 damage points.",
+    "text": "Use this item in the 'Present Warbands' step, and select one of this fighter's weapons. Until the end of the battle, add 1 to the damage points allocated to enemy fighters by each hit and critical hit from attack actions made with that weapon. If the fighter is dual-wielding, the venom is applied to both weapons.",
     "effects": [],
     "cost": 20,
     "rarity": "common"
@@ -54,7 +54,7 @@
     "slot": null,
     "name": "Healing Draught",
     "type": "single-use",
-    "text": "Use this item when making a Wait action  to immediately use the 'Respite' ability without needing or spending ability dice to do so. Treat the value of that ability as a 6.",
+    "text": "Use this item when making a Wait action to immediately use the 'Respite' ability without needing or spending ability dice to do so.",
     "effects": [],
     "cost": 40,
     "rarity": "common"
@@ -64,9 +64,9 @@
     "slot": "body",
     "name": "Heavy Armour",
     "type": "armour",
-    "text": "Increase the Defense characteristic of the bearer by 2, and decrease their Move characteristic by 1.",
+    "text": "Increase the bearer's Armour characteristic by 3, and decrease their Move characteristic by 1.",
     "effects": [
-      { "characteristic": "defense", "bonus": 2 },
+      { "characteristic": "defense", "bonus": 3 },
       { "characteristic": "move", "bonus": -1 }
     ],
     "cost": 70,
@@ -77,7 +77,7 @@
     "slot": null,
     "name": "Holy Relic",
     "type": "miscellaneous",
-    "text": "Start each battle with one additional Wyrd Dice.",
+    "text": "At the start of each battle, add 1 Wyrd Dice to your saved Wyrd Dice.",
     "effects": [],
     "cost": 100,
     "rarity": "rare"
@@ -87,9 +87,9 @@
     "slot": null,
     "name": "Lantern",
     "type": "miscellaneous",
-    "text": "Friendly fighters may re-roll failed Bravery tests while within 3\" of this fighter. However, this fighter must reduce their Defense characteristic by 1 when targeted by ranged attacks.",
+    "text": "Friendly fighters may re-roll failed Bravery tests while within 3\" of this fighter. However, enemy fighters may decrease the Difficulty Rating by 1 when targeting this fighter with ranged attack actions.",
     "effects": [],
-    "cost": 30,
+    "cost": 20,
     "rarity": "common"
   },
   {
@@ -97,7 +97,7 @@
     "slot": "body",
     "name": "Light Armour",
     "type": "armour",
-    "text": "Increase the Defense characteristic of the bearer by 1.",
+    "text": "Increase the bearer's Armour characteristic by 1.",
     "effects": [{ "characteristic": "defense", "bonus": 1 }],
     "cost": 30,
     "rarity": "common"
@@ -109,7 +109,7 @@
     "type": "miscellaneous",
     "text": "Once per battle, when the bearer is targeted by an attack action and after hit rolls have been made, you may turn one critical hit into a hit.",
     "effects": [],
-    "cost": 35,
+    "cost": 25,
     "rarity": "common"
   },
   {
@@ -117,15 +117,15 @@
     "slot": null,
     "name": "Mad Cap Mushrooms",
     "type": "single-use",
-    "text": "Use this item in the 'Present Warbands' step. Until the end of the battle, increase this fighter's Fight characteristic by 3. It also gains the Stupidity trait for the duration of the battle.",
+    "text": "Use this item in the 'Present Warbands' step. Until the end of the battle, increase this fighter's Fight characteristic by 3. It is also considered to have the Stupidity injury for the duration of the battle.",
     "effects": [],
     "cost": 20,
     "rarity": "common"
   },
   {
-    "id": "master-crafted-weapon",
+    "id": "master-wrought-weapon",
     "slot": null,
-    "name": "Master-Crafted Weapon",
+    "name": "Master-Wrought Weapon",
     "type": "miscellaneous",
     "text": "Purchase a weapon from the fighter's faction entry, and increase its gold coin cost by 100 gold coin. Then, add 1 to the hit and critical hit characteristics of that weapon.",
     "effects": [],
@@ -137,7 +137,7 @@
     "slot": null,
     "name": "Mordheim Map",
     "type": "miscellaneous",
-    "text": "The player controlling this warband can always decide which battlefield edge to deploy their warband fro, regardless of being the Attacker or the Defender. If both players have a Mordheim Map, roll off.",
+    "text": "When setting up a battle, you may decide the orientation of the deployment map, regardless of you being the Attacker or the Defender. If both you and your opponent have a Mordheim Map, roll off.",
     "effects": [],
     "cost": 80,
     "rarity": "rare"
@@ -157,8 +157,8 @@
     "slot": "hand",
     "name": "Shield",
     "type": "armour",
-    "text": "Increase the Defense characteristic of the bearer by 1.",
-    "effects": [{ "characteristic": "defense", "bonus": 1 }],
+    "text": "Increase the bearer's Fight characteristic by 1 when defending against a melee attack action. When defending against a ranged attack action, increase the Difficulty Rating by 1 instead.",
+    "effects": [],
     "cost": 20,
     "rarity": "common"
   },
@@ -167,7 +167,7 @@
     "slot": null,
     "name": "Smoke Bomb",
     "type": "single-use",
-    "text": "A fighter may use this item to make a free Retreat action. During that action, enemy fighters within 3\" of the bearer cannot make reactions.",
+    "text": "A fighter may discard this item to make a free Retreat action. During that action, enemy fighters within 3\" of the bearer cannot make reactions.",
     "effects": [],
     "cost": 20,
     "rarity": "common"
@@ -187,7 +187,7 @@
     "slot": null,
     "name": "Unholy Relic",
     "type": "miscellaneous",
-    "text": "Start each battle with one additional Wyrd Dice.",
+    "text": "At the start of each battle, add 1 Wyrd Dice to your saved Wyrd Dice.",
     "effects": [],
     "cost": 100,
     "rarity": "rare"
