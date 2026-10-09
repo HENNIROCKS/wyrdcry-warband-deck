@@ -25,3 +25,7 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] One With The Shadows: the ability data holds it twice, once with an empty text
 - [ ] Heroic talents: whether a second magical ability counts towards the five-talent limit, where the page says only "can never have more than five heroic talents"
 - [ ] Magical Affinity: whether "their lore of magic" means the magical abilities the fighter was recruited with, where the page does not define it
+- [ ] Injury 34: named Alcoholic with the id amnesia, where its text "cannot make reactions" fits neither name
+- [ ] Deep Wound: whether "the fighter survives" on a 3+ means no lasting effect, and whether the 15gc come from the warband's gold
+- [ ] Robbed: whether "all equipment carried" includes items, or only weapons and armour
+- [ ] Nine Lives: the talents page re-rolls only the first 11-12, the ability data any; and 11-12 now covers Deep Wound as well as Dead
