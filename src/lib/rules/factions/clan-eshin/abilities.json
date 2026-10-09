@@ -3,31 +3,31 @@
     "id": "enshrouding-darkness",
     "name": "Enshrouding Darkness",
     "type": "triple",
-    "text": "Magical ability. Until the end of the battleround, fighters within (X/2)\" of this fighter are not visible to fighters more than 1\" away from them."
+    "text": "Magical ability. Until the end of the battle round, fighters within (X/2)\" of this fighter are not visible to fighters more than 1\" away from them."
   },
   {
     "id": "gnawdoom",
     "name": "Gnawdoom",
-    "type": "triple",
-    "text": "Magical ability. Select an enemy fighter within 6\" and roll (X) d6. For each roll that exceeds the target’s Defense characteristic, allocate 2 damage points to that enemy fighter."
-  },
-  {
-    "id": "murder-stab",
-    "name": "Murder-Stab",
-    "type": "triple",
-    "text": "Add (X/2) to the damage points allocated to enemy fighters by each hit and critical hit from the next melee attack action made by this fighter in this activation."
+    "type": "double",
+    "text": "Magical ability. Select an enemy fighter within 6\" and roll (X) D6. For each roll that exceeds the target’s Armour characteristic, allocate 1 damage point to that enemy fighter."
   },
   {
     "id": "one-with-the-shadows",
     "name": "One With The Shadows",
-    "type": "triple",
-    "text": "A fighter cannot use this ability when visible to enemy fighters or when carrying treasure tokens. Remove this fighter from the battlefield. This fighter is now hidden."
+    "type": "double",
+    "text": "A fighter cannot use this ability when visible to enemy fighters or when carrying wyrdstone tokens. Remove this fighter from the battlefield. This fighter is now **hidden**."
   },
   {
     "id": "pack-tactics",
     "name": "Pack Tactics",
     "type": "double",
     "text": "Select a visible friendly Henchman within 3\" of this fighter. That fighter makes a free move action or a free attack action."
+  },
+  {
+    "id": "running-death",
+    "name": "Running Death",
+    "type": "triple",
+    "text": "This fighter makes a free move action or free retreat action. In addition, until the end of this fighter's activation, add 1 to the damage points allocated to enemy fighters by each critical hit from melee attack actions made by this fighter."
   },
   {
     "id": "skitterleap",

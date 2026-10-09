@@ -2,19 +2,19 @@
   {
     "id": "assassin-adept",
     "name": "Assassin Adept",
-    "cost": 130,
+    "cost": 120,
     "limit": { "min": 1, "max": 1 },
     "description": "Steeped in the ancient arts of far Cathay, the Assassin Adepts of clan Eshin command from the shadows and only strikes when the moment is right.",
     "profile": {
       "move": 6,
       "fight": 4,
       "shoot": 4,
-      "defense": 3,
+      "defense": 0,
       "health": 12,
       "bravery": 5
     },
     "keywords": ["skaven", "clan-eshin", "hero", "leader"],
-    "abilities": ["murder-stab", "one-with-the-shadows"],
+    "abilities": ["one-with-the-shadows", "running-death"],
     "gear": [],
     "choose": null
   },
@@ -28,7 +28,7 @@
       "move": 6,
       "fight": 4,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 14,
       "bravery": 5
     },
@@ -40,14 +40,14 @@
   {
     "id": "eshin-sorcerer",
     "name": "Eshin Sorcerer",
-    "cost": 105,
+    "cost": 110,
     "limit": { "min": 0, "max": 1 },
     "description": "These wiry, hooded warlocks combine martial discipline with black magic that bend shadows and wither the flesh.",
     "profile": {
       "move": 6,
       "fight": 3,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 12,
       "bravery": 5
     },
@@ -56,7 +56,7 @@
     "gear": [],
     "choose": {
       "source": null,
-      "prompt": "When recruiting this fighter, you must select one of the following abilities:",
+      "prompt": "When recruiting an Eshin Sorcerer, you must select one of the following magical abilities. In addition, the Eshin Sorcerer may select another magical ability instead of selecting a heroic talent.",
       "kind": "ability",
       "pick": 1,
       "abilities": ["enshrouding-darkness", "gnawdoom", "skitterleap"]
@@ -65,18 +65,18 @@
   {
     "id": "giant-rat",
     "name": "Giant Rat",
-    "cost": 40,
+    "cost": 50,
     "limit": { "min": 0, "max": null },
     "description": "Giant Rats are creations of the twisted genius of the Skaven. They are mutated monstrosities the size of dogs.",
     "profile": {
       "move": 8,
       "fight": 2,
       "shoot": 2,
-      "defense": 2,
+      "defense": 0,
       "health": 6,
       "bravery": 6
     },
-    "keywords": ["beast", "clan-eshin", "henchman"],
+    "keywords": ["skaven", "clan-eshin", "beast"],
     "abilities": [],
     "gear": ["weapon:vicious-teeth"],
     "choose": null
@@ -91,7 +91,7 @@
       "move": 6,
       "fight": 3,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 8,
       "bravery": 6
     },

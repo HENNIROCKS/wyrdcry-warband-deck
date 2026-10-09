@@ -60,6 +60,12 @@
     "effect": null
   },
   {
+    "id": "pierce-2",
+    "name": "PIERCE 2",
+    "text": "When making an attack action with this weapon against an enemy fighter, reduce the target's Armour characteristic by 2 (to a minimum of 0).",
+    "effect": null
+  },
+  {
     "id": "pierce-3",
     "name": "PIERCE 3",
     "text": "When making an attack action with this weapon against an enemy fighter, reduce the target's Armour characteristic by 3 (to a minimum of 0).",

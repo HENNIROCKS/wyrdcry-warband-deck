@@ -105,20 +105,20 @@
 		"range": { "min": 0, "max": 1 },
 		"attacks": 4,
 		"hit": 2,
-		"crit": 4,
-		"rules": ["parry", "two-handed"],
-		"cost": 40
+		"crit": 3,
+		"rules": ["parry", "two-handed", "pierce-1"],
+		"cost": 30
 	},
 	{
-		"id": "weeping-blades",
-		"name": "Weeping Blades",
+		"id": "weeping-blade",
+		"name": "Weeping Blade",
 		"type": "melee",
 		"range": { "min": 0, "max": 1 },
-		"attacks": 4,
-		"hit": 3,
+		"attacks": 3,
+		"hit": 2,
 		"crit": 5,
-		"rules": ["parry", "two-handed"],
-		"cost": 55
+		"rules": ["parry", "pierce-1"],
+		"cost": 40
 	},
 	{
 		"id": "staff",
@@ -216,7 +216,7 @@
 		"attacks": 3,
 		"hit": 2,
 		"crit": 3,
-		"rules": [],
+		"rules": ["whipcrack"],
 		"cost": 0
 	},
 	{
@@ -337,7 +337,7 @@
 		"attacks": 2,
 		"hit": 4,
 		"crit": 7,
-		"rules": ["mighty-2", "reload", "unreliable", "brace"],
+		"rules": ["reload", "unreliable", "brace", "pierce-2"],
 		"cost": 40
 	}
 ]

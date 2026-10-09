@@ -1,11 +1,12 @@
 [
   { "id": "weapon:dagger", "allow": "all" },
   { "id": "weapon:club", "allow": "all" },
+  { "id": "weapon:flail", "allow": "all" },
   { "id": "weapon:spear", "allow": "all" },
   { "id": "weapon:halberd", "allow": "hero" },
   { "id": "weapon:sword", "allow": "all" },
   { "id": "weapon:fighting-claws", "allow": "hero" },
-  { "id": "weapon:weeping-blades", "allow": "hero" },
+  { "id": "weapon:weeping-blade", "allow": "hero" },
   { "id": "weapon:sling", "allow": "all" },
   { "id": "weapon:throwing-stars", "allow": "hero" },
   { "id": "weapon:warplock-pistol", "allow": "hero" },
