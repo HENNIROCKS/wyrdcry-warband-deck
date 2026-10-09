@@ -83,6 +83,12 @@
 		"rules": []
 	},
 	{
+		"id": "war-hound",
+		"name": "WAR HOUND",
+		"type": "race",
+		"rules": []
+	},
+	{
 		"id": "zombie",
 		"name": "ZOMBIE",
 		"type": "race",
