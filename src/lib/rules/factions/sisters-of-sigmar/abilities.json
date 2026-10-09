@@ -6,10 +6,16 @@
     "text": "This fighter refuses to wear any armour, and is always considered to be in Cover."
   },
   {
-    "id": "blessed-sight",
-    "name": "Blessed Sight",
+    "id": "doom",
+    "name": "Doom",
     "type": "double",
-    "text": "Roll a die for each visible enemy fighter within (X)\" of this fighter. For each result of 4+, add 1 wyrd dice to your saved wyrd dice."
+    "text": "Select each enemy fighter within 6\" of this fighter. Until the end of the battle round, those fighters cannot make reactions."
+  },
+  {
+    "id": "foresight",
+    "name": "Foresight",
+    "type": "double",
+    "text": "Select a friendly fighter within 6\" of this fighter. Until the end of the battle round, all hit rolls targeting that fighter hit on a 5+, no matter the attacker's Fight or Shoot characteristics."
   },
   {
     "id": "hammer-of-sigmar",

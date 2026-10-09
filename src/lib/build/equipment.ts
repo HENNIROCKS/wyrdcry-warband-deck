@@ -30,6 +30,11 @@ function isPenitent(fighter: Fighter): boolean {
 	return fighter.abilities.includes('penitent');
 }
 
+/** A fighter with Armour of Faith, e.g. the Augur, refuses any armour. */
+function isFaithful(fighter: Fighter): boolean {
+	return fighter.abilities.includes('armour-of-faith');
+}
+
 /**
  * A BEAST buys nothing at all, which is a fact about the fighter rather than
  * about any one row. The sheet asks first and leaves the lists out entirely;
@@ -153,6 +158,7 @@ export function refuse(faction: Faction, fighter: Fighter, equipment: string[], 
 	if (item && item.type === 'armour') {
 		if (isWizard(fighter)) return 'A WIZARD cannot wear armour';
 		if (isPenitent(fighter)) return 'A PENITENT fighter cannot wear armour';
+		if (isFaithful(fighter)) return 'Armour of Faith refuses any armour';
 		if (carried) return 'Already worn';
 		/* One piece of body armour at a time – light or heavy, not both. */
 		if (item.slot === 'body' && held.some((worn) => ITEMS.get(worn)?.slot === 'body')) {
