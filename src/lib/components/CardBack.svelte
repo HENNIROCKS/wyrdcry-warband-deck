@@ -47,6 +47,7 @@
 		type EditDraft,
 		type FighterDraft
 	} from '../edit';
+	import { DEFAULT_COLOUR, PALETTE, readColour, readable } from '../colour';
 	import { RESULT_LABELS, displayDate, newestFirst, opponent } from '../history';
 	import { BLOCKED, LABELS, NOTES, change, offersTalent } from './RenownSheet.svelte';
 
@@ -171,6 +172,8 @@
 	}
 
 	const sorted = $derived(draft.history ? newestFirst(draft.history) : []);
+	/* A colour picked freely rather than off the palette, which the last swatch then shows. */
+	const customColour = $derived(draft.colour !== null && !PALETTE.some((entry) => entry.value === draft.colour));
 
 	function add() {
 		const record = toRecord(draft.pending);
@@ -511,6 +514,32 @@
 						</ul>
 					{/if}
 				</section>
+
+				<section>
+					<h3 class="heading"><span>Colour</span><span class="rule"></span></h3>
+					<div class="swatches" role="group" aria-label="Colour of the deck">
+						{#each PALETTE as entry (entry.value)}
+							<button
+								class="swatch"
+								style:--swatch={entry.value}
+								aria-label={entry.name}
+								aria-pressed={(draft.colour ?? DEFAULT_COLOUR) === entry.value}
+								onclick={() => (draft.colour = entry.value === DEFAULT_COLOUR ? null : entry.value)}
+							></button>
+						{/each}
+						<label class="swatch custom" class:on={customColour} style:--swatch={draft.colour}>
+							<input
+								type="color"
+								aria-label="Any colour"
+								value={draft.colour ?? DEFAULT_COLOUR}
+								oninput={(event) => (draft.colour = readColour(event.currentTarget.value))}
+							/>
+						</label>
+					</div>
+					{#if draft.colour && !readable(draft.colour)}
+						<p class="hint">White type on this colour is hard to read on the card.</p>
+					{/if}
+				</section>
 			{/if}
 		</div>
 	{/if}
@@ -600,6 +629,55 @@
 	.choice[aria-pressed='true'] {
 		background: var(--card-green);
 		color: var(--card-paper);
+	}
+
+	/* The deck's colour: round swatches in their own colour, the last one a
+	   colour wheel that opens the system picker and then shows what was picked. */
+	.swatches {
+		display: flex;
+		flex-wrap: wrap;
+		gap: calc(10 * var(--u));
+	}
+
+	.swatch {
+		position: relative;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		border: 2px solid var(--card-paper);
+		border-radius: 999px;
+		background: var(--swatch);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+	}
+
+	.swatch[aria-pressed='true'],
+	.custom.on {
+		box-shadow: 0 0 0 2px var(--card-ink);
+	}
+
+	.custom {
+		overflow: hidden;
+		background: conic-gradient(#c33, #cc3, #3c3, #3cc, #33c, #c3c, #c33);
+		cursor: pointer;
+	}
+
+	.custom.on {
+		background: var(--swatch);
+	}
+
+	.custom:focus-within {
+		outline: 2px solid var(--card-ink);
+		outline-offset: 2px;
+	}
+
+	.custom input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		opacity: 0;
+		cursor: pointer;
 	}
 
 	/* A figure and its name on one line, the steppers lined up at the right edge. */

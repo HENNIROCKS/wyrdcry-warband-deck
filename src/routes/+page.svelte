@@ -94,6 +94,17 @@
 	let fileInput: HTMLInputElement | undefined = $state();
 
 	const active = $derived(warbands.find((w) => w.warband.id === activeId) ?? null);
+
+	/* The deck's own colour stands in for the card green on the root, where the
+	   explanation overlay and the backs read it too. While the warband card is
+	   turned, the colour picked there already shows. Left again, the green. */
+	const colour = $derived(editingId === 'warband' && draft ? draft.colour : (active?.colour ?? null));
+	$effect(() => {
+		const root = document.documentElement.style;
+		if (colour) root.setProperty('--card-green', colour);
+		else root.removeProperty('--card-green');
+		return () => root.removeProperty('--card-green');
+	});
 	const cards = $derived(active ? toCards(active.warband, active.selections, active.fluff, active.history, active.renownHistory) : []);
 	/* Levels waiting for a choice, minus those of a fighter an import has since removed. */
 	const pendingRenown = $derived(
@@ -392,6 +403,7 @@
 			notes: isWarband ? active.warband.factionNotes : (instance?.notes ?? ''),
 			fluff: isWarband ? (active.fluff?.warband ?? '') : (active.fluff?.fighters[id] ?? ''),
 			history: isWarband ? $state.snapshot(active.history ?? []) : null,
+			colour: isWarband ? (active.colour ?? null) : null,
 			removed: [],
 			pending: emptyPending()
 		};

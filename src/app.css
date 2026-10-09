@@ -58,7 +58,7 @@
 	/* What the backs' fields and outlined buttons sit on, so they stand out from
 	   the texture where it darkens towards the card's foot. */
 	--card-field: rgba(255, 255, 255, 0.45);
-	--card-wash-2: rgba(22, 117, 74, 0.12);
+	--card-wash-2: color-mix(in srgb, var(--card-green) 12%, transparent);
 	/*
 	 * A value that explains itself when tapped, and the weapon that carries
 	 * rules. The one signal colour on a green and paper card, dark enough to

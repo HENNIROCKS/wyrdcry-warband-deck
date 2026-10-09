@@ -128,6 +128,7 @@ export interface DeckMeta {
 	fluff?: Fluff | null;
 	history?: BattleRecord[] | null;
 	renownHistory?: RenownChoice[] | null;
+	colour?: string | null;
 }
 
 export type ExportedWarband = Warband & { _deck?: DeckMeta };
@@ -226,6 +227,8 @@ export interface StoredWarband {
 	fluff?: Fluff | null;
 	/** The battles fought, in the order they were entered. Kept off the warband model like `fluff`. */
 	history?: BattleRecord[] | null;
+	/** The deck's own colour in place of the card green, `#rrggbb`. Null for the green. */
+	colour?: string | null;
 	/**
 	 * What every renown level was spent on, cumulative: the builder cannot
 	 * regenerate it, so an import never throws it away wholesale.

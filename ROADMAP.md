@@ -42,6 +42,7 @@
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
+- [ ] 🃏 A colour of its own for each warband, off a palette that stays readable on the card or any other
 
 ## Ideas
 

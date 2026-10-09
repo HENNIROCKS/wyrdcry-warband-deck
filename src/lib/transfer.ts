@@ -6,6 +6,7 @@
  * overwrites a whole campaign.
  */
 
+import { readColour } from './colour';
 import { RULESET_VERSION } from './gamedata';
 import { deviceId, getWarband } from './storage';
 import {
@@ -248,6 +249,9 @@ export function toStored(candidate: ImportCandidate): StoredWarband {
 		   export. A file without the field – one from the builder – keeps what is
 		   stored. */
 		history: readHistory(candidate.meta?.history) ?? candidate.existing?.history ?? null,
+		/* A file out of this app says the colour, the green included; one from
+		   the builder says nothing and keeps the stored one. */
+		colour: candidate.meta && 'colour' in candidate.meta ? readColour(candidate.meta.colour) : (candidate.existing?.colour ?? null),
 		...mergeRenown(candidate)
 	};
 }
@@ -276,7 +280,8 @@ export async function buildExport(entry: StoredWarband): Promise<ExportedWarband
 			selections: entry.selections,
 			fluff: entry.fluff,
 			history: entry.history,
-			renownHistory: entry.renownHistory
+			renownHistory: entry.renownHistory,
+			colour: entry.colour ?? null
 		}
 	};
 }

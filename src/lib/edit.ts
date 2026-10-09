@@ -58,6 +58,8 @@ export interface EditDraft {
 	fluff: string;
 	/** The battles, on the warband card only. */
 	history: BattleRecord[] | null;
+	/** The deck's colour, on the warband card only; null for the green. */
+	colour: string | null;
 	/** Battles struck out, dropped on Done and brought back until then. */
 	removed: string[];
 	/** The battle being entered and not yet added. */
@@ -164,6 +166,7 @@ export function applyDraft(
 		warband,
 		fluff,
 		history: isWarband ? finalHistory(draft) : stored.history,
+		colour: isWarband ? draft.colour : (stored.colour ?? null),
 		pendingRenown: pending.length ? pending : null
 	};
 	for (const { level, option } of fighter?.spent ?? []) {
