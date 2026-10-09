@@ -1,6 +1,6 @@
 # Deviations
 
-Where the deck deliberately differs from the site repo. A sync must not undo these; the rest of the game data stays as synced. Ticked: confirmed by the rules author.
+Where the deck deliberately differs from the site repo. A sync must not undo these; the rest of the game data stays as synced. Ticked: confirmed by the rules author. Below them, questions for the rules author that change nothing in the deck yet.
 
 - [x] Possessed: the Stability test's New Mutation rolls a D66 on the Mutation Table, where the page says 2d6
 - [x] Possessed: Tentacles carry Whipcrack, where the page says Whiplash
@@ -15,3 +15,11 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Oppressor names the Strike Them Down reaction, where the page calls it Cut Them Down
 - [ ] Strike Them Down answers a Retreat action, where the page names a disengage action 0.9 no longer has
 - [ ] Trading Post costs follow the game data where the page prints others: Dark Venom, Familiar, Healing Draught, Smoke Bomb
+
+## Open questions
+
+- [ ] Daemon Great Claw: a profile in the weapons data no fighter carries, possibly left over from Wyrdforge
+- [ ] Blood of Von Carstein: the group of Vampire choices and one trait in it share the name, and the trait is to be renamed
+- [ ] Hired swords: the 0.9 data still gives them 0.5 Armour values and names four ids it no longer has
+- [ ] One With The Shadows: the ability data holds it twice, once with an empty text
+- [ ] Pierce: one rule, Pierce X, in place of Pierce 1 and Pierce 2
