@@ -31,7 +31,7 @@
 - [x] 🃏 A colour of its own for each warband, off a palette that stays readable on the card or any other
 - [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
 - [ ] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
-- [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
+- [x] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
 - [ ] 🛠️ Sell or discard from the warband stash after the build
