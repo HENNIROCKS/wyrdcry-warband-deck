@@ -820,8 +820,15 @@ for (const talent of talents) {
 	}
 	if (!talent.name?.trim() || !talent.text?.trim()) problem(shared.talents, `"${talent.id}" has no name or no text`);
 	for (const effect of talent.effects ?? []) {
-		if (effect.kind !== 'keyword' || !keywordIds.has(effect.keyword)) {
-			problem(shared.talents, `"${talent.id}" has an effect on "${effect.keyword}", keywords.json has none`);
+		if (effect.kind === 'keyword') {
+			if (!keywordIds.has(effect.keyword)) {
+				problem(shared.talents, `"${talent.id}" gives the keyword "${effect.keyword}", keywords.json has none`);
+			}
+		} else if (effect.kind === 'crit') {
+			if (!Number.isInteger(effect.bonus)) problem(shared.talents, `"${talent.id}" adds ${effect.bonus} to critical damage`);
+			if (!talent.weapon) problem(shared.talents, `"${talent.id}" adds critical damage but selects no weapon`);
+		} else {
+			problem(shared.talents, `"${talent.id}" has an effect of kind "${effect.kind}"`);
 		}
 	}
 	if (talent.weapon !== undefined && !['melee', 'ranged'].includes(talent.weapon)) {

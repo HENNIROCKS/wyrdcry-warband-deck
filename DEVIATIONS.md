@@ -24,3 +24,4 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Hired swords: the 0.9 data still gives them 0.5 Armour values and names four ids it no longer has
 - [ ] One With The Shadows: the ability data holds it twice, once with an empty text
 - [ ] Heroic talents: whether a second magical ability counts towards the five-talent limit, where the page says only "can never have more than five heroic talents"
+- [ ] Magical Affinity: whether "their lore of magic" means the magical abilities the fighter was recruited with, where the page does not define it

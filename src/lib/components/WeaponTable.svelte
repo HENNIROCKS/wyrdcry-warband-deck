@@ -30,7 +30,7 @@
 			{/if}
 			<div class="col">{weapon.range}</div>
 			<div class="col">{weapon.attacks}</div>
-			<div class="col">{weapon.damage}</div>
+			<div class="col" class:modified={weapon.modified}>{weapon.damage}</div>
 		</div>
 	{/each}
 </div>
@@ -56,6 +56,13 @@
 
 	.head {
 		background: var(--card-green);
+	}
+
+	/* The damage differs from the weapon's profile: a talent adds to it. Same mark
+	   as a changed value in the tables above. */
+	.modified {
+		color: var(--card-green);
+		box-shadow: inset 0 calc(-3 * var(--u)) 0 calc(-1 * var(--u)) var(--card-green);
 	}
 
 	.col {

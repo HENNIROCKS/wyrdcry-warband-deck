@@ -78,6 +78,8 @@ export interface CardWeapon {
 	attacks: string;
 	/** Hit value and critical value, as in the wiki: "2/4". */
 	damage: string;
+	/** The damage differs from the weapon's profile: a talent adds to it. */
+	modified?: boolean;
 	/** Its rules, for the overlay – they are not on the card itself. */
 	explanation?: CardExplanation;
 }

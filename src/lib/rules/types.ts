@@ -107,8 +107,11 @@ export interface HeroicTalent {
 	text: string;
 	/** Set where the talent asks for a weapon type of this kind to be selected. */
 	weapon?: 'melee' | 'ranged';
-	/** What the card takes over from the talent: a keyword it gains, by its id in `keywords.json`. */
-	effects?: { kind: 'keyword'; keyword: string }[];
+	/**
+	 * What the card takes over from the talent: a keyword it gains, by its id in
+	 * `keywords.json`, or critical damage added to the weapon it was taken for.
+	 */
+	effects?: ({ kind: 'keyword'; keyword: string } | { kind: 'crit'; bonus: number })[];
 }
 
 export interface UniversalAbility extends Ability {

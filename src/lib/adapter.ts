@@ -194,13 +194,13 @@ const DUAL_WIELDING = {
  * Several of the same weapon share one row: two identical rows say nothing the
  * count does not.
  */
-function weaponRow(weapon: WeaponProfile, count = 1): CardWeapon {
+function weaponRow(weapon: WeaponProfile, count = 1, crit?: { amount: number; source: string }): CardWeapon {
 	const range = `${weapon.range}"`;
 	/* The extra attack belongs to the weapon in hand, so it is the row's own
 	   number rather than a bonus on the fighter. */
 	const dual = count > 1 && weapon.type === 'melee';
 	const attacks = String(weapon.attacks + (dual ? 1 : 0));
-	const damage = `${weapon.hit}/${weapon.crit}`;
+	const damage = `${weapon.hit}/${weapon.crit + (crit?.amount ?? 0)}`;
 	const name = count > 1 ? `${weapon.name} ×${count}` : weapon.name;
 	const rules = weapon.special_rules
 		.map((ruleId) => WEAPON_RULES.get(ruleId))
@@ -214,17 +214,22 @@ function weaponRow(weapon: WeaponProfile, count = 1): CardWeapon {
 		range,
 		attacks,
 		damage,
-		explanation: rules.length
-			? {
-					title: name,
-					facts: [
-						{ label: 'Range', value: range },
-						{ label: 'Attacks', value: attacks },
-						{ label: 'Damage', value: damage }
-					],
-					rules
-				}
-			: undefined
+		...(crit && { modified: true }),
+		explanation:
+			rules.length || crit
+				? {
+						title: name,
+						facts: [
+							{ label: 'Range', value: range },
+							{ label: 'Attacks', value: attacks },
+							{ label: 'Damage', value: damage }
+						],
+						...(crit && {
+							summary: `Critical damage ${weapon.crit} + ${crit.amount} from ${crit.source}, already included.`
+						}),
+						rules
+					}
+				: undefined
 	};
 }
 
@@ -403,14 +408,33 @@ export function toCard(
 	/* The row each weapon already has, so a second copy raises its count instead
 	   of printing the same line again. */
 	const carried = new Map<string, { row: CardWeapon; count: number }>();
+	/* The critical damage a talent adds to the weapon it was taken for, by the
+	   weapon's id. A talent written by hand names no weapon and adds nothing here:
+	   its name carries the choice. */
+	const critBonus = new Map<string, { amount: number; talent: string }>();
+	for (const entry of renownHistory) {
+		if (entry.instanceId !== instance.instanceId || entry.kind !== 'talent' || !entry.choice) continue;
+		const talent = HEROIC_TALENTS.find((t) => t.id === entry.talent);
+		for (const effect of talent?.effects ?? []) {
+			if (effect.kind === 'crit') critBonus.set(entry.choice, { amount: effect.bonus, talent: talent!.name });
+		}
+	}
+	/* The talents whose bonus stands on a row of the table, lower case. */
+	const critApplied = new Set<string>();
+	const critOf = (id: string, weapon: WeaponProfile) => {
+		const bonus = critBonus.get(id);
+		if (!bonus) return undefined;
+		critApplied.add(bonus.talent.toLowerCase());
+		return { amount: bonus.amount, source: `${bonus.talent} (${weapon.name})` };
+	};
 	const addWeapon = (id: string, weapon: WeaponProfile) => {
 		const seen = carried.get(id);
 		if (seen) {
 			seen.count++;
-			Object.assign(seen.row, weaponRow(weapon, seen.count));
+			Object.assign(seen.row, weaponRow(weapon, seen.count, critOf(id, weapon)));
 			return;
 		}
-		const row = weaponRow(weapon);
+		const row = weaponRow(weapon, 1, critOf(id, weapon));
 		carried.set(id, { row, count: 1 });
 		weapons.push(row);
 		if (weapon.type === 'melee') melee = true;
@@ -542,7 +566,7 @@ export function toCard(
 	const talents = heldTalents(HEROIC_TALENTS, instance.instanceId, ownNames, renownHistory, warband.customAbilities);
 	const talentKeywords = new Map<string, string>();
 	for (const talent of HEROIC_TALENTS.filter((t) => talents.has(t.id))) {
-		for (const effect of talent.effects ?? []) {
+		for (const effect of (talent.effects ?? []).filter((e) => e.kind === 'keyword')) {
 			talentKeywords.set(talent.name.toLowerCase(), KEYWORDS.get(effect.keyword)?.name ?? effect.keyword.toUpperCase());
 		}
 	}
@@ -592,7 +616,10 @@ export function toCard(
 			customAbilities(warband, ...ownNames)
 				.filter((ability) => ability.name.toLowerCase() !== rolled?.name.toLowerCase())
 				.map((ability) =>
-					talentKeywords.has(ability.name.toLowerCase())
+					[talentKeywords, critApplied].some((counted) =>
+						/* A talent with a weapon in its name, "Weapon Master (Sword)", is counted by the talent. */
+						counted.has(ability.name.toLowerCase().replace(/\s*\([^)]*\)$/, ''))
+					)
 						? { ...ability, note: ALREADY_INCLUDED }
 						: ability
 				),

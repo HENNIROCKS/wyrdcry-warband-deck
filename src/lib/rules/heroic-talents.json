@@ -20,7 +20,8 @@
     "specialization": "strength",
     "type": "trait",
     "weapon": "melee",
-    "text": "Select a melee weapon type. When making attack actions with weapons of that type, increase the critical damage characteristic by 1."
+    "text": "Select a melee weapon type. When making attack actions with weapons of that type, increase the critical damage characteristic by 1.",
+    "effects": [{ "kind": "crit", "bonus": 1 }]
   },
   {
     "id": "staggering-blows",
@@ -161,7 +162,8 @@
     "specialization": "perception",
     "type": "trait",
     "weapon": "ranged",
-    "text": "Select a ranged weapon type. When making attack actions with weapons of that type, increase the Critical Damage characteristic by 1."
+    "text": "Select a ranged weapon type. When making attack actions with weapons of that type, increase the Critical Damage characteristic by 1.",
+    "effects": [{ "kind": "crit", "bonus": 1 }]
   },
   {
     "id": "trick-shot",
