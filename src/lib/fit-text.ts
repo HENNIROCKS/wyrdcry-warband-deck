@@ -30,8 +30,39 @@ function textWidth(span: HTMLElement, cell: HTMLElement): number {
 	return Math.ceil(range.getBoundingClientRect().width / scale) + 1;
 }
 
+/*
+ * Whether the card is caught mid-turn. The deck scales a card evenly, but turning
+ * it over narrows it without making it shorter – and a card edge-on measures no
+ * width at all, so its cells would read as roomy. Asked of the card rather than
+ * the cell, whose few pixels of height round too coarsely to tell.
+ */
+function turning(node: HTMLElement): boolean {
+	const card = node.closest<HTMLElement>('.card') ?? node;
+	if (!card.offsetWidth || !card.offsetHeight) return false;
+	const rect = card.getBoundingClientRect();
+	const x = rect.width / card.offsetWidth;
+	const y = rect.height / card.offsetHeight;
+	return Math.abs(x - y) > 0.02 * Math.max(x, y);
+}
+
+/* About two seconds of frames, longer than any turn; past that it measures anyway. */
+const MAX_WAIT = 120;
+
 export function fitText(node: HTMLElement) {
+	let frame = 0;
+	let waited = 0;
+
+	/* A card that mounts while it is being turned is measured once it lies flat:
+	   nothing about its size changes then, so the observer would not ask again. */
 	function measure() {
+		cancelAnimationFrame(frame);
+		if (turning(node) && waited < MAX_WAIT) {
+			waited += 1;
+			frame = requestAnimationFrame(measure);
+			return;
+		}
+		waited = 0;
+
 		/* Measured at full size: the spans below already carry the last factor. */
 		node.style.setProperty('--fit', '1');
 
@@ -59,5 +90,10 @@ export function fitText(node: HTMLElement) {
 
 	/* No update hook: the action takes no argument, so Svelte would never call one.
 	   A card is rebuilt from scratch when the deck moves to another fighter. */
-	return { destroy: () => observer.disconnect() };
+	return {
+		destroy: () => {
+			observer.disconnect();
+			cancelAnimationFrame(frame);
+		}
+	};
 }

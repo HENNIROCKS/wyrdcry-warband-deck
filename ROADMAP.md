@@ -31,7 +31,7 @@
 - [x] 🃏 A colour of its own for each warband, off a palette that stays readable on the card or any other
 - [x] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [x] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
-- [ ] 🃏 Fit the warband card's values again after editing its back, where Disposable shrinks to Dispo…
+- [x] 🃏 Fit the warband card's values again after editing its back, where Disposable shrinks to Dispo…
 - [ ] 📈 Heroic traits: Magical Affinity teaches a further magical ability
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
