@@ -29,21 +29,21 @@
 - [x] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [x] 🃏 A photo of the painted model as the card image, kept out of the JSON export
 - [x] 🃏 A colour of its own for each warband, off a palette that stays readable on the card or any other
-- [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
-- [ ] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
 - [x] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
+- [ ] 🃏 Fit the warband card's values again after editing its back, where Disposable shrinks to Dispo…
+- [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
-- [ ] 🛠️ Sell or discard from the warband stash after the build
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
-- [ ] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
-- [ ] 🎨 Go over the design and the interface outside the cards
-- [ ] 🎨 Light and dark mode, together with going over the design outside the cards
+- [ ] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
+- [ ] 🛠️ Sell or discard from the warband stash after the build
 - [ ] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
+- [ ] 🎨 Go over the design and the interface outside the cards
+- [ ] 🎨 Light and dark mode, together with going over the design outside the cards
+- [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
-- [ ] 🃏 Fit the warband card's values again after editing its back, where Disposable shrinks to Dispo…
 
 ## Ideas
 
