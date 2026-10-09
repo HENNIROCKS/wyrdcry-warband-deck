@@ -29,6 +29,7 @@
 - [x] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [x] 🃏 A photo of the painted model as the card image, kept out of the JSON export
 - [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
+- [ ] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
