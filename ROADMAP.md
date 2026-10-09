@@ -28,6 +28,7 @@
 - [x] 🛠️ Edit on the back of the card: a fighter's fields, equipment and dismissal, the warband's notes and battles
 - [x] 🛠️ Edit a fighter: rename, equip, dismiss, correct campaign values
 - [x] 🃏 A photo of the painted model as the card image, kept out of the JSON export
+- [x] 🃏 A colour of its own for each warband, off a palette that stays readable on the card or any other
 - [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
 - [ ] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
 - [ ] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
@@ -42,7 +43,7 @@
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
-- [ ] 🃏 A colour of its own for each warband, off a palette that stays readable on the card or any other
+- [ ] 🃏 Fit the warband card's values again after editing its back, where Disposable shrinks to Dispo…
 
 ## Ideas
 
@@ -54,5 +55,4 @@ Nothing promised, nothing planned.
 - 🃏 Faction rules on the warband card as well, not only on every fighter card
 - ⚙️ A desktop mode that really saves, over the File System Access API
 - 🎨 Keep the screen awake, or make it easy to jump back to where you were – both just soften the screen going dark
-- 🎨 Option to use a different color for each deck individually
 - 🎨 Virtual tuck box for each deck
