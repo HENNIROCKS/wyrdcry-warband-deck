@@ -9,7 +9,7 @@
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
-	import RenownSheet from '$lib/components/RenownSheet.svelte';
+	import RenownSheet, { offersTalent, type TalentOffer } from '$lib/components/RenownSheet.svelte';
 	import { hasKeyword, itemCost, toCards } from '$lib/adapter';
 	import { applyAftermath, startAftermath, type AftermathAnswer, type AftermathDraft } from '$lib/aftermath';
 	import { countedFighters } from '$lib/morale';
@@ -31,13 +31,29 @@
 		adjustZeal,
 		zealOf
 	} from '$lib/battle';
-	import { applyDraft, dismiss, dismissCost, emptyPending, type EditDraft } from '$lib/edit';
+	import { applyDraft, dismiss, dismissCost, emptyPending, nameProblem, type EditDraft } from '$lib/edit';
 	import { explain } from '$lib/explanation';
-	import { earnedLevels, limitFor, optionsFor, promoted, spend, type RenownOption } from '$lib/renown';
-	import { refuse, takesNothing } from '$lib/build/equipment';
+	import {
+		earnedLevels,
+		heldTalents,
+		limitFor,
+		optionsFor,
+		promoted,
+		spend,
+		talentsFor,
+		weaponsOffered,
+		type RenownPick
+	} from '$lib/renown';
+	import { allows, gearOf, refuse, takesNothing } from '$lib/build/equipment';
 	import { fighterOf } from '$lib/build/roster';
 	import { FIGHTERS, ITEMS, WEAPONS } from '$lib/gamedata';
-	import { FACTIONS as RULESETS, ITEMS as RULE_ITEMS, RACIAL_LIMITS } from '$lib/rules';
+	import {
+		FACTIONS as RULESETS,
+		HEROIC_TALENTS,
+		ITEMS as RULE_ITEMS,
+		RACIAL_LIMITS,
+		WEAPONS as RULE_WEAPONS
+	} from '$lib/rules';
 	import {
 		allWarbands,
 		chooseWarband,
@@ -55,7 +71,7 @@
 	import { rosterPdf } from '$lib/roster-pdf';
 	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
 	import type { DeckCard } from '$lib/types/card';
-	import type { BattleState, PendingRenown, StatKey, StoredPhoto, StoredWarband } from '$lib/types/warband';
+	import type { BattleState, FighterInstance, PendingRenown, StatKey, StoredPhoto, StoredWarband } from '$lib/types/warband';
 
 	let warbands = $state<StoredWarband[]>([]);
 	let activeId = $state<string | null>(null);
@@ -135,7 +151,62 @@
 		const options = card.stats.length
 			? optionsFor(profile, instance, pending.branch, stored.renownHistory ?? [], limitFor(card.keywords, RACIAL_LIMITS))
 			: [];
-		return { name: card.name, options };
+		return { name: card.name, options, talents: talentOffer(stored, deck, instance, card.name, pending) };
+	}
+
+	/**
+	 * The names the faction and the other fighters answer to besides their own: the
+	 * profile names, which `adapter.ts` matches a card by when it has none, and the
+	 * builder's default name.
+	 */
+	function reservedFor(stored: StoredWarband, instanceId: string): string[] {
+		const faction = stored.warband.factionId ? RULESETS.get(stored.warband.factionId) : undefined;
+		return [
+			faction?.name ?? '',
+			/* What the builder calls every fighter it adds until it is renamed. */
+			'New Fighter',
+			...stored.warband.fighters
+				.filter((f) => f.instanceId !== instanceId)
+				.map((f) => FIGHTERS.get(f.fighterId)?.name ?? '')
+		].filter(Boolean);
+	}
+
+	/**
+	 * What a hero's level can take instead: the talents with the reason each is out
+	 * of reach, and whether the fighter needs a name of its own first. A talent is
+	 * written against the fighter's name, so a name shared with another fighter
+	 * would give it the talent too.
+	 */
+	function talentOffer(
+		stored: StoredWarband,
+		deck: DeckCard[],
+		instance: FighterInstance,
+		shown: string,
+		pending: PendingRenown
+	): TalentOffer | null {
+		if (!offersTalent(pending.branch)) return null;
+		const faction = stored.warband.factionId ? RULESETS.get(stored.warband.factionId) : undefined;
+		const profile = faction && fighterOf(faction, instance.fighterId);
+		const profileName = FIGHTERS.get(instance.fighterId)?.name ?? '';
+		const held = heldTalents(HEROIC_TALENTS, instance.instanceId, [shown, profileName], stored.renownHistory ?? [], stored.warband.customAbilities);
+		const carried = [...(profile ? gearOf(profile) : []), ...instance.equipment];
+		const sold = faction && profile ? faction.equipment.filter((e) => e.id.startsWith('weapon:')).map((e) => e.id.slice(7)).filter((id) => allows(faction, profile, id)) : [];
+		const names = new Set(
+			[
+				...stored.warband.fighters.filter((f) => f.instanceId !== instance.instanceId).map((f) => f.customName),
+				...reservedFor(stored, instance.instanceId)
+			]
+				.map((n) => n.trim().toLowerCase())
+				.filter(Boolean)
+		);
+		const own = instance.customName.trim().toLowerCase();
+		const mustName = own === '' || names.has(own);
+		return {
+			options: talentsFor(HEROIC_TALENTS, held, (kind) => weaponsOffered(kind, carried, sold, RULE_WEAPONS)),
+			namePrompt: mustName ? 'The talent is saved under the fighter’s name, so no other fighter may share it' : null,
+			name: instance.customName,
+			taken: (name) => names.has(name.trim().toLowerCase())
+		};
 	}
 
 	/*
@@ -150,7 +221,10 @@
 		const next = queue[0] ?? null;
 		const deck = toCards(provisional.warband, provisional.selections, provisional.fluff, provisional.history, provisional.renownHistory);
 		return {
-			next: next && { level: next.level, branch: next.branch, options: renownChoice(provisional, deck, next)?.options ?? [] },
+			next: next && (() => {
+				const view = renownChoice(provisional, deck, next);
+				return { level: next.level, branch: next.branch, options: view?.options ?? [], talents: view?.talents ?? null };
+			})(),
 			waiting: queue.length
 		};
 	});
@@ -324,11 +398,12 @@
 	}
 
 	/** Spends the open level in one write, then goes on to the next one or closes. */
-	async function spendRenown(option: RenownOption | null) {
+	async function spendRenown(pick: RenownPick | null) {
 		if (!active || !nextRenown) return;
 		const snapshot = $state.snapshot(active);
 		try {
-			await putWarband(spend(snapshot, { ...nextRenown }, option ? { ...option } : null));
+			const reserved = reservedFor(snapshot, nextRenown.instanceId);
+			await putWarband(spend(snapshot, { ...nextRenown }, pick && $state.snapshot(pick), reserved));
 		} catch {
 			notify('The choice could not be saved.', 'error');
 			return;
@@ -366,7 +441,9 @@
 		discharged = null;
 		editingId = null;
 		try {
-			await putWarband(dismiss(snapshot, instanceId, card?.kind === 'fighter' ? card.cost : 0, toStash));
+			await putWarband(
+				dismiss(snapshot, instanceId, card?.kind === 'fighter' ? card.cost : 0, toStash, reservedFor(snapshot, instanceId))
+			);
 		} catch {
 			notify('The fighter could not be dismissed.', 'error');
 			return;
@@ -402,7 +479,8 @@
 						renownFloor: Math.max(0, ...levels),
 						spent: [],
 						equipment: [...instance.equipment],
-						stash: [...active.warband.stash]
+						stash: [...active.warband.stash],
+						reserved: reservedFor(active, id)
 					}
 				: null,
 			notes: isWarband ? active.warband.factionNotes : (instance?.notes ?? ''),
@@ -426,6 +504,11 @@
 		if (!active || !editingId || !draft) return;
 		const snapshot = $state.snapshot(active);
 		const values = $state.snapshot(draft);
+		const problem = values.fighter && nameProblem(values.fighter);
+		if (problem) {
+			notify(problem, 'error');
+			return;
+		}
 		const targetId = editingId;
 		/* IndexedDB trips over the reactivity proxy, so the photo is rebuilt as a plain object. */
 		const photoValues = photoDraft?.changed
@@ -780,6 +863,7 @@
 		level={nextRenown.level}
 		branch={nextRenown.branch}
 		options={renownView.options}
+		talents={renownView.talents}
 		waiting={pendingRenown.length - 1}
 		onspend={spendRenown}
 		onclose={() => (renownOpen = false)}

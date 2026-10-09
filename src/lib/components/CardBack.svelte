@@ -1,11 +1,11 @@
 <script lang="ts" module>
-	import type { RenownOption } from '../renown';
+	import type { RenownOption, RenownPick } from '../renown';
 	import type { BattleRecord, PhotoCrop, RenownBranch, StoredPhoto } from '../types/warband';
 
 	/** The levels the fighter on this back can spend, on the warband as Done would store it. */
 	export interface BackRenown {
 		/** The first level still open, and what it can be spent on. */
-		next: { level: number; branch: RenownBranch; options: RenownOption[] } | null;
+		next: { level: number; branch: RenownBranch; options: RenownOption[]; talents: TalentOffer | null } | null;
 		/** Every level still open, `next` included. */
 		waiting: number;
 	}
@@ -40,6 +40,7 @@
 	import {
 		MAX_XP,
 		emptyPending,
+		nameProblem,
 		renownFloor,
 		sendToStash,
 		takeFromStash,
@@ -49,7 +50,8 @@
 	} from '../edit';
 	import { DEFAULT_COLOUR, PALETTE, readColour, readable } from '../colour';
 	import { RESULT_LABELS, displayDate, newestFirst, opponent } from '../history';
-	import { BLOCKED, LABELS, NOTES, change, offersTalent } from './RenownSheet.svelte';
+	import { BLOCKED, LABELS, NOTES, anythingOpen, change, type TalentOffer } from './RenownSheet.svelte';
+	import TalentPicker from './TalentPicker.svelte';
 
 	let {
 		name,
@@ -150,24 +152,33 @@
 	let campaign: HTMLElement | undefined = $state();
 
 	const next = $derived(spending ? (renown?.next ?? null) : null);
-	const open = $derived(next?.options.some((o) => o.blocked === null) ?? false);
+	const open = $derived(next ? anythingOpen(next.options, next.talents) : false);
+	let talking = $state(false);
 
 	async function showSpending(on: boolean) {
 		spending = on;
+		talking = false;
 		await tick();
 		/* The page swapped under a finger that was halfway down the card. */
 		(on ? article : campaign)?.scrollIntoView({ block: 'start' });
 	}
 
-	function choose(option: RenownOption | null) {
+	function choose(pick: RenownPick | null) {
 		if (!draft.fighter || !next) return;
-		draft.fighter.spent = [...draft.fighter.spent, { level: next.level, option }];
+		/* The name the talent is written against is the name the field shows, and
+		   the field stays the one place that holds it. */
+		const nameBefore = pick?.kind === 'talent' && pick.name ? draft.fighter.name : undefined;
+		if (pick?.kind === 'talent' && pick.name) draft.fighter.name = pick.name;
+		const kept = pick?.kind === 'talent' ? { ...pick, name: null } : pick;
+		draft.fighter.spent = [...draft.fighter.spent, { level: next.level, pick: kept, nameBefore }];
 		showSpending(false);
 	}
 
 	/** Only the last: the choices after a level were offered on the figures it left. */
 	function undoLast() {
 		if (!draft.fighter) return;
+		const last = draft.fighter.spent.at(-1);
+		if (last?.nameBefore !== undefined) draft.fighter.name = last.nameBefore;
 		draft.fighter.spent = draft.fighter.spent.slice(0, -1);
 	}
 
@@ -218,13 +229,32 @@
 			<section>
 				<button class="back-link" onclick={() => showSpending(false)}>‹ Back</button>
 				<h3 class="heading"><span>Renown {next.level}</span><span class="rule"></span></h3>
-				<p class="note">
-					{NOTES[next.branch]}{#if offersTalent(next.branch)}{' '}Talents are not offered here yet – go back to keep the level for later.{/if}
-				</p>
+				<p class="note">{NOTES[next.branch]}</p>
 
+				{#if next.talents}
+					<div class="tabs" role="group" aria-label="What to spend the level on">
+						<button aria-pressed={!talking} class:on={!talking} onclick={() => (talking = false)}>
+							Characteristics
+						</button>
+						<button aria-pressed={talking} class:on={talking} onclick={() => (talking = true)}>
+							Heroic Talents
+						</button>
+					</div>
+				{/if}
+
+				{#if talking && next.talents}
+					<TalentPicker
+						variant="card"
+						options={next.talents.options}
+						name={next.talents.name}
+						namePrompt={next.talents.namePrompt}
+						taken={next.talents.taken}
+						onpick={choose}
+					/>
+				{:else}
 				<div class="options">
 					{#each next.options as option (option.characteristic)}
-						<button class="option" disabled={option.blocked !== null} onclick={() => choose(option)}>
+						<button class="option" disabled={option.blocked !== null} onclick={() => choose({ kind: 'stat', option })}>
 							<span class="line">
 								{LABELS[option.characteristic]}
 								{#if option.blocked}<span class="why">{BLOCKED[option.blocked]}</span>{/if}
@@ -235,8 +265,12 @@
 						</button>
 					{/each}
 				</div>
-				{#if !open && (next.branch === 'henchman' || next.branch === 'none')}
+				{#if next.talents && !next.options.some((o) => o.blocked === null)}
+					<p class="note">No characteristic can be raised – choose a heroic talent.</p>
+				{/if}
+				{#if !open}
 					<button class="add" onclick={() => choose(null)}>Use up this level</button>
+				{/if}
 				{/if}
 			</section>
 		</div>
@@ -252,6 +286,7 @@
 						placeholder={draft.fighter.placeholder}
 						bind:value={draft.fighter.name}
 					/>
+					{#if nameProblem(draft.fighter)}<p class="note">{nameProblem(draft.fighter)}</p>{/if}
 				</section>
 			{/if}
 
@@ -357,9 +392,11 @@
 								<li>
 									<span class="line">
 										<span class="when">Renown {spent.level}</span>
-										{#if spent.option}
-											{LABELS[spent.option.characteristic]}
-											{change(spent.option)}
+										{#if spent.pick?.kind === 'stat'}
+											{LABELS[spent.pick.option.characteristic]}
+											{change(spent.pick.option)}
+										{:else if spent.pick?.kind === 'talent'}
+											{spent.pick.talent.name}{#if spent.pick.weapon}{' '}({spent.pick.weapon.name}){/if}
 										{:else}
 											used up
 										{/if}
@@ -784,6 +821,30 @@
 		font-family: 'Alegreya', serif;
 		font-size: calc(17 * var(--t));
 		color: var(--card-link);
+	}
+
+	.tabs {
+		display: flex;
+		border-bottom: 1px solid var(--card-green);
+	}
+
+	.tabs button {
+		flex: 1;
+		min-height: 44px;
+		padding: 0 calc(8 * var(--u));
+		border: 0;
+		border-bottom: 3px solid transparent;
+		margin-bottom: -1px;
+		background: transparent;
+		font-family: 'Alegreya', serif;
+		font-size: calc(18 * var(--t));
+		color: var(--card-ink-muted);
+	}
+
+	.tabs button.on {
+		border-bottom-color: var(--card-green);
+		color: var(--card-ink);
+		font-weight: 600;
 	}
 
 	.options {

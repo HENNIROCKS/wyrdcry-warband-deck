@@ -1,6 +1,15 @@
 <script lang="ts" module>
-	import type { RenownOption } from '../renown';
+	import type { RenownOption, RenownPick, TalentOption } from '../renown';
 	import type { RenownBranch, StatKey } from '../types/warband';
+
+	/** What a level can be spent on besides a characteristic, and what the fighter's name has to do with it. */
+	export interface TalentOffer {
+		options: TalentOption[];
+		/** Set where the fighter has no name of its own, or shares it: the label of the field asking for one. */
+		namePrompt: string | null;
+		name: string;
+		taken: (name: string) => boolean;
+	}
 
 	/* Shared with the back of a fighter's card, which spends a level the same way. */
 	export const LABELS: Record<StatKey, string> = {
@@ -38,19 +47,27 @@
 		none: 'This fighter has neither the HERO nor the HENCHMAN keyword, so the rules do not say what its renown is worth. A characteristic can be raised.'
 	};
 
-	/** A level a talent could be picked for: how to keep it open is each view's own sentence. */
+	/** A level a talent could be picked for. */
 	export function offersTalent(branch: RenownBranch): boolean {
 		return branch === 'hero' || branch === 'promotion';
+	}
+
+	/** Whether any characteristic or talent is still free to take. */
+	export function anythingOpen(options: RenownOption[], talents: TalentOffer | null): boolean {
+		return options.some((o) => o.blocked === null) || (talents?.options.some((o) => o.blocked === null) ?? false);
 	}
 </script>
 
 <script lang="ts">
+	import TalentPicker from './TalentPicker.svelte';
+
 	let {
 		instanceId,
 		name,
 		level,
 		branch,
 		options,
+		talents,
 		waiting,
 		onspend,
 		onclose
@@ -60,14 +77,17 @@
 		level: number;
 		branch: RenownBranch;
 		options: RenownOption[];
+		talents: TalentOffer | null;
 		/** Further levels still open after this one. */
 		waiting: number;
-		/** The option confirmed, or null where nothing could be raised. */
-		onspend: (option: RenownOption | null) => void | Promise<void>;
+		/** The pick confirmed, or null where nothing could be taken. */
+		onspend: (pick: RenownPick | null) => void | Promise<void>;
 		onclose: () => void;
 	} = $props();
 
-	const open = $derived(options.some((o) => o.blocked === null));
+	const open = $derived(anythingOpen(options, talents));
+	let showTalents = $state<string | null>(null);
+	const talking = $derived(showTalents === `${instanceId}:${level}`);
 
 	/* The sheet stays mounted while the next level comes in, so a pick is tied to
 	   the level it was made for and counts only while that option is still free. */
@@ -82,11 +102,11 @@
 	let writing = $state<string | null>(null);
 	const busy = $derived(writing === at);
 
-	async function confirm(option: RenownOption | null) {
+	async function confirm(pick: RenownPick | null) {
 		if (busy) return;
 		writing = at;
 		try {
-			await onspend(option);
+			await onspend(pick);
 		} finally {
 			writing = null;
 		}
@@ -100,9 +120,30 @@
 			Renown {level}{#if waiting > 0}{' '}· {waiting} more waiting{/if}
 		</p>
 		<p class="note">
-			{NOTES[branch]}{#if offersTalent(branch)}{' '}Talents are not offered here yet – close this to keep the level for later.{/if}
+			{NOTES[branch]}
 		</p>
 
+		{#if talents}
+			<div class="tabs" role="group" aria-label="What to spend the level on">
+				<button aria-pressed={!talking} class:on={!talking} onclick={() => (showTalents = null)}>
+					Characteristics
+				</button>
+				<button aria-pressed={talking} class:on={talking} onclick={() => (showTalents = at)}>
+					Heroic Talents
+				</button>
+			</div>
+		{/if}
+
+		{#if talking && talents}
+			<TalentPicker
+				variant="sheet"
+				options={talents.options}
+				name={talents.name}
+				namePrompt={talents.namePrompt}
+				taken={talents.taken}
+				onpick={confirm}
+			/>
+		{:else}
 		<div class="options">
 			{#each options as option (option.characteristic)}
 				<button
@@ -122,18 +163,24 @@
 				</button>
 			{/each}
 		</div>
+		{#if talents && !options.some((o) => o.blocked === null)}
+			<p class="note out">No characteristic can be raised – choose a heroic talent.</p>
+		{/if}
+		{/if}
 
 		<div class="actions">
 			<button class="ghost" onclick={onclose}>Decide later</button>
-			{#if open}
-				<button disabled={!picked || busy} onclick={() => confirm(picked)}>
+			{#if talking}
+				<!-- The talent picker has its own confirm button. -->
+			{:else if options.some((o) => o.blocked === null)}
+				<button disabled={!picked || busy} onclick={() => picked && confirm({ kind: 'stat', option: picked })}>
 					{#if picked}
 						Raise {LABELS[picked.characteristic]} to {figure(picked.characteristic, picked.to)}
 					{:else}
 						Choose a characteristic
 					{/if}
 				</button>
-			{:else if branch === 'henchman' || branch === 'none'}
+			{:else if !open}
 				<button disabled={busy} onclick={() => confirm(null)}>Use up this level</button>
 			{/if}
 		</div>
@@ -184,6 +231,10 @@
 		background: var(--ui-surface-2);
 	}
 
+	.out {
+		margin: 12px 0 0;
+	}
+
 	.options {
 		display: flex;
 		flex-direction: column;
@@ -231,6 +282,30 @@
 	.why {
 		grid-column: 1 / -1;
 		font-size: var(--ui-t-sm);
+		color: var(--ui-text);
+	}
+
+	.tabs {
+		display: flex;
+		margin-bottom: 12px;
+		border-bottom: 1px solid var(--ui-border);
+	}
+
+	.tabs button {
+		flex: 1;
+		min-height: 44px;
+		padding: 8px 12px;
+		border: 0;
+		border-bottom: 3px solid transparent;
+		margin-bottom: -1px;
+		background: transparent;
+		font-size: var(--ui-t-md);
+		font-weight: 600;
+		color: var(--ui-text-muted);
+	}
+
+	.tabs button.on {
+		border-bottom-color: var(--ui-accent-text, var(--ui-accent));
 		color: var(--ui-text);
 	}
 

@@ -104,7 +104,7 @@ export interface PendingRenown {
 /**
  * What a renown level was spent on. `statOverrides` holds the resulting figure
  * without its reason, so the reason is kept here and written into `_deck`.
- * `characteristic` is null where nothing could be raised.
+ * `characteristic` is null where nothing could be raised or a talent was taken.
  */
 export interface RenownChoice {
 	instanceId: string;
@@ -114,6 +114,11 @@ export interface RenownChoice {
 	/** Signed, as the figure moves: −1 for Bravery, which is a roll to beat. */
 	bonus: number;
 	source: string;
+	/** The heroic talent's id (`kind` 'talent') or magical ability's id (`kind` 'ability'), where one was taken. */
+	talent?: string | null;
+	kind?: 'talent' | 'ability' | null;
+	/** The weapon a talent was taken for, by its id. */
+	choice?: string | null;
 }
 
 /** Metadata of this app. The builder ignores unknown keys and hands them back. */

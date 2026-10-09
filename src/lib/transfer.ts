@@ -180,7 +180,7 @@ function readRenownHistory(incoming: unknown): RenownChoice[] | null {
 	if (!Array.isArray(incoming)) return null;
 	return incoming.flatMap((entry): RenownChoice[] => {
 		if (typeof entry !== 'object' || entry === null) return [];
-		const { instanceId, level, branch, characteristic, bonus, source } = entry as Record<string, unknown>;
+		const { instanceId, level, branch, characteristic, bonus, source, talent, kind, choice } = entry as Record<string, unknown>;
 		if (typeof instanceId !== 'string' || typeof level !== 'number' || !Number.isInteger(level)) return [];
 		if (typeof branch !== 'string' || !BRANCHES.includes(branch)) return [];
 		if (characteristic !== null && (typeof characteristic !== 'string' || !STATS.includes(characteristic))) return [];
@@ -191,7 +191,12 @@ function readRenownHistory(incoming: unknown): RenownChoice[] | null {
 				branch: branch as RenownBranch,
 				characteristic: characteristic as StatKey | null,
 				bonus: typeof bonus === 'number' ? bonus : 0,
-				source: typeof source === 'string' ? source : `Renown ${level}`
+				source: typeof source === 'string' ? source : `Renown ${level}`,
+				...(typeof talent === 'string' && (kind === 'talent' || kind === 'ability') && {
+					talent,
+					kind,
+					choice: typeof choice === 'string' ? choice : null
+				})
 			}
 		];
 	});

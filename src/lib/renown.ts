@@ -6,8 +6,10 @@
  * which characteristics each may raise, and what a choice writes.
  */
 
-import type { RacialLimit } from './rules/types';
+import type { HeroicTalent, RacialLimit, Weapon } from './rules/types';
+import { newId } from './id';
 import {
+	type CustomAbility,
 	type FighterInstance,
 	type PendingRenown,
 	type RenownBranch,
@@ -136,45 +138,227 @@ export function optionsFor(
 	});
 }
 
+/** The most heroic talents a fighter can have. */
+export const MAX_TALENTS = 5;
+/** The specializations a fighter's talents may come from. */
+export const MAX_SPECIALIZATIONS = 2;
+
+export interface WeaponOption {
+	id: string;
+	name: string;
+}
+
+export interface TalentOption {
+	talent: HeroicTalent;
+	/** Why it cannot be picked, or null where it can. */
+	blocked: 'specialization' | 'limit' | 'repeat' | null;
+	/** The weapons to select a type from, for a talent that asks for one; null for the rest. */
+	weapons: WeaponOption[] | null;
+}
+
+/** What a level is spent on: a characteristic, or a heroic talent. */
+export type RenownPick =
+	| { kind: 'stat'; option: RenownOption }
+	| {
+			kind: 'talent';
+			talent: HeroicTalent;
+			/** The weapon a talent was taken for. */
+			weapon: WeaponOption | null;
+			/** The name the fighter carries from now on, where the talent has to be written against one. */
+			name: string | null;
+	  };
+
+/** "Name: text" with the type in front, the spelling `adapter.ts` reads back. */
+function talentLine(talent: HeroicTalent, weapon: WeaponOption | null): string {
+	const type = talent.type[0].toUpperCase() + talent.type.slice(1);
+	const name = weapon ? `${talent.name} (${weapon.name})` : talent.name;
+	return `[${type}] ${name}: ${talent.text}`;
+}
+
+const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+/**
+ * The talents a fighter has: those taken at a level of renown, and those the
+ * builder wrote against its name by hand. Told apart from other abilities by
+ * the talent's own name, with or without the weapon after it.
+ */
+export function heldTalents(
+	talents: HeroicTalent[],
+	instanceId: string,
+	names: string[],
+	history: RenownChoice[],
+	customAbilities: CustomAbility[]
+): Set<string> {
+	const held = new Set(
+		history.filter((c) => c.instanceId === instanceId && c.kind === 'talent' && c.talent).map((c) => c.talent as string)
+	);
+	for (const entry of customAbilities) {
+		if (!entry.fighter.split(',').some((t) => names.some((n) => sameName(n, t)))) continue;
+		const written = entry.ability.match(/^\s*(?:\[[^\]]+\]\s*)?([^:(]+?)\s*(?:\([^)]*\))?\s*:/)?.[1];
+		const talent = talents.find((t) => written && sameName(t.name, written));
+		if (talent) held.add(talent.id);
+	}
+	return held;
+}
+
+/**
+ * Every talent with the reason it cannot be taken, if there is one: a third
+ * specialization, a sixth talent, one the fighter has already. Weapon-bound
+ * talents come with the weapons to select from.
+ */
+export function talentsFor(
+	talents: HeroicTalent[],
+	held: Set<string>,
+	weaponsOf: (kind: 'melee' | 'ranged') => WeaponOption[]
+): TalentOption[] {
+	const specializations = new Set(talents.filter((t) => held.has(t.id)).map((t) => t.specialization));
+	return talents.map((talent) => ({
+		talent,
+		blocked: held.has(talent.id)
+			? 'repeat'
+			: held.size >= MAX_TALENTS
+				? 'limit'
+				: !specializations.has(talent.specialization) && specializations.size >= MAX_SPECIALIZATIONS
+					? 'specialization'
+					: null,
+		weapons: talent.weapon ? weaponsOf(talent.weapon) : null
+	}));
+}
+
+/**
+ * The weapons of one kind a talent can be selected for: what the fighter
+ * carries first, then what its faction sells it. The rule binds to the kind of
+ * weapon, so one bought later counts.
+ */
+export function weaponsOffered(
+	kind: 'melee' | 'ranged',
+	carried: string[],
+	sold: string[],
+	weapons: Map<string, Weapon>
+): WeaponOption[] {
+	const seen = new Set<string>();
+	return [...carried, ...sold].flatMap((id) => {
+		const weapon = weapons.get(id);
+		if (!weapon || weapon.type !== kind || seen.has(id)) return [];
+		seen.add(id);
+		return [{ id, name: weapon.name }];
+	});
+}
+
+/**
+ * The abilities with those written against `from` moved to `to`, or dropped
+ * where `to` is null. A fighter field can name several fighters, separated by
+ * commas, and only the one name is touched; an entry left with no name goes.
+ */
+export function retargeted(abilities: CustomAbility[], from: string, to: string | null): CustomAbility[] {
+	return abilities.flatMap((ability) => {
+		const names = ability.fighter.split(',').map((n) => n.trim());
+		if (!names.some((n) => sameName(n, from))) return [ability];
+		const kept = names.flatMap((n) => (sameName(n, from) ? (to === null ? [] : [to]) : [n]));
+		return kept.length ? [{ ...ability, fighter: kept.join(', ') }] : [];
+	});
+}
+
+/**
+ * Whether abilities written against `name` belong to this fighter alone: it has
+ * a name of its own, and no other fighter answers to it – by name of its own,
+ * by profile, or as the faction. `reserved` lists the names the others answer
+ * to besides their own.
+ */
+export function ownsName(warband: Warband, instanceId: string, name: string, reserved: string[]): boolean {
+	if (name.trim() === '') return false;
+	return (
+		!reserved.some((r) => sameName(r, name)) &&
+		!warband.fighters.some((f) => f.instanceId !== instanceId && sameName(f.customName, name))
+	);
+}
+
+/**
+ * The warband with a fighter's name changed, and the abilities written against
+ * its old name moved along. Nothing moves from a name the fighter does not own
+ * (see `ownsName`) or to one it could not own: an empty name, or one another
+ * fighter answers to. The abilities then stay under the old name.
+ */
+export function renamed(
+	warband: Warband,
+	instanceId: string,
+	from: string,
+	to: string,
+	reserved: string[] = []
+): Warband {
+	const moves =
+		!sameName(from, to) &&
+		ownsName(warband, instanceId, from, reserved) &&
+		ownsName(warband, instanceId, to, reserved);
+	return {
+		...warband,
+		fighters: warband.fighters.map((f) => (f.instanceId === instanceId ? { ...f, customName: to } : f)),
+		customAbilities: moves ? retargeted(warband.customAbilities, from, to) : warband.customAbilities
+	};
+}
+
 /**
  * Spends one level and writes everything it changes in one go: the figure, the
  * reason beside it, the pending entry it clears, and a revision – it is
  * campaign progress. One value, so a single `putWarband` stores all of it and a
  * phone that goes to sleep mid-way cannot leave a level both spent and open.
  *
- * `option` is null where nothing could be raised and the rules offer nothing
+ * `pick` is null where nothing could be raised and the rules offer nothing
  * else – a henchman level, or one without a keyword. The level is then spent on
  * nothing, so the entry does not stay open for ever. A hero's level stays open
- * instead: a Heroic Talent is still a choice it has.
+ * instead unless every characteristic and talent is out of reach.
+ *
+ * A talent is written as an ability against the fighter's own name, which is
+ * how the builder keeps one as well; the pick brings the name where the fighter
+ * has none or shares it. `reserved` is as in `ownsName`.
  */
 export function spend(
 	stored: StoredWarband,
 	pending: PendingRenown,
-	option: RenownOption | null
+	pick: RenownPick | null,
+	reserved: string[] = []
 ): StoredWarband {
+	const option = pick?.kind === 'stat' ? pick.option : null;
+	const talent = pick?.kind === 'talent' ? pick : null;
 	const choice: RenownChoice = {
 		instanceId: pending.instanceId,
 		level: pending.level,
 		branch: pending.branch,
 		characteristic: option?.characteristic ?? null,
 		bonus: option?.bonus ?? 0,
-		source: `Renown ${pending.level}`
+		source: `Renown ${pending.level}`,
+		...(talent && { talent: talent.talent.id, kind: 'talent' as const, choice: talent.weapon?.id ?? null })
 	};
 	const same = (e: { instanceId: string; level: number }) =>
 		e.instanceId === pending.instanceId && e.level === pending.level;
 
+	let warband = stored.warband;
+	if (option) {
+		warband = {
+			...warband,
+			fighters: warband.fighters.map((f) =>
+				f.instanceId === pending.instanceId
+					? { ...f, statOverrides: { ...f.statOverrides, [option.characteristic]: option.to } }
+					: f
+			)
+		};
+	}
+	if (talent) {
+		const current = warband.fighters.find((f) => f.instanceId === pending.instanceId)?.customName ?? '';
+		const name = (talent.name ?? current).trim();
+		warband = renamed(warband, pending.instanceId, current, name, reserved);
+		const ability: CustomAbility = {
+			id: newId(),
+			fighter: name,
+			type: talent.talent.type,
+			ability: talentLine(talent.talent, talent.weapon)
+		};
+		warband = { ...warband, customAbilities: [...warband.customAbilities, ability] };
+	}
+
 	return {
 		...stored,
-		warband: option
-			? {
-					...stored.warband,
-					fighters: stored.warband.fighters.map((f) =>
-						f.instanceId === pending.instanceId
-							? { ...f, statOverrides: { ...f.statOverrides, [option.characteristic]: option.to } }
-							: f
-					)
-				}
-			: stored.warband,
+		warband,
 		renownHistory: [...(stored.renownHistory ?? []).filter((e) => !same(e)), choice],
 		pendingRenown: (stored.pendingRenown ?? []).filter((e) => !same(e)),
 		revision: stored.revision + 1,

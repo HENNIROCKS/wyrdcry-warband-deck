@@ -10,7 +10,7 @@
 import { itemCost } from './adapter';
 import { newId } from './id';
 import { today } from './history';
-import { earnedLevels, spend, type RenownOption } from './renown';
+import { earnedLevels, ownsName, renamed, retargeted, spend, type RenownPick } from './renown';
 import type { BattleRecord, FighterInstance, StoredWarband } from './types/warband';
 
 export interface PendingBattle {
@@ -24,7 +24,9 @@ export interface PendingBattle {
 export interface SpentLevel {
 	level: number;
 	/** Null where nothing could be raised and the level is used up. */
-	option: RenownOption | null;
+	pick: RenownPick | null;
+	/** The name the field held before this pick wrote its own into it, for Undo. */
+	nameBefore?: string;
 }
 
 /** What only a fighter's back corrects: its name and its campaign figures. */
@@ -47,9 +49,26 @@ export interface FighterDraft {
 	equipment: string[];
 	/** The warband's stash, which the fighter hands pieces to and takes them from. */
 	stash: string[];
+	/** The names other fighters and the faction answer to, besides their own names. */
+	reserved: string[];
 }
 
 export const MAX_XP = 3;
+
+/**
+ * Why the back cannot be kept as it stands, or null. A talent is written
+ * against the fighter's name, so a talent spent here needs a name of its own
+ * that no other fighter answers to.
+ */
+export function nameProblem(fighter: FighterDraft): string | null {
+	if (!fighter.spent.some((s) => s.pick?.kind === 'talent')) return null;
+	const name = fighter.name.trim();
+	if (name === '') return 'A talent belongs to one fighter by name – give this one a name first.';
+	if (fighter.reserved.some((r) => r.trim().toLowerCase() === name.toLowerCase())) {
+		return 'Another fighter answers to this name – choose a name of its own.';
+	}
+	return null;
+}
 
 export interface EditDraft {
 	/** On a fighter's card only. */
@@ -134,7 +153,7 @@ export function applyDraft(
 	/* The stash is the draft's copy from when the card was turned: written only
 	   when something moved, so a back that moved nothing leaves it as it is. */
 	const moved = fighter && before && fighter.equipment.join() !== before.equipment.join();
-	const warband = isWarband
+	const base = isWarband
 		? { ...stored.warband, factionNotes: draft.notes }
 		: {
 				...stored.warband,
@@ -145,7 +164,6 @@ export function applyDraft(
 								...f,
 								notes: draft.notes,
 								...(fighter && {
-									customName: fighter.name.trim(),
 									xp: fighter.xp,
 									renown: fighter.renown,
 									equipment: fighter.equipment
@@ -154,6 +172,11 @@ export function applyDraft(
 						: f
 				)
 			};
+	/* What is written against the fighter's name moves with it. */
+	const warband =
+		fighter && before
+			? renamed(base, targetId, before.customName, fighter.name.trim(), fighter.reserved)
+			: base;
 	const fluff = {
 		warband: isWarband ? draft.fluff : (stored.fluff?.warband ?? ''),
 		fighters: isWarband
@@ -169,9 +192,9 @@ export function applyDraft(
 		colour: isWarband ? draft.colour : (stored.colour ?? null),
 		pendingRenown: pending.length ? pending : null
 	};
-	for (const { level, option } of fighter?.spent ?? []) {
+	for (const { level, pick } of fighter?.spent ?? []) {
 		const entry = next.pendingRenown?.find((e) => e.instanceId === targetId && e.level === level);
-		if (entry) next = spend(next, entry, option);
+		if (entry) next = spend(next, entry, pick, fighter?.reserved);
 	}
 	if (!next.pendingRenown?.length) next = { ...next, pendingRenown: null };
 	return { ...next, revision: stored.revision + 1, updatedAt: new Date().toISOString() };
@@ -194,9 +217,19 @@ export function dismissCost(instance: FighterInstance, cost: number, toStash: nu
 /**
  * The warband without the fighter, as the builder's `REMOVE_FIGHTER` leaves it
  * after `SEND_TO_STASH` for each piece in `toStash`. What only this app keeps
- * about the fighter goes with it.
+ * about the fighter goes with it, as do the abilities written against its own
+ * name – unless another fighter answers to the same name (`reserved` lists the
+ * names the others answer to besides their own). A fighter with no name of its
+ * own has none: what is carried by a profile's name belongs to every fighter of
+ * that profile.
  */
-export function dismiss(stored: StoredWarband, instanceId: string, cost: number, toStash: number[]): StoredWarband {
+export function dismiss(
+	stored: StoredWarband,
+	instanceId: string,
+	cost: number,
+	toStash: number[],
+	reserved: string[] = []
+): StoredWarband {
 	const instance = stored.warband.fighters.find((f) => f.instanceId === instanceId);
 	if (!instance) return stored;
 	const others = <T extends { instanceId: string }>(list: T[] | null | undefined) =>
@@ -204,6 +237,7 @@ export function dismiss(stored: StoredWarband, instanceId: string, cost: number,
 	const without = <T>(record: Record<string, T>) =>
 		Object.fromEntries(Object.entries(record).filter(([id]) => id !== instanceId));
 	const pendingRenown = others(stored.pendingRenown);
+	const own = ownsName(stored.warband, instanceId, instance.customName, reserved);
 
 	return {
 		...stored,
@@ -211,7 +245,10 @@ export function dismiss(stored: StoredWarband, instanceId: string, cost: number,
 			...stored.warband,
 			gold: stored.warband.gold - dismissCost(instance, cost, toStash),
 			stash: [...stored.warband.stash, ...toStash.map((i) => instance.equipment[i]).filter(Boolean)],
-			fighters: stored.warband.fighters.filter((f) => f.instanceId !== instanceId)
+			fighters: stored.warband.fighters.filter((f) => f.instanceId !== instanceId),
+			customAbilities: own
+				? retargeted(stored.warband.customAbilities, instance.customName, null)
+				: stored.warband.customAbilities
 		},
 		selections: stored.selections && {
 			...stored.selections,

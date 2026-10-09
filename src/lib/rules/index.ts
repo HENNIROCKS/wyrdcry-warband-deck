@@ -20,6 +20,7 @@ import { assembleFrom } from './assemble';
 import { collectHiredSwords } from './hired-swords';
 import type {
 	Campaign,
+	HeroicTalent,
 	Homebrew,
 	Item,
 	Keyword,
@@ -35,6 +36,7 @@ import weapons from './weapons.json';
 import items from './items.json';
 import weaponRules from './weapon-rules.json';
 import universalAbilities from './universal-abilities.json';
+import heroicTalents from './heroic-talents.json';
 
 export type * from './types';
 
@@ -82,6 +84,7 @@ export const WEAPONS = pooled<Weapon>(weapons, 'weapons', hired.weapons);
 export const ITEMS = pooled<Item>(items, 'items', hired.items);
 export const WEAPON_RULES = pooled<WeaponRule>(weaponRules, 'weapon-rules');
 export const UNIVERSAL_ABILITIES = universalAbilities as UniversalAbility[];
+export const HEROIC_TALENTS = heroicTalents as HeroicTalent[];
 
 /**
  * The factions are collected from the directory, so a new one is a folder and no

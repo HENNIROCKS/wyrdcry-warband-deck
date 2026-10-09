@@ -94,6 +94,21 @@ export interface Ability {
 	text: string;
 }
 
+export const SPECIALIZATIONS = ['strength', 'toughness', 'agility', 'perception', 'wits'] as const;
+export type Specialization = (typeof SPECIALIZATIONS)[number];
+export type TalentType = 'trait' | 'reaction' | 'double' | 'triple';
+
+/** What a hero may take instead of raising a characteristic when it reaches a level of renown. */
+export interface HeroicTalent {
+	id: string;
+	name: string;
+	specialization: Specialization;
+	type: TalentType;
+	text: string;
+	/** Set where the talent asks for a weapon type of this kind to be selected. */
+	weapon?: 'melee' | 'ranged';
+}
+
 export interface UniversalAbility extends Ability {
 	/** "any" for everyone, otherwise a keyword id from `keywords.json`. */
 	keyword: string;

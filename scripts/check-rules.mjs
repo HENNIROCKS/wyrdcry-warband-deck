@@ -72,7 +72,8 @@ const shared = {
 	weapons: join(RULES, 'weapons.json'),
 	items: join(RULES, 'items.json'),
 	weaponRules: join(RULES, 'weapon-rules.json'),
-	universal: join(RULES, 'universal-abilities.json')
+	universal: join(RULES, 'universal-abilities.json'),
+	talents: join(RULES, 'heroic-talents.json')
 };
 
 const campaign = (await read(shared.campaign)) ?? {};
@@ -82,6 +83,7 @@ const weapons = (await read(shared.weapons)) ?? [];
 const items = (await read(shared.items)) ?? [];
 const weaponRules = (await read(shared.weaponRules)) ?? [];
 const universal = (await read(shared.universal)) ?? [];
+const talents = (await read(shared.talents)) ?? [];
 
 const ids = (list) => new Set(list.map((entry) => entry.id));
 const keywordIds = ids(keywords);
@@ -204,6 +206,7 @@ duplicates(shared.weapons, weapons);
 duplicates(shared.items, items);
 duplicates(shared.weaponRules, weaponRules);
 duplicates(shared.universal, universal);
+duplicates(shared.talents, talents);
 
 /* Every race needs an entry, so a missing one cannot pass for "no limit": that
    is a `profile` of null. The races come from the race keywords and from the
@@ -795,6 +798,23 @@ for (const [name, tiers] of Object.entries({
 			problem(shared.campaign, `${name}: "${tier.label}" starts at ${tier.min}, the tier before ends at ${previous}`);
 		}
 		previous = tier.max;
+	}
+}
+
+/* --- Heroic talents -------------------------------------------------------- */
+
+const SPECIALIZATIONS = ['strength', 'toughness', 'agility', 'perception', 'wits'];
+const TALENT_TYPES = ['trait', 'reaction', 'double', 'triple'];
+for (const talent of talents) {
+	if (!SPECIALIZATIONS.includes(talent.specialization)) {
+		problem(shared.talents, `"${talent.id}" has the specialization "${talent.specialization}", which is none of ${SPECIALIZATIONS.join(', ')}`);
+	}
+	if (!TALENT_TYPES.includes(talent.type)) {
+		problem(shared.talents, `"${talent.id}" has the type "${talent.type}", which is none of ${TALENT_TYPES.join(', ')}`);
+	}
+	if (!talent.name?.trim() || !talent.text?.trim()) problem(shared.talents, `"${talent.id}" has no name or no text`);
+	if (talent.weapon !== undefined && !['melee', 'ranged'].includes(talent.weapon)) {
+		problem(shared.talents, `"${talent.id}" selects a "${talent.weapon}" weapon, which is neither melee nor ranged`);
 	}
 }
 
