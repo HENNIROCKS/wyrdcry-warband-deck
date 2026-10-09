@@ -82,8 +82,14 @@ export interface Recruitable {
 export function recruitable(faction: Faction, draft: Draft): Recruitable[] {
 	const left = goldLeft(faction, draft);
 	const full = draft.fighters.length >= (faction.warband_size.max ?? Infinity);
-	const leads = (fighter: Fighter) => (fighter.keywords.includes('leader') ? 0 : 1);
-	const ordered = [...faction.fighters].sort((a, b) => leads(a) - leads(b));
+	/* Leader, heroes, henchmen, then whoever is none of these – a BEAST or a
+	   THRALL. Within a rank the faction's own file order stands. */
+	const ranks = ['leader', 'hero', 'henchman'];
+	const rank = (fighter: Fighter) => {
+		const at = ranks.findIndex((keyword) => fighter.keywords.includes(keyword));
+		return at < 0 ? ranks.length : at;
+	};
+	const ordered = [...faction.fighters].sort((a, b) => rank(a) - rank(b));
 
 	return ordered.map((fighter) => {
 		const held = countOf(draft, fighter.id);
