@@ -29,3 +29,4 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Deep Wound: whether "the fighter survives" on a 3+ means no lasting effect, and whether the 15gc come from the warband's gold
 - [ ] Robbed: whether "all equipment carried" includes items, or only weapons and armour
 - [ ] Nine Lives: the talents page re-rolls only the first 11-12, the ability data any; and 11-12 now covers Deep Wound as well as Dead
+- [ ] Favour tiers: the income page names four standings (Disposable, Recognized, Valued, Favoured at 0–10, 11–25, 26–50, 51+) with income per shard, where the campaign data has five (Disposable, Proven, Loyal, Trusted, Favoured at 0–10, 11–20, 21–30, 31–40, 41+) and a flat default gold
