@@ -193,6 +193,11 @@ export interface BattleRound {
 export interface BattleState extends BattleRound {
 	startedAt: string;
 	/**
+	 * The warband's Zeal, counted through the battle like the wounds. Absent
+	 * reads as 0, so a battle saved before the count existed still loads.
+	 */
+	zeal?: number;
+	/**
 	 * The round the last `nextRound` left behind, so a mistaken tap can be taken
 	 * back. Null once the new round has been played into – from there on there is
 	 * nothing left to return to.

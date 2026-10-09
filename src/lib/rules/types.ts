@@ -209,7 +209,28 @@ export interface MoraleRuleEffect {
 	fighters: string[] | 'all';
 }
 
-export type RuleEffect = StatRuleEffect | RecruitRuleEffect | MoraleRuleEffect;
+export interface ZealRuleEffect {
+	kind: 'zeal';
+	/** The Zeal the warband must have reached for the stage to hold. */
+	at: number;
+	/** The stage's name, as the battle bar shows it. */
+	label: string;
+	/**
+	 * What the stage adds to a characteristic of every fighter while it holds.
+	 * Empty where the stage works through its text alone.
+	 */
+	amounts: Partial<Record<StatKey, number>>;
+	/**
+	 * A situation the card cannot know, in which the stage changes some
+	 * characteristics. The card marks them with a star and explains it, but does
+	 * not count the amount in.
+	 */
+	conditions?: { stats: StatKey[]; amount?: number; text: string };
+	/** A keyword id whose carriers the stage leaves out, such as HIRED SWORD. */
+	except?: string;
+}
+
+export type RuleEffect = StatRuleEffect | RecruitRuleEffect | MoraleRuleEffect | ZealRuleEffect;
 
 export interface RuleOption {
 	id: string;

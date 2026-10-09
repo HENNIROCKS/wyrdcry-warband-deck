@@ -13,6 +13,7 @@
 	import { hasKeyword, itemCost, toCards } from '$lib/adapter';
 	import { applyAftermath, startAftermath, type AftermathAnswer, type AftermathDraft } from '$lib/aftermath';
 	import { countedFighters } from '$lib/morale';
+	import { reached, zealStages } from '$lib/zeal';
 	import {
 		allocate,
 		isWavering,
@@ -26,7 +27,9 @@
 		togglePanicked,
 		toggleWaiting,
 		undoRound,
-		waveringThreshold
+		waveringThreshold,
+		adjustZeal,
+		zealOf
 	} from '$lib/battle';
 	import { applyDraft, dismiss, dismissCost, emptyPending, type EditDraft } from '$lib/edit';
 	import { explain } from '$lib/explanation';
@@ -243,6 +246,8 @@
 			counted.map((f) => f.instanceId)
 		)
 	);
+	const stages = $derived(active ? zealStages(active.warband) : []);
+	const zeal = $derived(zealOf(battle));
 	const out = $derived(outOfAction(battle, counted));
 	const wavering = $derived(isWavering(battle, counted));
 	/** Where the wavering bubble hangs: the tail reaches into the header's padding, up to the select.
@@ -639,7 +644,9 @@
 				{/snippet}
 				{#snippet children()}
 					{#if battle}
-						<p>Round {battle.round} · {left} to act</p>
+						<p>
+							Round {battle.round} · {left} to act{#if stages.length}{' '}· Zeal {zeal}{/if}
+						</p>
 						{#if out > 0}
 							<p class:wavering>
 								{fighterCount(out)} out of action{#if wavering}{' '}· Wavering{/if}
@@ -713,6 +720,9 @@
 		{counted}
 		{battle}
 		{wavering}
+		{stages}
+		{zeal}
+		onzeal={(delta) => setBattle(adjustZeal(battle, delta))}
 		{photos}
 		ontoggle={(id) => setBattle(toggle(battle, id))}
 		onwait={(id) => setBattle(toggleWaiting(battle, id))}

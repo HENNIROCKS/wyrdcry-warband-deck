@@ -6,7 +6,7 @@
 		"text": "Over the course of a battle, track the warband's Zeal. Zeal is increased through the use of certain faction abilities, and as it reaches each threshold below, you must apply the corresponding effect to all friendly fighters (excluding `HIRED SWORDS`). The effects are cumulative and last for the entire battle. Some effects require an enemy fighter to be **condemned**, which is applied through the use of the 'Condemn' ability and the 'Sudden Accusation' reaction; use a condemned token to keep track of condemned fighters.\n\nAt 0+ Zeal: when a friendly fighter makes an attack action against a condemned enemy fighter, increase their Fight or Shoot characteristic by 1.",
 		"pick": null,
 		"options": [],
-		"effect": null
+		"effect": { "kind": "zeal", "at": 0, "label": "Grim", "amounts": {}, "conditions": { "stats": ["fight", "shoot"], "amount": 1, "text": "When this fighter makes an attack action against a condemned enemy fighter, increase its Fight or Shoot characteristic by 1." }, "except": "hired-sword" }
 	},
 	{
 		"id": "zeal-wrathful",
@@ -15,7 +15,7 @@
 		"text": "At 5+ Zeal: when a friendly fighter makes an attack action against a condemned enemy fighter, you may turn 1 hit into a critical hit.",
 		"pick": null,
 		"options": [],
-		"effect": null
+		"effect": { "kind": "zeal", "at": 5, "label": "Wrathful", "amounts": {} }
 	},
 	{
 		"id": "zeal-frenzied",
@@ -24,7 +24,7 @@
 		"text": "At 10+ Zeal: increase the Armour characteristic of all friendly fighters by 1.",
 		"pick": null,
 		"options": [],
-		"effect": null
+		"effect": { "kind": "zeal", "at": 10, "label": "Frenzied", "amounts": { "defense": 1 }, "except": "hired-sword" }
 	},
 	{
 		"id": "sudden-accusation",
