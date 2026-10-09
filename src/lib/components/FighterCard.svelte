@@ -105,8 +105,10 @@
 			return {
 				key: stat.key,
 				label: stat.label,
-				/* The star says the figure can still rise – the tag alone would say only
-				   that it was worked out, and those are two different promises. */
+				/* The star says the situation can still change what this figure is worth
+				   at the table – a bonus to it, or a cost to whoever attacks the fighter.
+				   The tag alone would say only that it was worked out, and those are two
+				   different promises. */
 				value: shown + (conditions.length ? '*' : ''),
 				explanation:
 					layers.length > 1 || conditions.length

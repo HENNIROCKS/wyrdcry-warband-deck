@@ -1,5 +1,5 @@
 /**
- * Effects the game data describes but does not carry.
+ * Effects the game data describes but does not carry, or carries wrongly.
  *
  * An item's `effect` holds a single characteristic, so Heavy Armour's `+3
  * Armour` fits and the `-1 Move` in the same sentence does not. The card needs
