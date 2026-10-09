@@ -120,6 +120,10 @@ changed shape upstream stops the run instead of quietly yielding less: a table
 row the extraction cannot read, or a rule hanging on a keyword no fighter
 carries, both end it with a message.
 
+Where the deck deliberately differs from what it syncs – a correction to the
+draft, or a reading of it the draft leaves open – is listed in
+[`DEVIATIONS.md`](DEVIATIONS.md).
+
 The game data is **not** part of this repo. It belongs to the Wyrdcry project,
 whose licence is currently unresolved, which is why `src/lib/data/*.json` is
 gitignored.

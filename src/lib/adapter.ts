@@ -477,10 +477,11 @@ export function toCard(
 		const item = ITEMS.get(id);
 		if (!item) continue;
 		/* No cost: the profile's own cost covers what it cannot take off. And no
-		   layer either – the Freelance Knight's Armour 6 is the value with his
-		   armour on. Counting it again would put him at 9, which is also why the
-		   note below still holds: the bonus is in the figure, it just arrived there
-		   with the profile. */
+		   layer either – the Freelance Knight's Armour 6 is taken to include his
+		   armour, as it did in the 0.5 data; the 0.9 draft has not said. Counting
+		   it again would put him at 9, which is also why the note below still
+		   holds: the bonus is in the figure, it just arrived there with the
+		   profile. */
 		const inProfile = item.effect != null || CURATED_ITEM_EFFECTS.has(id);
 		equipmentEntries.push({
 			label: item.name,
