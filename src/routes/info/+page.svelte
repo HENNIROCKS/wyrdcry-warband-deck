@@ -3,6 +3,7 @@
 	import { base } from '$app/paths';
 
 	import BackArrow from '$lib/components/BackArrow.svelte';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { RULESET_VERSION } from '$lib/gamedata';
 	import { RELEASE_STAGE } from '$lib/release';
 
@@ -72,6 +73,7 @@
 		<p class="version">
 			Version {__APP_VERSION__} <span class="badge">{RELEASE_STAGE}</span>{#if buildDate}{' '}<span class="part">· Build {buildDate}</span>{/if}{#if ruleset}{' '}<span class="part">· Ruleset {ruleset}</span>{/if}
 		</p>
+		<div class="mode"><ThemeToggle /></div>
 	</header>
 
 	<section>
@@ -316,6 +318,11 @@
 	.version {
 		margin: 0;
 		font-size: var(--ui-t-md);
+	}
+
+	/* Set a little further off the version line than that is off the title. */
+	.mode {
+		margin-top: 8px;
 	}
 
 	/* A line too long for the phone breaks before a dot, never after it. */
