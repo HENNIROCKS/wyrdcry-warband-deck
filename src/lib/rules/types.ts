@@ -394,5 +394,9 @@ export interface HiredSword {
 export interface Campaign {
 	warband_budget: number;
 	standing_thresholds: { min: number; max: number; label: string }[];
-	favour_tiers: { min: number; max: number; label: string; income: number }[];
+	/**
+	 * The income page's table: income for the standing, plus so much per shard
+	 * delivered. The campaign data has other tiers; see DEVIATIONS.md.
+	 */
+	favour_tiers: { min: number; max: number; label: string; income: number; per_shard: number }[];
 }

@@ -1,7 +1,7 @@
 /**
- * Step 2 of the aftermath sequence: experience, and the renown it crosses
- * into. Pure warband math – the back of the warband card that collects a
- * player's answers is `AftermathBack.svelte`.
+ * Steps 2 and 4 of the aftermath sequence: experience and the renown it
+ * crosses into, then favour and income. Pure warband math – the back of the
+ * warband card that collects a player's answers is `AftermathBack.svelte`.
  *
  * Renown is a counter here. What a level is spent on – a Characteristics
  * Increase – is `renown.ts`, which the page opens for every level this step
@@ -10,7 +10,10 @@
  */
 
 import { isOut } from './battle';
-import type { BattleState } from './types/warband';
+import { newId } from './id';
+import { today } from './history';
+import { CAMPAIGN } from './rules';
+import type { BattleRecord, BattleState } from './types/warband';
 import type { FighterCardData } from './types/card';
 import type { FighterInstance, Warband } from './types/warband';
 
@@ -73,9 +76,31 @@ export interface AftermathDraft {
 	answers: Record<string, AftermathAnswer>;
 	/** The one fighter given the bonus point, if any. */
 	bonus: string | null;
+	/** Step 4, and the battle's line in the history. */
+	income: IncomeDraft;
 }
 
-export function startAftermath(warband: Warband, cards: FighterCardData[], battle: BattleState | null): AftermathDraft {
+export interface IncomeDraft {
+	/** Wyrdstone shards delivered to the faction. */
+	shards: number;
+	result: BattleRecord['result'] | null;
+	/** Whether Apply adds the battle to the history. */
+	record: boolean;
+	opponentWarband: string;
+	opponentPlayer: string;
+	/**
+	 * A line already in the history from the day the battle started on, which
+	 * is likely this battle entered by hand. Its presence starts `record` off.
+	 */
+	recorded: BattleRecord | null;
+}
+
+export function startAftermath(
+	warband: Warband,
+	cards: FighterCardData[],
+	battle: BattleState | null,
+	history: BattleRecord[] = []
+): AftermathDraft {
 	const all = candidates(warband, cards, battle);
 	const rows = all.filter((c) => c.eligible);
 	return {
@@ -84,7 +109,60 @@ export function startAftermath(warband: Warband, cards: FighterCardData[], battl
 		answers: Object.fromEntries(
 			rows.map((r) => [r.instanceId, { participated: r.participated, survived: r.survived, enemyOut: false }])
 		),
-		bonus: null
+		bonus: null,
+		income: startIncome(history, battle)
+	};
+}
+
+function startIncome(history: BattleRecord[], battle: BattleState | null): IncomeDraft {
+	const since = battle ? localDay(battle.startedAt) : today();
+	const recorded = history.filter((r) => r.date >= since).at(-1) ?? null;
+	return { shards: 0, result: null, record: recorded === null, opponentWarband: '', opponentPlayer: '', recorded };
+}
+
+/** A timestamp's calendar day where the device is, the way `today()` writes it. */
+function localDay(iso: string): string {
+	const at = new Date(iso);
+	const pad = (n: number) => String(n).padStart(2, '0');
+	return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}`;
+}
+
+export type FavourTier = (typeof CAMPAIGN.favour_tiers)[number];
+
+/** The standing a favour score is in; the last tier is open at the top. */
+export function tierFor(favour: number): FavourTier {
+	const tiers = CAMPAIGN.favour_tiers;
+	return tiers.find((t) => favour >= t.min && favour <= t.max) ?? tiers[tiers.length - 1];
+}
+
+export interface Income {
+	favour: number;
+	/** The favour score once it is earned. */
+	total: number;
+	/** The standing the warband rises into first, which then pays the income. */
+	tier: FavourTier;
+	gold: number;
+}
+
+/**
+ * Step 4: a favour for each shard, one more for a win (4.1); then the income
+ * of the standing the warband now holds, so a rise counts at once (4.2).
+ */
+export function income(favour: number, draft: IncomeDraft): Income {
+	const earned = draft.shards + (draft.result === 'win' ? 1 : 0);
+	const tier = tierFor(favour + earned);
+	return { favour: earned, total: favour + earned, tier, gold: tier.income + tier.per_shard * draft.shards };
+}
+
+/** The battle's line in the history, or null where none is to be added. */
+export function battleRecord(draft: IncomeDraft): BattleRecord | null {
+	if (!draft.record || !draft.result) return null;
+	return {
+		id: newId(),
+		date: today(),
+		result: draft.result,
+		opponentWarband: draft.opponentWarband.trim(),
+		opponentPlayer: draft.opponentPlayer.trim()
 	};
 }
 
@@ -115,10 +193,13 @@ export function applyXp(fighter: FighterInstance, points: number): FighterInstan
 export function applyAftermath(
 	warband: Warband,
 	answers: Map<string, AftermathAnswer>,
-	bonusInstanceId: string | null
+	bonusInstanceId: string | null,
+	earned: Income | null = null
 ): Warband {
 	return {
 		...warband,
+		/* `gold` is the whole treasury: income adds to it as it is. */
+		...(earned && { favour: earned.total, gold: warband.gold + earned.gold }),
 		fighters: warband.fighters.map((fighter) => {
 			const answer = answers.get(fighter.instanceId);
 			if (!answer) return fighter;

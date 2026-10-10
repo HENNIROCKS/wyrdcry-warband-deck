@@ -33,6 +33,7 @@
 		onedit,
 		ondone,
 		doneLabel,
+		doneDisabled = false,
 		oncancel,
 		turnTo = null,
 		photos
@@ -62,6 +63,7 @@
 		onedit?: (instanceId: string) => void;
 		ondone?: () => void;
 		doneLabel?: string;
+		doneDisabled?: boolean;
 		oncancel?: () => void;
 		/**
 		 * The card to turn over when it is not the one on top – ending a battle
@@ -398,6 +400,7 @@
 			onedit={() => onedit?.(top.instanceId)}
 			{ondone}
 			{doneLabel}
+			{doneDisabled}
 			{oncancel}
 		/>
 	{/if}

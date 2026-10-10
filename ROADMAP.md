@@ -36,7 +36,7 @@
 - [x] 🛠️ Sell or discard from the warband stash after the build
 - [x] 🛠️ Buy and sell at the trading post between battles
 - [x] 🎨 Light and dark mode, together with going over the design outside the cards
-- [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
+- [x] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [ ] 📈 Heroic traits: Magical Affinity teaches a further magical ability
 - [ ] 🛠️ Hire a Hired Sword for a single battle

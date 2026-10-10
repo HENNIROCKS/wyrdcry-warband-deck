@@ -25,6 +25,7 @@
 		onedit,
 		ondone,
 		doneLabel = 'Done',
+		doneDisabled = false,
 		oncancel
 	}: {
 		battle?: BattleState | null;
@@ -61,6 +62,8 @@
 		ondone?: () => void;
 		/** What finishing the turned card does, on its button. */
 		doneLabel?: string;
+		/** Holds the button back while the turned card still lacks an answer. */
+		doneDisabled?: boolean;
 		/** Turns the card over again and lets what was written fall. */
 		oncancel?: () => void;
 	} = $props();
@@ -89,7 +92,7 @@
 		     changed now would land on a card whose front is not in view. -->
 		<div class="finish">
 			<button class="btn" onclick={() => oncancel?.()}>Cancel</button>
-			<button class="btn primary" onclick={() => ondone?.()}>{doneLabel}</button>
+			<button class="btn primary" disabled={doneDisabled} onclick={() => ondone?.()}>{doneLabel}</button>
 		</div>
 	{:else if state}
 		<div class="wounds">

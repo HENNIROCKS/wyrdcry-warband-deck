@@ -17,6 +17,7 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Trading Post costs follow the game data where the page prints others: Dark Venom, Familiar, Healing Draught, Smoke Bomb
 - [ ] Selling equipment brings half its price rounded down to 5gc and never less than 5gc, as the page says, where the builder rounds down to 1gc
 - [ ] Throwing a piece out of the stash brings no gold back, where the builder's discard hands its full price back
+- [ ] Favour tiers and income follow the income page's four standings, where the campaign data has five and a flat default gold – from 11 favour the card names a standing the builder does not
 
 ## Open upstream
 

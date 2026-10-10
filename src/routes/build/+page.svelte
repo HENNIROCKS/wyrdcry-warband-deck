@@ -214,7 +214,7 @@
 		draft.ruleChoices = { ...draft.ruleChoices, [ruleId]: next };
 	}
 
-	/** The tier the builder's info row prints as Standing, from the same table. */
+	/** The standing the warband card prints, from the same table. */
 	const favourTier = $derived(
 		CAMPAIGN.favour_tiers.find((tier) => draft.favour >= tier.min && draft.favour <= tier.max)
 	);
@@ -426,7 +426,7 @@
 			</label>
 			<p class="field-hint">
 				Standing {favourTier?.label ?? '—'}, worth {favourTier?.income ?? 0} gc of income in
-				the aftermath. A warband that has not fought yet carries none, so 0 is the usual
+				the aftermath, and {favourTier?.per_shard ?? 0} gc for each shard delivered. A warband that has not fought yet carries none, so 0 is the usual
 				answer.
 			</p>
 		</section>

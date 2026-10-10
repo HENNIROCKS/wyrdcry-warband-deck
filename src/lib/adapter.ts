@@ -14,7 +14,6 @@ import { CURATED_CONDITIONS, CURATED_ITEM_EFFECTS, CURATED_ITEM_GRANTS } from '.
 import { RESULT_LABELS, displayDate, newestFirst, opponent, tally } from './history';
 import {
 	ABILITIES,
-	CAMPAIGN_RULES,
 	FACTIONS,
 	FIGHTERS,
 	ITEMS,
@@ -24,7 +23,7 @@ import {
 } from './gamedata';
 import type { WeaponProfile } from './gamedata';
 import { heldTalents, promoted } from './renown';
-import { HEROIC_TALENTS, KEYWORDS } from './rules';
+import { CAMPAIGN, HEROIC_TALENTS, KEYWORDS } from './rules';
 import { raisedBy, rolledRow, rulesLeftOut } from './rules-bridge';
 import type {
 	CardEntry,
@@ -705,12 +704,13 @@ export function toCard(
 }
 
 /**
- * Which tier the warband's favour puts it in – the standing, the way the
- * builder's info row reads it. The thresholds are open at the top in the data
- * as well, so anything past the last one keeps its label.
+ * Which tier the warband's favour puts it in – the standing, off the income
+ * page's table rather than the campaign data the builder's info row reads, so
+ * from 11 favour the two name it differently (DEVIATIONS.md). The last tier is
+ * open at the top, so anything past it keeps its label.
  */
 function standingFor(favour: number): string {
-	const tiers = CAMPAIGN_RULES.favour_tiers;
+	const tiers = CAMPAIGN.favour_tiers;
 	const tier = tiers.find((t) => favour >= t.min && favour <= t.max);
 	return tier?.label ?? tiers[tiers.length - 1]?.label ?? '';
 }

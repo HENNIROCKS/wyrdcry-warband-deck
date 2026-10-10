@@ -43,7 +43,9 @@ the Warband Builder is not currently assured – see
   get reminded of each fighter's Bravery test while it does, mark who is
   panicked, count the rounds and clear the round's states for the next one – one step of
   that is undoable, and a battle started by mistake can be cancelled
-- After a battle, award experience and spend the renown it brings
+- After a battle, award experience and spend the renown it brings, then earn
+  favour for the shards delivered and a win, collect the income of the standing
+  it brings into the stash, and add the battle to the history
 - Export through the system share sheet, either as the current state or as a
   dated snapshot
 - Export the warband as a roster PDF on A4 landscape, through the same share

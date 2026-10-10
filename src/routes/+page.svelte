@@ -17,7 +17,15 @@
 	import MenuButton from '$lib/components/MenuButton.svelte';
 	import RenownSheet, { offersTalent, type TalentOffer } from '$lib/components/RenownSheet.svelte';
 	import { hasKeyword, itemCost, toCards } from '$lib/adapter';
-	import { applyAftermath, startAftermath, type AftermathAnswer, type AftermathDraft } from '$lib/aftermath';
+	import {
+		applyAftermath,
+		battleRecord,
+		income,
+		startAftermath,
+		type AftermathAnswer,
+		type AftermathDraft,
+		type IncomeDraft
+	} from '$lib/aftermath';
 	import { countedFighters } from '$lib/morale';
 	import { reached, zealStages } from '$lib/zeal';
 	import {
@@ -494,17 +502,25 @@
 	 */
 	async function applyAftermathAndEnd(
 		answers: Map<string, AftermathAnswer>,
-		bonusInstanceId: string | null
+		bonusInstanceId: string | null,
+		incomeDraft: IncomeDraft
 	) {
 		if (!active) return;
 		const snapshot = $state.snapshot(active);
-		const warband = applyAftermath(snapshot.warband, answers, bonusInstanceId);
+		const warband = applyAftermath(
+			snapshot.warband,
+			answers,
+			bonusInstanceId,
+			income(snapshot.warband.favour, incomeDraft)
+		);
+		const record = battleRecord(incomeDraft);
 		const levels = earnedLevels(snapshot.warband, warband, keywordsOf);
 		const pending = [...(snapshot.pendingRenown ?? []), ...levels];
 		const entry: StoredWarband = {
 			...snapshot,
 			warband,
 			battle: null,
+			history: record ? [...(snapshot.history ?? []), record] : snapshot.history,
 			pendingRenown: pending.length ? pending : null,
 			revision: snapshot.revision + 1,
 			updatedAt: new Date().toISOString()
@@ -529,11 +545,11 @@
 		if (!nextRenown) renownOpen = false;
 	}
 
-	/** Turns the warband card over to ask what the battle was worth in experience. */
+	/** Turns the warband card over to ask what the battle was worth: experience, then favour and income. */
 	function endBattle() {
 		if (!active) return;
 		const fighters = cards.filter((c) => c.kind === 'fighter');
-		aftermath = startAftermath(active.warband, fighters, battle);
+		aftermath = startAftermath(active.warband, fighters, battle, active.history ?? []);
 		turned = 'aftermath';
 		editingId = 'warband';
 	}
@@ -573,10 +589,10 @@
 
 	/* Ended before the write, like `saveEdit`, so a second tap finds nothing to apply. */
 	async function finishAftermath() {
-		if (!aftermath || !editingId) return;
+		if (!aftermath?.income.result || !editingId) return;
 		const values = $state.snapshot(aftermath);
 		editingId = null;
-		await applyAftermathAndEnd(new Map(Object.entries(values.answers)), values.bonus);
+		await applyAftermathAndEnd(new Map(Object.entries(values.answers)), values.bonus, values.income);
 	}
 
 	function startEdit(id: string) {
@@ -868,7 +884,10 @@
 						{/if}
 						<hr />
 						<button onclick={endBattle}>End battle</button>
-						<p class="hint">Asks who earned experience, then drops the wounds and who is out of action.</p>
+						<p class="hint">
+							Asks for the result and the shards, for favour and income, then who earned
+							experience, and drops the wounds and who is out of action.
+						</p>
 						<button onclick={() => (abandoning = true)}>Cancel battle</button>
 						<p class="hint">Drops the battle without experience, as if it never started.</p>
 					{:else}
@@ -943,11 +962,12 @@
 		onedit={startEdit}
 		ondone={turned === 'aftermath' ? finishAftermath : saveEdit}
 		doneLabel={turned === 'aftermath' ? 'Apply and end battle' : 'Done'}
+		doneDisabled={turned === 'aftermath' && !aftermath?.income.result}
 		oncancel={() => (editingId = null)}
 	>
 		{#snippet back(card)}
 			{#if turned === 'aftermath' && aftermath}
-				<AftermathBack name={card.name} bind:draft={aftermath} />
+				<AftermathBack name={card.name} favour={active?.warband.favour ?? 0} bind:draft={aftermath} />
 			{:else if turned === 'edit' && draft}
 				<CardBack
 					name={card.name}
