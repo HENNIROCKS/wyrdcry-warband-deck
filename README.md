@@ -8,8 +8,8 @@ Unofficial fan project. No connection to Games Workshop.
 
 **Status: early.** The app builds a warband of any of the eight factions, tracks
 a battle and edits a fighter afterwards – name, experience, renown, equipment,
-buying, dismissal; it does not yet roll injuries or sell to the trading post,
-and the way back to the Warband Builder is not currently assured – see
+buying, selling, dismissal; it does not yet roll injuries, and the way back to
+the Warband Builder is not currently assured – see
 [Warband Builder compatibility](#warband-builder-compatibility).
 
 ## What it does
@@ -31,8 +31,9 @@ and the way back to the Warband Builder is not currently assured – see
   a characteristic right there. Equipment moves between a fighter and the
   stash there as well, checked against what the fighter may carry, and is
   bought there from the faction's list and the Trading Post, a rare piece once
-  its Rarity roll is made. Gold is added to the stash on the warband's back. A
-  fighter is dismissed there too, its equipment sent to the stash if you like
+  its Rarity roll is made. On the warband's back, gold is added to the stash and
+  a piece in it sold for half its price or thrown away. A fighter is dismissed
+  there too, its equipment sent to the stash if you like
 - Put a photo of the painted model in a fighter's image field, moved and zoomed
   on the back of the card; it stays on the device
 - Tap a worked-out value or a weapon to see where it comes from: which

@@ -45,6 +45,7 @@
 		fromTradingPost,
 		nameProblem,
 		purchase,
+		salePrice,
 		tradingPost,
 		type EditDraft
 	} from '$lib/edit';
@@ -336,7 +337,11 @@
 		if (!active || editingId !== 'warband' || turned !== 'edit') return null;
 		const warbandCard = cards[0];
 		if (warbandCard?.kind !== 'warband') return null;
-		return { left: warbandCard.gold.remaining, items: active.warband.stash.map(nameOf) };
+		return {
+			left: warbandCard.gold.remaining,
+			items: active.warband.stash.map((id) => ({ name: nameOf(id), price: salePrice(itemCost(id)) })),
+			blocked: battle ? IN_BATTLE : null
+		};
 	});
 
 	/* Whether and how the fighter on the back can be dismissed. The leader stays:
@@ -606,7 +611,8 @@
 			colour: isWarband ? (active.colour ?? null) : null,
 			removed: [],
 			pending: emptyPending(),
-			goldAdded: []
+			goldAdded: [],
+			stashOut: []
 		};
 		photoDraft = instance ? { photo: stored.get(id) ?? null, changed: false } : null;
 		turned = 'edit';

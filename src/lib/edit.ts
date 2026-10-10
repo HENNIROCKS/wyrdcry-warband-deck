@@ -95,6 +95,38 @@ export interface EditDraft {
 	pending: PendingBattle;
 	/** Sums of gold added to the treasury on the warband card's back, in order; Done writes their total. */
 	goldAdded: number[];
+	/** Pieces of the stash sold or thrown away on the warband card's back, by their place in it. */
+	stashOut: StashOut[];
+}
+
+export interface StashOut {
+	/** The piece's place in the stash as stored, which nothing moves until Done. */
+	index: number;
+	/** Sold for `salePrice()`; otherwise thrown away for nothing. */
+	sold: boolean;
+}
+
+/**
+ * What a piece sells for: half its price, rounded down to a multiple of 5gc,
+ * never less than 5gc – a 25gc piece brings 10gc, a 5gc one still 5gc. A piece
+ * the game data has no price for brings nothing.
+ */
+export function salePrice(cost: number): number {
+	if (cost <= 0) return 0;
+	return Math.max(5, Math.floor(cost / 2 / 5) * 5);
+}
+
+/**
+ * What the stash leaves the treasury with, against `gold` as the whole of it.
+ * A piece leaving takes its price out of the warband's value; sold, its sale
+ * price comes back, as in the builder's `SELL_FROM_STASH`. Thrown away, nothing
+ * does, so the gold left over stays where it was.
+ */
+export function stashGold(stash: string[], out: StashOut[]): number {
+	return out.reduce((sum, { index, sold }) => {
+		const cost = itemCost(stash[index] ?? '');
+		return sum - cost + (sold ? salePrice(cost) : 0);
+	}, 0);
 }
 
 /** The gold the back adds to the treasury. */
@@ -226,7 +258,12 @@ export function applyDraft(
 	   when something moved, so a back that moved nothing leaves it as it is. */
 	const moved = fighter && before && fighter.equipment.join() !== before.equipment.join();
 	const base = isWarband
-		? { ...stored.warband, factionNotes: draft.notes, gold: stored.warband.gold + goldAdded(draft) }
+		? {
+				...stored.warband,
+				factionNotes: draft.notes,
+				gold: stored.warband.gold + goldAdded(draft) + stashGold(stored.warband.stash, draft.stashOut),
+				stash: stored.warband.stash.filter((_, i) => !draft.stashOut.some((out) => out.index === i))
+			}
 		: {
 				...stored.warband,
 				...(moved && { stash: fighter.stash }),

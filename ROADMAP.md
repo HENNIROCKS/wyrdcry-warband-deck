@@ -37,8 +37,8 @@
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
-- [ ] 🛠️ Sell or discard from the warband stash after the build
-- [ ] 🛠️ Buy and sell at the trading post between battles
+- [x] 🛠️ Sell or discard from the warband stash after the build
+- [x] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🎨 Go over the design and the interface outside the cards
 - [x] 🎨 Light and dark mode, together with going over the design outside the cards

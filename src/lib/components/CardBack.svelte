@@ -41,7 +41,10 @@
 	export interface BackStash {
 		/** The gold left in the treasury, before what the back adds. */
 		left: number;
-		items: string[];
+		/** The pieces in the stash as stored, each with what it sells for. */
+		items: { name: string; price: number }[];
+		/** Why nothing can be sold or thrown away now, or null when it can. */
+		blocked: string | null;
 	}
 
 	/** What the warband's Purchase pays for, worked out by the page. */
@@ -224,6 +227,21 @@
 
 	/* Gold typed in on the warband card's back, added to the draft with Add. */
 	let goldInput = $state('');
+
+	function stashOut(index: number, sold: boolean) {
+		draft.stashOut = [...draft.stashOut, { index, sold }];
+	}
+
+	function stashBack(index: number) {
+		draft.stashOut = draft.stashOut.filter((out) => out.index !== index);
+	}
+
+	/* What the back brings into the gold left: what is added, and what is sold.
+	   A piece thrown away brings nothing, and neither does it take any. */
+	const goldIn = $derived(
+		goldAdded(draft) +
+			draft.stashOut.reduce((sum, out) => sum + (out.sold ? (stash?.items[out.index]?.price ?? 0) : 0), 0)
+	);
 
 	function addGold() {
 		const amount = Math.floor(Number(goldInput));
@@ -627,8 +645,8 @@
 					<h3 class="heading"><span>Stash</span><span class="rule"></span></h3>
 					<p class="caption">Gold</p>
 					<p class="line">
-						{stash.left + goldAdded(draft)} gc
-						{#if draft.goldAdded.length}<span class="why">+{goldAdded(draft)} gc with Done</span>{/if}
+						{stash.left + goldIn} gc
+						{#if goldIn}<span class="why">+{goldIn} gc with Done</span>{/if}
 					</p>
 					<div class="entry-row">
 						<input
@@ -649,9 +667,22 @@
 					{/if}
 					<p class="caption">Equipment</p>
 					{#if stash.items.length}
+						{#if stash.blocked}<p class="hint">{stash.blocked}</p>{/if}
 						<ul class="list">
 							{#each stash.items as item, i (i)}
-								<li><span class="line">{item}</span></li>
+								{@const out = draft.stashOut.find((o) => o.index === i)}
+								<li class:gone={out}>
+									<span class="line">
+										<span class="piece">{item.name}</span>
+										{#if out}<span class="why">{out.sold ? `Sold for ${item.price} gc` : 'Thrown away'}</span>{/if}
+									</span>
+									{#if out}
+										<button class="remove" onclick={() => stashBack(i)}>Undo</button>
+									{:else if !stash.blocked}
+										<button class="remove" onclick={() => stashOut(i, true)}>Sell {item.price} gc</button>
+										<button class="remove" onclick={() => stashOut(i, false)}>Discard</button>
+									{/if}
+								</li>
 							{/each}
 						</ul>
 					{:else}
@@ -1002,9 +1033,15 @@
 		font-variant-numeric: lining-nums tabular-nums;
 	}
 
-	.removed .line {
-		text-decoration: line-through;
+	.removed .line,
+	.gone .line {
 		color: var(--card-ink-muted);
+	}
+
+	/* A piece leaving the stash is struck out; what becomes of it is not. */
+	.removed .line,
+	.gone .piece {
+		text-decoration: line-through;
 	}
 
 	.back-link {

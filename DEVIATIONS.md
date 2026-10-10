@@ -15,6 +15,8 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Oppressor names the Strike Them Down reaction, where the page calls it Cut Them Down
 - [ ] Strike Them Down answers a Retreat action, where the page names a disengage action 0.9 no longer has
 - [ ] Trading Post costs follow the game data where the page prints others: Dark Venom, Familiar, Healing Draught, Smoke Bomb
+- [ ] Selling equipment brings half its price rounded down to 5gc and never less than 5gc, as the page says, where the builder rounds down to 1gc
+- [ ] Throwing a piece out of the stash brings no gold back, where the builder's discard hands its full price back
 
 ## Open upstream
 
