@@ -27,6 +27,11 @@ import { FACTIONS, KEYWORDS, WEAPONS, type Ability, type Faction, type Fighter, 
  * because the game data's profiles do not carry it either – it would otherwise
  * appear on homebrew cards and nowhere else.
  */
+/** A keyword id as the card spells it: the keyword's name, or the id in capitals. */
+export function keywordName(id: string): string {
+	return KEYWORDS.get(id)?.name ?? id.toUpperCase();
+}
+
 function splitKeywords(fighter: Fighter): { race: string[]; keywords: string[] } {
 	const race: string[] = [];
 	const keywords: string[] = [];
@@ -34,7 +39,7 @@ function splitKeywords(fighter: Fighter): { race: string[]; keywords: string[] }
 	for (const id of fighter.keywords) {
 		const keyword = KEYWORDS.get(id);
 		if (keyword?.type === 'faction') continue;
-		const name = keyword?.name ?? id.toUpperCase();
+		const name = keywordName(id);
 		if (keyword?.type === 'race') race.push(name);
 		else keywords.push(name);
 	}
@@ -161,7 +166,7 @@ export function rolledRow(factionId: string, fighterId: string, chosen?: string[
 		name: row.name,
 		text: row.text,
 		source: choice.source,
-		keywords: (row.keywords ?? []).map((id) => KEYWORDS.get(id)?.name ?? id.toUpperCase()),
+		keywords: (row.keywords ?? []).map(keywordName),
 		weapon: row.weapon ?? null,
 		armed: row.armed ?? false
 	};
@@ -190,13 +195,12 @@ export function raisedBy(factionId: string, fighterId: string, chosen?: string[]
  */
 export function rulesLeftOut(factionId: string, keywords: string[]): Map<string, string> {
 	const held = new Set(keywords.map((keyword) => keyword.toUpperCase()));
-	const spelled = (id: string) => KEYWORDS.get(id)?.name ?? id.toUpperCase();
 	const left = new Map<string, string>();
 	for (const rule of FACTIONS.get(factionId)?.rules ?? []) {
-		if (rule.except && held.has(spelled(rule.except))) {
-			left.set(rule.name, `Does not apply to a \`${spelled(rule.except)}\`.`);
-		} else if (rule.only && !held.has(spelled(rule.only))) {
-			left.set(rule.name, `Applies only to a \`${spelled(rule.only)}\`.`);
+		if (rule.except && held.has(keywordName(rule.except))) {
+			left.set(rule.name, `Does not apply to a \`${keywordName(rule.except)}\`.`);
+		} else if (rule.only && !held.has(keywordName(rule.only))) {
+			left.set(rule.name, `Applies only to a \`${keywordName(rule.only)}\`.`);
 		}
 	}
 	return left;

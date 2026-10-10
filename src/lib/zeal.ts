@@ -5,7 +5,8 @@
  * faction's own rules, and handed in. A faction without any does not count Zeal.
  */
 
-import { FACTIONS, KEYWORDS } from './rules';
+import { FACTIONS } from './rules';
+import { keywordName } from './rules-bridge';
 import type { ZealRuleEffect } from './rules';
 import type { Warband } from './types/warband';
 
@@ -31,7 +32,6 @@ export function holdingFor(stages: ZealRuleEffect[], zeal: number, keywords: str
 	const held = keywords.map((keyword) => keyword.toLowerCase());
 	return reached(stages, zeal).filter((stage) => {
 		if (!stage.except) return true;
-		const name = KEYWORDS.get(stage.except)?.name ?? stage.except;
-		return !held.includes(name.toLowerCase());
+		return !held.includes(keywordName(stage.except).toLowerCase());
 	});
 }
