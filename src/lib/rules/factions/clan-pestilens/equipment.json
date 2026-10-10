@@ -1,6 +1,5 @@
 [
   { "id": "weapon:dagger", "allow": "all" },
-  { "id": "weapon:club", "allow": "all" },
   { "id": "weapon:foetid-blade", "allow": "all" },
   { "id": "weapon:woe-stave", "allow": "all" },
   { "id": "weapon:sword", "allow": "all" },
