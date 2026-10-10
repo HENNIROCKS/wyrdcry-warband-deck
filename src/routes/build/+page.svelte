@@ -12,6 +12,7 @@
 	import { base } from '$app/paths';
 	import { page } from '$app/state';
 
+	import BackArrow from '$lib/components/BackArrow.svelte';
 	import FighterSheet from '$lib/components/build/FighterSheet.svelte';
 	import RuleText from '$lib/components/RuleText.svelte';
 	import { toWarband, selectionsOf } from '$lib/build/export';
@@ -268,9 +269,7 @@
 
 <header class="bar">
 	<a class="leave" href="{base}/" aria-label="Leave the builder">
-		<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-			<path d="M19 12H5M11 18l-6-6 6-6" />
-		</svg>
+		<BackArrow size={20} />
 	</a>
 	<h1>Build a warband</h1>
 	<span class="gold" class:over={left < 0}>{left} gc</span>
@@ -345,9 +344,13 @@
 			</section>
 		{/if}
 	{:else if step === 'name'}
-		<label class="named" class:missing={!named}>
-			<span class="field-label">Name <span class="aside">{draft.name.length}/40</span></span>
-			<input class="field-input"
+		<div class="named" class:missing={!named}>
+			<label class="field-label" for="warband-name">
+				Name <span class="aside" aria-hidden="true">{draft.name.length}/40</span>
+			</label>
+			<input
+				id="warband-name"
+				class="field-input"
 				bind:value={draft.name}
 				placeholder="The Ostermark Free Company"
 				maxlength="40"
@@ -359,7 +362,7 @@
 				     cannot say it differently. -->
 				<p class="notice warn" id="name-open">{nameProblem}</p>
 			{/if}
-		</label>
+		</div>
 	{:else if step === 'roster' && faction}
 		<section>
 			<h3 class="field-label">Recruited · {draft.fighters.length} of {faction.warband_size.max}</h3>

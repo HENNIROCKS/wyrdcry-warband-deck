@@ -104,8 +104,8 @@ make target passes no arguments through:
 npm run sync:data -- --site /path/to/wyrdcry
 ```
 
-The app follows the 0.9 draft of the rules, which the site repo keeps apart from
-the stable 0.5. It reads two things from there. The JSON files under
+The app follows 0.9, the current rules. The site repo still keeps them apart
+from the deprecated 0.5. It reads two things from there. The JSON files under
 `src/data-versions/0.9/` it copies, writing a fighter's `armour` into the
 `defense` the app reads. The universal abilities it extracts from
 `docs/rules/the-combat-phase/abilities.md`, because they exist nowhere else —
@@ -122,7 +122,7 @@ row the extraction cannot read, or a rule hanging on a keyword no fighter
 carries, both end it with a message.
 
 Where the deck deliberately differs from what it syncs – a correction to the
-draft, or a reading of it the draft leaves open – is listed in
+rules, or a reading of them the rules leave open – is listed in
 [`DEVIATIONS.md`](DEVIATIONS.md).
 
 The game data is **not** part of this repo. It belongs to the Wyrdcry project,

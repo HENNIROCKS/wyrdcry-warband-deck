@@ -41,7 +41,7 @@
 - [ ] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 🎨 Go over the design and the interface outside the cards
-- [ ] 🎨 Light and dark mode, together with going over the design outside the cards
+- [x] 🎨 Light and dark mode, together with going over the design outside the cards
 - [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible

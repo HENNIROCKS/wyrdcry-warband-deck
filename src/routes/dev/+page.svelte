@@ -3,6 +3,8 @@
 	import { base } from '$app/paths';
 	import { qr, url } from 'virtual:dev-network';
 
+	import BackArrow from '$lib/components/BackArrow.svelte';
+
 	/* This route only exists in the dev server. In a build it is empty. */
 	const insecure = $derived(url !== null && !url.startsWith('https://'));
 </script>
@@ -46,7 +48,7 @@
 	{/if}
 
 	<div class="btn-stack">
-		<a class="btn primary" href="{base}/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>Back to the deck</a>
+		<a class="btn primary" href="{base}/"><BackArrow />Back to the deck</a>
 	</div>
 </main>
 

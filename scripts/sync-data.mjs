@@ -8,9 +8,9 @@
  * Nothing is written before every source has been read and checked. A run that
  * fails halfway would leave a mixture behind that was never shipped together.
  *
- * The app follows the 0.9 draft. The site repo keeps it apart from the stable
- * 0.5: its data under src/data-versions/0.9/, its rules pages under docs/
- * (0.5 has src/data/ and versioned_docs/version-0.5/).
+ * The app follows 0.9, the current rules. The site repo keeps them apart from
+ * the deprecated 0.5: its data under src/data-versions/0.9/, its rules pages
+ * under docs/ (0.5 has src/data/ and versioned_docs/version-0.5/).
  *
  * Usage:  npm run sync:data [-- --site <path to the site repo>]
  *                           [--from <path to the data>] [--docs <path to docs>]
@@ -180,7 +180,7 @@ const docs = argument('--docs') ?? join(site, DOCS_DIR);
 if (!(await exists(source))) {
 	fail(
 		`Source not found: ${source}`,
-		`The 0.9 data is expected under ${DATA_DIR}. Once 0.9 is released, the site repo moves it to src/data.`,
+		`The 0.9 data is expected under ${DATA_DIR}. Should the site repo move it to src/data, DATA_DIR follows.`,
 		'Site repo elsewhere? npm run sync:data -- --site <path to the site repo>'
 	);
 }

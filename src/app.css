@@ -40,6 +40,9 @@
 	/* What a sheet or a menu lifts off the page with. */
 	--ui-backdrop: rgba(0, 0, 0, 0.6);
 	--ui-shadow: rgba(0, 0, 0, 0.45);
+	/* Added to a focused field's green edge where the edge alone is too slight a
+	   change: none here, where grey to green already reads. */
+	--ui-focus-ring: transparent;
 
 	/* The Card Creator's corner for a control, a field, a menu and a notice. A
 	   sheet is a surface rather than a control and keeps a rounder one. */
@@ -151,6 +154,9 @@
 		--ui-field-border: #78736c;
 		--ui-backdrop: rgba(46, 38, 32, 0.45);
 		--ui-shadow: rgba(46, 38, 32, 0.2);
+		/* The field's own edge is dark here, and green on it stands only 1.2:1 off
+		   the unfocused state – a second pixel of it makes the change. */
+		--ui-focus-ring: var(--ui-accent);
 	}
 }
 
@@ -304,6 +310,15 @@ button {
 	background: var(--ui-surface-hover);
 }
 
+/* Keyboard focus gets what the pointer gets. */
+.btn.primary:not(:disabled):focus-visible {
+	background: var(--ui-accent);
+}
+
+.btn:not(.primary, .danger, :disabled):focus-visible {
+	background: var(--ui-surface-hover);
+}
+
 @media (hover: hover) {
 	.btn.primary:not(:disabled):hover {
 		background: var(--ui-accent);
@@ -374,11 +389,12 @@ button {
 }
 
 .field-input::placeholder {
-	color: var(--ui-text-subtle);
+	color: var(--ui-text-muted);
 }
 
 .field-input:focus {
 	border-color: var(--ui-accent);
+	box-shadow: 0 0 0 1px var(--ui-focus-ring);
 }
 
 /* What a field or a group of choices is for, at the Card Creator's 0.7rem –
@@ -398,7 +414,7 @@ button {
 .field-label .aside {
 	font-weight: 400;
 	text-transform: none;
-	color: var(--ui-text-subtle);
+	color: var(--ui-text-muted);
 }
 
 /* A line under a field that says what it takes. */

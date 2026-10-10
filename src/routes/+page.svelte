@@ -70,6 +70,7 @@
 	} from '$lib/storage';
 	import { photoLayout, type PhotoView } from '$lib/photo';
 	import { rosterPdf } from '$lib/roster-pdf';
+	import { RELEASE_STAGE } from '$lib/release';
 	import { ImportError, exportWarband, readFile, shareFile, toStored, type ExportResult, type ImportCandidate } from '$lib/transfer';
 	import type { DeckCard } from '$lib/types/card';
 	import type { BattleState, FighterInstance, PendingRenown, StatKey, StoredPhoto, StoredWarband } from '$lib/types/warband';
@@ -703,7 +704,7 @@
 		{:else if active}
 			<h1>{active.warband.name}</h1>
 		{:else}
-			<h1 class="app-title">Wyrdcry Warband Deck <span class="badge">Early</span></h1>
+			<h1 class="app-title">Wyrdcry Warband Deck <span class="badge">{RELEASE_STAGE}</span></h1>
 		{/if}
 	</div>
 

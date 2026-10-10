@@ -157,7 +157,7 @@
 
 	<div class="body">
 		<label class="named">
-			<span class="field-label">Name <span class="aside">{entry.name.length}/28</span></span>
+			<span class="field-label">Name <span class="aside" aria-hidden="true">{entry.name.length}/28</span></span>
 			<input class="field-input" bind:value={entry.name} placeholder={fighter.name} maxlength="28" />
 		</label>
 
@@ -617,6 +617,5 @@
 
 	.remove {
 		margin-top: 6px;
-		color: var(--ui-text-muted);
 	}
 </style>
