@@ -115,16 +115,9 @@ export function startAftermath(
 }
 
 function startIncome(history: BattleRecord[], battle: BattleState | null): IncomeDraft {
-	const since = battle ? localDay(battle.startedAt) : today();
+	const since = today(battle ? new Date(battle.startedAt) : undefined);
 	const recorded = history.filter((r) => r.date >= since).at(-1) ?? null;
 	return { shards: 0, result: null, record: recorded === null, opponentWarband: '', opponentPlayer: '', recorded };
-}
-
-/** A timestamp's calendar day where the device is, the way `today()` writes it. */
-function localDay(iso: string): string {
-	const at = new Date(iso);
-	const pad = (n: number) => String(n).padStart(2, '0');
-	return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}`;
 }
 
 export type FavourTier = (typeof CAMPAIGN.favour_tiers)[number];

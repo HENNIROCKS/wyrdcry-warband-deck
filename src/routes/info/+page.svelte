@@ -56,7 +56,7 @@
 		{
 			question: 'Which factions can I build?',
 			answer:
-				'The six out of the rulebook: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead, Witch Hunters and the Possessed. Beside them, under a heading of their own, the homebrew Clan Pestilens and Greenskin Marauders, written for 0.9 as well. Each one is transcribed by hand against the game data, so a value here can differ from the builder – the characteristics deliberately do, because this app works modifiers into them that the builder leaves in the item text.'
+				'The six out of the rulebook: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead, Witch Hunters and the Possessed. Beside them, under a heading of their own, the homebrew Clan Pestilens and Greenskin Marauders, written for 0.9 as well. Each one is transcribed by hand against the game data, so a value here can differ from the builder – the characteristics deliberately do, because this app works modifiers into them that the builder leaves in the item text, and so does the standing, which follows the four tiers of the income page where the builder reads five.'
 		}
 	];
 </script>

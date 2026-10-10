@@ -426,8 +426,8 @@
 			</label>
 			<p class="field-hint">
 				Standing {favourTier?.label ?? '—'}, worth {favourTier?.income ?? 0} gc of income in
-				the aftermath, and {favourTier?.per_shard ?? 0} gc for each shard delivered. A warband that has not fought yet carries none, so 0 is the usual
-				answer.
+				the aftermath, and {favourTier?.per_shard ?? 0} gc for each shard delivered. A
+				warband that has not fought yet carries none, so 0 is the usual answer.
 			</p>
 		</section>
 

@@ -810,6 +810,14 @@ for (const [name, tiers] of Object.entries({
 			problem(shared.campaign, `${name}: "${tier.label}" starts at ${tier.min}, the tier before ends at ${previous}`);
 		}
 		previous = tier.max;
+		/* What a favour tier pays; a missing figure would put NaN on the aftermath's back. */
+		if (name === 'favour_tiers') {
+			for (const key of ['income', 'per_shard']) {
+				if (typeof tier[key] !== 'number' || tier[key] < 0) {
+					problem(shared.campaign, `favour_tiers: "${tier.label}" has ${key} ${tier[key]}`);
+				}
+			}
+		}
 	}
 }
 

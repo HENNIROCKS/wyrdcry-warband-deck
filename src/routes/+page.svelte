@@ -545,7 +545,7 @@
 		if (!nextRenown) renownOpen = false;
 	}
 
-	/** Turns the warband card over to ask what the battle was worth: experience, then favour and income. */
+	/** Turns the warband card over to ask what the battle was worth: the result and the shards, then experience. */
 	function endBattle() {
 		if (!active) return;
 		const fighters = cards.filter((c) => c.kind === 'fighter');

@@ -17,12 +17,11 @@ export function newestFirst(records: BattleRecord[]): BattleRecord[] {
 		.map(({ record }) => record);
 }
 
-/* Today as the phone's own calendar has it – `toISOString` is UTC and would
-   date a late game to the next morning. */
-export function today(): string {
-	const now = new Date();
+/* A day as the phone's own calendar has it, today unless told otherwise –
+   `toISOString` is UTC and would date a late game to the next morning. */
+export function today(at = new Date()): string {
 	const pad = (n: number) => String(n).padStart(2, '0');
-	return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+	return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}`;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
