@@ -2,7 +2,7 @@
   {
     "id": "plague-priest",
     "name": "Plague Priest",
-    "cost": 120,
+    "cost": 130,
     "limit": { "min": 1, "max": 1 },
     "description": "A Plague Priest leads by rite and by fear, chanting the Liturgus Infecticus over his flock until the words mean nothing and the sickness means everything. Raw sorcery he leaves to his deacons — a true priest does not stoop to it.",
     "profile": {
@@ -47,7 +47,7 @@
   {
     "id": "plague-monk",
     "name": "Plague Monk",
-    "cost": 95,
+    "cost": 100,
     "limit": { "min": 0, "max": 3 },
     "description": "The Plague Monks enter a fight blind to everything but its end. They chant, they swing, and the red veil does the rest.",
     "profile": {

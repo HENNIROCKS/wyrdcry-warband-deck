@@ -21,7 +21,7 @@
   {
     "id": "orc-big-un",
     "name": "Orc Big 'Un",
-    "cost": 110,
+    "cost": 115,
     "limit": { "min": 0, "max": 2 },
     "description": "Bigger than their kin and considerably louder about it, Big 'Uns shoulder their way to the front of every fight. Nothing in the cursed city frightens them, which is less courage than a simple failure to imagine losing.",
     "profile": {
@@ -40,7 +40,7 @@
   {
     "id": "orc-shaman",
     "name": "Orc Shaman",
-    "cost": 100,
+    "cost": 105,
     "limit": { "min": 0, "max": 1 },
     "description": "Orc Shamans do not so much cast spells as get overtaken by them. The Waaagh! builds up behind their eyes until something has to give, and whatever gives usually gives loudly, greenly, and in the direction of whoever the boss was pointing at.",
     "profile": {
@@ -66,7 +66,7 @@
   {
     "id": "goblin-boss",
     "name": "Goblin Boss",
-    "cost": 70,
+    "cost": 75,
     "limit": { "min": 0, "max": 1 },
     "description": "Sharper than any Orc and quick to stand behind one, a Goblin Boss keeps the little ones in line with threats, bribes, and the occasional knife in the dark.",
     "profile": {

@@ -30,3 +30,4 @@ Where the deck deliberately differs from the site repo. A sync must not undo the
 - [ ] Robbed: whether "all equipment carried" includes items, or only weapons and armour
 - [ ] Nine Lives: the talents page re-rolls only the first 11-12, the ability data any; and 11-12 now covers Deep Wound as well as Dead
 - [ ] Favour tiers: the income page names four standings (Disposable, Recognized, Valued, Favoured at 0–10, 11–25, 26–50, 51+) with income per shard, where the campaign data has five (Disposable, Proven, Loyal, Trusted, Favoured at 0–10, 11–20, 21–30, 31–40, 41+) and a flat default gold
+- [ ] Hero costs: in the 0.9 fighter data every henchman costs its statline plus power level, while a hero costs 5gc more, a leader 10gc and a wizard 10–15gc – whether that surcharge is meant, since the homebrew warbands are priced with it

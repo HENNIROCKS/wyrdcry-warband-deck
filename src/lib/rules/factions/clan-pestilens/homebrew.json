@@ -32,7 +32,7 @@
       "hit": 2,
       "crit": 4,
       "rules": ["pierce-1", "two-handed", "unreliable", "plague-vapour"],
-      "cost": 30
+      "cost": 25
     },
     {
       "id": "foetid-blade",
@@ -43,18 +43,18 @@
       "hit": 1,
       "crit": 3,
       "rules": ["infecting"],
-      "cost": 15
+      "cost": 10
     },
     {
       "id": "woe-stave",
       "name": "Woe-stave",
       "type": "melee",
-      "range": { "min": 0, "max": 2 },
+      "range": { "min": 0, "max": 1 },
       "attacks": 3,
       "hit": 2,
       "crit": 3,
       "rules": [],
-      "cost": 15
+      "cost": 10
     }
   ]
 }
