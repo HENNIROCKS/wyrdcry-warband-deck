@@ -41,6 +41,8 @@
 	export interface BackStash {
 		/** The gold left in the treasury, before what the back adds. */
 		left: number;
+		/** The stash as stored, by id – what `stashIncome()` prices from. */
+		ids: string[];
 		/** The pieces in the stash as stored, each with what it sells for. */
 		items: { name: string; price: number }[];
 		/** Why nothing can be sold or thrown away now, or null when it can. */
@@ -79,6 +81,7 @@
 		emptyPending,
 		goldAdded,
 		nameProblem,
+		stashIncome,
 		renownFloor,
 		sendToStash,
 		takeFromStash,
@@ -236,12 +239,8 @@
 		draft.stashOut = draft.stashOut.filter((out) => out.index !== index);
 	}
 
-	/* What the back brings into the gold left: what is added, and what is sold.
-	   A piece thrown away brings nothing, and neither does it take any. */
-	const goldIn = $derived(
-		goldAdded(draft) +
-			draft.stashOut.reduce((sum, out) => sum + (out.sold ? (stash?.items[out.index]?.price ?? 0) : 0), 0)
-	);
+	/* What the back brings into the gold left: what is added, and what is sold. */
+	const goldIn = $derived(goldAdded(draft) + (stash ? stashIncome(stash.ids, draft.stashOut) : 0));
 
 	function addGold() {
 		const amount = Math.floor(Number(goldInput));
@@ -679,7 +678,9 @@
 									{#if out}
 										<button class="remove" onclick={() => stashBack(i)}>Undo</button>
 									{:else if !stash.blocked}
-										<button class="remove" onclick={() => stashOut(i, true)}>Sell {item.price} gc</button>
+										{#if item.price}
+											<button class="remove" onclick={() => stashOut(i, true)}>Sell {item.price} gc</button>
+										{/if}
 										<button class="remove" onclick={() => stashOut(i, false)}>Discard</button>
 									{/if}
 								</li>

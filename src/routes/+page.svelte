@@ -339,6 +339,7 @@
 		if (warbandCard?.kind !== 'warband') return null;
 		return {
 			left: warbandCard.gold.remaining,
+			ids: [...active.warband.stash],
 			items: active.warband.stash.map((id) => ({ name: nameOf(id), price: salePrice(itemCost(id)) })),
 			blocked: battle ? IN_BATTLE : null
 		};

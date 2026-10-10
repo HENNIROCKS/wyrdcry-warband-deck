@@ -117,16 +117,22 @@ export function salePrice(cost: number): number {
 }
 
 /**
+ * What the pieces sold out of the stash bring into the gold left over. A piece
+ * thrown away brings nothing, and neither does it take any.
+ */
+export function stashIncome(stash: string[], out: StashOut[]): number {
+	return out.reduce((sum, { index, sold }) => sum + (sold ? salePrice(itemCost(stash[index] ?? '')) : 0), 0);
+}
+
+/**
  * What the stash leaves the treasury with, against `gold` as the whole of it.
  * A piece leaving takes its price out of the warband's value; sold, its sale
  * price comes back, as in the builder's `SELL_FROM_STASH`. Thrown away, nothing
  * does, so the gold left over stays where it was.
  */
 export function stashGold(stash: string[], out: StashOut[]): number {
-	return out.reduce((sum, { index, sold }) => {
-		const cost = itemCost(stash[index] ?? '');
-		return sum - cost + (sold ? salePrice(cost) : 0);
-	}, 0);
+	const removed = out.reduce((sum, { index }) => sum + itemCost(stash[index] ?? ''), 0);
+	return stashIncome(stash, out) - removed;
 }
 
 /** The gold the back adds to the treasury. */
