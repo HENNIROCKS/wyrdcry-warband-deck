@@ -8,9 +8,12 @@
  */
 
 import { itemCost } from './adapter';
+import { takesNothing } from './build/equipment';
+import { ITEMS } from './gamedata';
 import { newId } from './id';
 import { today } from './history';
 import { earnedLevels, ownsName, renamed, retargeted, spend, type RenownPick } from './renown';
+import type { Fighter } from './rules';
 import type { BattleRecord, FighterInstance, StoredWarband } from './types/warband';
 
 export interface PendingBattle {
@@ -47,6 +50,13 @@ export interface FighterDraft {
 	spent: SpentLevel[];
 	/** What the fighter has bought, as stored – what it is born with is not in here. */
 	equipment: string[];
+	/**
+	 * What is bought on this back, kept apart from `equipment` until Done so it
+	 * can be taken back. Done adds it to what the fighter carries, and that is
+	 * the payment: `gold` is the whole treasury, so the value it adds comes off
+	 * what is left.
+	 */
+	bought: string[];
 	/** The warband's stash, which the fighter hands pieces to and takes them from. */
 	stash: string[];
 	/** Every name the faction and the other fighters answer to, their own names included. */
@@ -83,6 +93,13 @@ export interface EditDraft {
 	removed: string[];
 	/** The battle being entered and not yet added. */
 	pending: PendingBattle;
+	/** Sums of gold added to the treasury on the warband card's back, in order; Done writes their total. */
+	goldAdded: number[];
+}
+
+/** The gold the back adds to the treasury. */
+export function goldAdded(draft: EditDraft): number {
+	return draft.goldAdded.reduce((sum, amount) => sum + amount, 0);
 }
 
 export function emptyPending(): PendingBattle {
@@ -132,6 +149,61 @@ export function takeFromStash(fighter: FighterDraft, index: number): void {
 	fighter.equipment = [...fighter.equipment, id];
 }
 
+export interface TradingOffer {
+	id: string;
+	name: string;
+	cost: number;
+	/** Bought only after a Rarity roll of 6+, which is made at the table. */
+	rare: boolean;
+	/** Null where it can be bought; otherwise why not. */
+	refused: string | null;
+}
+
+/**
+ * The Trading Post, open to every faction and every fighter who takes
+ * equipment at all – one of each item per fighter. Read off the game data,
+ * which the warband's value prices from. The Master-Wrought Weapon is left
+ * out: it raises a weapon's cost rather than being a piece of its own.
+ *
+ * `held` is everything the fighter carries, bought or ordered.
+ */
+export function tradingPost(fighter: Fighter, held: string[]): { miscellaneous: TradingOffer[]; singleUse: TradingOffer[] } {
+	const none = takesNothing(fighter);
+	const rows = [...ITEMS.values()]
+		.filter((item) => item.id !== 'master-wrought-weapon')
+		.map((item) => ({
+			type: item.type,
+			offer: {
+				id: item.id,
+				name: item.name,
+				cost: item.cost,
+				rare: item.rare === true,
+				refused: none ?? (held.includes(item.id) ? 'One of each per fighter' : null)
+			}
+		}));
+	const of = (type: string) => rows.filter((row) => row.type === type).map((row) => row.offer);
+	return { miscellaneous: of('miscellaneous'), singleUse: of('single-use') };
+}
+
+/** Whether the piece comes from the Trading Post rather than a faction's list. */
+export function fromTradingPost(id: string): boolean {
+	const type = ITEMS.get(id)?.type;
+	return type === 'miscellaneous' || type === 'single-use';
+}
+
+/**
+ * Buys a piece for the fighter. Whether it may is for the offer to say:
+ * `refuse()` for what the faction sells, `tradingPost()` for the rest.
+ */
+export function buy(fighter: FighterDraft, id: string): void {
+	fighter.bought = [...fighter.bought, id];
+}
+
+/** Takes back a piece bought on this back, before Done pays for it. */
+export function unbuy(fighter: FighterDraft, index: number): void {
+	fighter.bought = fighter.bought.filter((_, i) => i !== index);
+}
+
 /**
  * The warband as Done would store it. Renown raised on the back is a level to
  * spend like one from the aftermath, and the levels spent on the back are then
@@ -154,7 +226,7 @@ export function applyDraft(
 	   when something moved, so a back that moved nothing leaves it as it is. */
 	const moved = fighter && before && fighter.equipment.join() !== before.equipment.join();
 	const base = isWarband
-		? { ...stored.warband, factionNotes: draft.notes }
+		? { ...stored.warband, factionNotes: draft.notes, gold: stored.warband.gold + goldAdded(draft) }
 		: {
 				...stored.warband,
 				...(moved && { stash: fighter.stash }),
@@ -166,7 +238,7 @@ export function applyDraft(
 								...(fighter && {
 									xp: fighter.xp,
 									renown: fighter.renown,
-									equipment: fighter.equipment
+									equipment: [...fighter.equipment, ...fighter.bought]
 								})
 							}
 						: f
@@ -258,6 +330,29 @@ export function dismiss(
 		fluff: stored.fluff && { ...stored.fluff, fighters: without(stored.fluff.fighters) },
 		renownHistory: others(stored.renownHistory),
 		pendingRenown: pendingRenown?.length ? pendingRenown : null,
+		revision: stored.revision + 1,
+		updatedAt: new Date().toISOString()
+	};
+}
+
+/**
+ * Pays for everything a warband from the builder still has waiting, as the
+ * builder's `PURCHASE_PENDING` does: what was ordered joins what each fighter
+ * carries, and a fighter not yet bought becomes one. `gold` stays – it is the
+ * whole treasury, and the value the purchase adds is what now comes off it.
+ */
+export function purchase(stored: StoredWarband): StoredWarband {
+	return {
+		...stored,
+		warband: {
+			...stored.warband,
+			fighters: stored.warband.fighters.map((f) => ({
+				...f,
+				isPending: false,
+				equipment: f.isPending ? f.equipment : [...f.equipment, ...f.pendingEquipment],
+				pendingEquipment: []
+			}))
+		},
 		revision: stored.revision + 1,
 		updatedAt: new Date().toISOString()
 	};

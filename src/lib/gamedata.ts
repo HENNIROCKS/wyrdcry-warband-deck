@@ -61,6 +61,8 @@ export interface ItemProfile {
 	/** Null on an item that changes no characteristic, which is most of them. */
 	effect?: { characteristic: string; bonus: number } | null;
 	cost: number;
+	/** Found at the Trading Post only on a Rarity roll of 6+. */
+	rare?: boolean;
 }
 
 export interface AbilityProfile {

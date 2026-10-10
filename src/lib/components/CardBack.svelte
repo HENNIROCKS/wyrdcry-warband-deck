@@ -20,6 +20,39 @@
 		carried: string[];
 		/** The stash in the draft's order, each with why the fighter cannot take it. */
 		stash: { name: string; refused: string | null }[];
+		/** What is bought on this back and paid for with Done, in the draft's order. */
+		bought: { name: string; cost: number }[];
+		/** What can be bought, a group per heading, each row with why it cannot be. */
+		shop: { heading: string; rows: BackOffer[] }[];
+		/** The gold left once what is bought here is paid for. */
+		left: number;
+	}
+
+	export interface BackOffer {
+		id: string;
+		name: string;
+		cost: number;
+		/** Null where it can be bought; otherwise why not. */
+		refused: string | null;
+		rare?: boolean;
+	}
+
+	/** The warband's stash as its back shows it, worked out by the page. */
+	export interface BackStash {
+		/** The gold left in the treasury, before what the back adds. */
+		left: number;
+		items: string[];
+	}
+
+	/** What the warband's Purchase pays for, worked out by the page. */
+	export interface BackPurchase {
+		/** A line per fighter with something to pay for. */
+		lines: { name: string; items: string[] }[];
+		cost: number;
+		/** The gold left once it is paid. */
+		left: number;
+		/** Why it cannot be paid now, or null when it can. */
+		blocked: string | null;
 	}
 
 	/** What dismissing the fighter on this back would mean, worked out by the page. */
@@ -39,12 +72,15 @@
 	import { imageFieldMask } from '../image-field-mask';
 	import {
 		MAX_XP,
+		buy,
 		emptyPending,
+		goldAdded,
 		nameProblem,
 		renownFloor,
 		sendToStash,
 		takeFromStash,
 		toRecord,
+		unbuy,
 		type EditDraft,
 		type FighterDraft
 	} from '../edit';
@@ -60,6 +96,9 @@
 		equipment = null,
 		dismissal = null,
 		ondismiss,
+		purchase = null,
+		onpurchase,
+		stash = null,
 		photo = $bindable(null)
 	}: {
 		name: string;
@@ -69,6 +108,12 @@
 		dismissal?: BackDismissal | null;
 		/** Asks for the fighter to be dismissed, handing what goes to the stash. */
 		ondismiss?: (toStash: number[]) => void;
+		/** On the warband card: what Purchase would pay for. */
+		purchase?: BackPurchase | null;
+		/** Pays for everything ordered, written at once rather than with Done. */
+		onpurchase?: () => void;
+		/** On the warband card: the gold and what lies in the stash. */
+		stash?: BackStash | null;
 		/** The fighter's photo as it stands in the edit; `changed` says whether Done has to write it. Null on a card that takes none. */
 		photo?: { photo: StoredPhoto | null; changed: boolean } | null;
 	} = $props();
@@ -152,6 +197,40 @@
 	let campaign: HTMLElement | undefined = $state();
 
 	const next = $derived(spending ? (renown?.next ?? null) : null);
+
+	/* A second page for buying equipment, the same way: what is bought is part
+	   of the draft, and the page stays open for the next piece. */
+	let buying = $state(false);
+	/* The rare piece asked about: it is found with a Rarity roll at the table
+	   first, so a tap asks for the roll rather than buying. */
+	let asking = $state<string | null>(null);
+	let equipmentSection: HTMLElement | undefined = $state();
+
+	async function showBuying(on: boolean) {
+		buying = on;
+		asking = null;
+		await tick();
+		(on ? article : equipmentSection)?.scrollIntoView({ block: 'start' });
+	}
+
+	function pick(fighter: FighterDraft, row: BackOffer) {
+		if (row.rare && asking !== row.id) {
+			asking = row.id;
+			return;
+		}
+		asking = null;
+		buy(fighter, row.id);
+	}
+
+	/* Gold typed in on the warband card's back, added to the draft with Add. */
+	let goldInput = $state('');
+
+	function addGold() {
+		const amount = Math.floor(Number(goldInput));
+		if (!(amount > 0)) return;
+		draft.goldAdded = [...draft.goldAdded, amount];
+		goldInput = '';
+	}
 	const open = $derived(next ? anythingOpen(next.options, next.talents) : false);
 	let talking = $state(false);
 
@@ -224,7 +303,44 @@
 <article class="card back" bind:this={article}>
 	<h2 class="name">{name}</h2>
 
-	{#if next}
+	{#if buying && equipment && draft.fighter}
+		{@const fighter = draft.fighter}
+		<div class="parchment">
+			<section>
+				<button class="back-link" onclick={() => showBuying(false)}>‹ Back</button>
+				<h3 class="heading"><span>Buy</span><span class="rule"></span></h3>
+				<p class="note">Paid with Done · {equipment.left} gc left</p>
+				{@render boughtList(fighter, equipment.bought, 'Bought here')}
+				{#each equipment.shop as group (group.heading)}
+					{#if group.rows.length}
+						<p class="caption">{group.heading}</p>
+						<div class="options">
+							{#each group.rows as row (row.id)}
+								{#if asking === row.id}
+									<div class="ask">
+										<p class="note">Found {row.name} with a Rarity roll of 6+?</p>
+										<div class="ask-actions">
+											<button class="remove" onclick={() => (asking = null)}>Not found</button>
+											<button class="remove" onclick={() => pick(fighter, row)}>Found – buy for {row.cost} gc</button>
+										</div>
+									</div>
+								{:else}
+									<button class="option" disabled={row.refused !== null} onclick={() => pick(fighter, row)}>
+										<span class="line">
+											{row.name}
+											{#if row.refused}<span class="why">{row.refused}</span>
+											{:else if row.rare}<span class="why">Rare – a Rarity roll of 6+ first</span>{/if}
+										</span>
+										<span class="change">{row.cost} gc</span>
+									</button>
+								{/if}
+							{/each}
+						</div>
+					{/if}
+				{/each}
+			</section>
+		</div>
+	{:else if next}
 		<div class="parchment">
 			<section>
 				<button class="back-link" onclick={() => showSpending(false)}>‹ Back</button>
@@ -419,7 +535,7 @@
 
 			{#if equipment && draft.fighter}
 				{@const fighter = draft.fighter}
-				<section>
+				<section bind:this={equipmentSection}>
 					<h3 class="heading"><span>Equipment</span><span class="rule"></span></h3>
 					{#if equipment.blocked}
 						<p class="hint">{equipment.blocked}</p>
@@ -457,6 +573,11 @@
 							</ul>
 						{:else}
 							<p class="hint">The stash is empty.</p>
+						{/if}
+
+						{#if !equipment.takesNothing}
+							{@render boughtList(fighter, equipment.bought, 'Bought, paid with Done')}
+							<button class="add" onclick={() => showBuying(true)}>Buy…</button>
 						{/if}
 					{/if}
 				</section>
@@ -498,6 +619,60 @@
 						{/if}
 						<button class="dismiss" onclick={() => ondismiss?.(toStash)}>Dismiss {name}…</button>
 					{/if}
+				</section>
+			{/if}
+
+			{#if stash}
+				<section>
+					<h3 class="heading"><span>Stash</span><span class="rule"></span></h3>
+					<p class="caption">Gold</p>
+					<p class="line">
+						{stash.left + goldAdded(draft)} gc
+						{#if draft.goldAdded.length}<span class="why">+{goldAdded(draft)} gc with Done</span>{/if}
+					</p>
+					<div class="entry-row">
+						<input
+							class="amount"
+							type="number"
+							inputmode="numeric"
+							min="1"
+							placeholder="Gold to add"
+							aria-label="Gold to add"
+							bind:value={goldInput}
+						/>
+						<button class="add" disabled={!(Number(goldInput) >= 1)} onclick={addGold}>Add</button>
+					</div>
+					{#if draft.goldAdded.length}
+						<button class="remove" onclick={() => (draft.goldAdded = draft.goldAdded.slice(0, -1))}>
+							Undo {draft.goldAdded.at(-1)} gc
+						</button>
+					{/if}
+					<p class="caption">Equipment</p>
+					{#if stash.items.length}
+						<ul class="list">
+							{#each stash.items as item, i (i)}
+								<li><span class="line">{item}</span></li>
+							{/each}
+						</ul>
+					{:else}
+						<p class="hint">The stash is empty.</p>
+					{/if}
+				</section>
+			{/if}
+
+			{#if purchase}
+				<section>
+					<h3 class="heading"><span>Purchase</span><span class="rule"></span></h3>
+					<ul class="list">
+						{#each purchase.lines as line, i (i)}
+							<li><span class="line"><span class="when">{line.name}</span> {line.items.join(', ')}</span></li>
+						{/each}
+					</ul>
+					<p class="hint">{purchase.cost} gc · {purchase.left} gc left after paying</p>
+					{#if purchase.blocked}<p class="note">{purchase.blocked}</p>{/if}
+					<button class="add" disabled={purchase.blocked !== null} onclick={() => onpurchase?.()}>
+						Purchase for {purchase.cost} gc
+					</button>
 				</section>
 			{/if}
 
@@ -585,6 +760,22 @@
 	{/if}
 </article>
 
+<!-- What is bought on this back, on the card's page and on the buying page alike. -->
+{#snippet boughtList(fighter: FighterDraft, bought: BackEquipment['bought'], caption: string)}
+	{#if bought.length}
+		<p class="caption">{caption}</p>
+		<ul class="list">
+			{#each bought as item, i (i)}
+				<li>
+					<span class="line">{item.name}</span>
+					<span class="when">{item.cost} gc</span>
+					<button class="remove" onclick={() => unbuy(fighter, i)}>Undo</button>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+{/snippet}
+
 <style>
 	/* A lighter patch of the paper rather than a box: no frame and no line,
 	   brighter and edged in green while the field is being written in. */
@@ -630,7 +821,8 @@
 		gap: calc(12 * var(--u));
 	}
 
-	.date {
+	.date,
+	.amount {
 		flex: 1;
 		min-width: 0;
 		font-variant-numeric: lining-nums tabular-nums;
@@ -1014,6 +1206,23 @@
 
 	.remove:disabled {
 		color: var(--card-ink-muted);
+	}
+
+	/* A rare piece asking for its roll in the place of its row. */
+	.ask {
+		padding: calc(6 * var(--u)) calc(10 * var(--u));
+		background: var(--card-field);
+		border-radius: calc(6 * var(--u));
+	}
+
+	.ask .note {
+		margin: 0;
+	}
+
+	.ask-actions {
+		display: flex;
+		justify-content: space-between;
+		gap: calc(12 * var(--u));
 	}
 
 	/* Names a list within a section, set like the counters' labels. */

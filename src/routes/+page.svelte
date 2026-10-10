@@ -5,7 +5,13 @@
 	import { base } from '$app/paths';
 
 	import AftermathBack from '$lib/components/AftermathBack.svelte';
-	import CardBack, { type BackDismissal, type BackEquipment, type BackRenown } from '$lib/components/CardBack.svelte';
+	import CardBack, {
+		type BackDismissal,
+		type BackEquipment,
+		type BackPurchase,
+		type BackRenown,
+		type BackStash
+	} from '$lib/components/CardBack.svelte';
 	import Deck from '$lib/components/Deck.svelte';
 	import ImportPrompt from '$lib/components/ImportPrompt.svelte';
 	import MenuButton from '$lib/components/MenuButton.svelte';
@@ -31,7 +37,17 @@
 		adjustZeal,
 		zealOf
 	} from '$lib/battle';
-	import { applyDraft, dismiss, dismissCost, emptyPending, nameProblem, type EditDraft } from '$lib/edit';
+	import {
+		applyDraft,
+		dismiss,
+		dismissCost,
+		emptyPending,
+		fromTradingPost,
+		nameProblem,
+		purchase,
+		tradingPost,
+		type EditDraft
+	} from '$lib/edit';
 	import { explain } from '$lib/explanation';
 	import {
 		abilitiesFor,
@@ -45,7 +61,7 @@
 		weaponsOffered,
 		type RenownPick
 	} from '$lib/renown';
-	import { allows, gearOf, refuse, takesNothing } from '$lib/build/equipment';
+	import { allows, gearOf, offers, refuse, takesNothing } from '$lib/build/equipment';
 	import { fighterOf } from '$lib/build/roster';
 	import { ABILITIES, FIGHTERS, ITEMS, WEAPONS } from '$lib/gamedata';
 	import {
@@ -271,17 +287,56 @@
 				: !faction || !profile
 					? "This fighter is not in the app's own rules, so what it may carry cannot be checked."
 					: null;
-		if (blocked || !faction || !profile) return { blocked, takesNothing: null, carried: [], stash: [] };
+		if (blocked || !faction || !profile) {
+			return { blocked, takesNothing: null, carried: [], stash: [], bought: [], shop: [], left: 0 };
+		}
 		const rules = { ...profile, keywords: promoted(profile.keywords, fighter.renown).map((k) => k.toLowerCase()) };
-		/* Purchases still waiting to be confirmed fill hands as well, as in the
-		   builder – they just cannot be moved until they are bought. */
-		const held = [...fighter.equipment, ...instance.pendingEquipment];
+		/* What is bought here fills hands as well, and so does what a warband
+		   from the builder still has waiting to be confirmed – that just cannot
+		   be moved until it is bought. */
+		const held = [...fighter.equipment, ...fighter.bought, ...instance.pendingEquipment];
+		const costOf = (ids: string[]) => ids.reduce((sum, id) => sum + itemCost(id), 0);
+		const gold = cards[0]?.kind === 'warband' ? cards[0].gold : { remaining: 0, pending: 0 };
+		const left = gold.remaining - gold.pending - costOf(fighter.bought);
+		/* Priced the way the warband's value prices them, off the game data, and
+		   refused where the gold left does not reach. */
+		const priced = <T extends { id: string; refused: string | null }>(rows: T[]) =>
+			rows.map((row) => {
+				const cost = itemCost(row.id);
+				return { ...row, cost, refused: row.refused ?? (cost > left ? `Short by ${cost - left} gc` : null) };
+			});
+		const sold = offers(faction, rules, held);
+		const post = tradingPost(rules, held);
 		return {
 			blocked: null,
 			takesNothing: takesNothing(rules),
 			carried: fighter.equipment.map(nameOf),
-			stash: fighter.stash.map((id) => ({ name: nameOf(id), refused: refuse(faction, rules, held, id) }))
+			/* A Trading Post piece is no faction's to sell, so `refuse()` would turn
+			   it away from every fighter; the Trading Post answers for it. */
+			stash: fighter.stash.map((id) => ({
+				name: nameOf(id),
+				refused: fromTradingPost(id)
+					? ([...post.miscellaneous, ...post.singleUse].find((o) => o.id === id)?.refused ?? null)
+					: refuse(faction, rules, held, id)
+			})),
+			bought: fighter.bought.map((id) => ({ name: nameOf(id), cost: itemCost(id) })),
+			shop: [
+				{ heading: 'Melee weapons', rows: priced(sold.melee) },
+				{ heading: 'Ranged weapons', rows: priced(sold.ranged) },
+				{ heading: 'Armour', rows: priced(sold.armour) },
+				{ heading: 'Trading Post', rows: priced(post.miscellaneous) },
+				{ heading: 'Trading Post – single use', rows: priced(post.singleUse) }
+			],
+			left
 		};
+	});
+
+	/* The gold and the stash on the back of the warband card. */
+	const backStash = $derived.by((): BackStash | null => {
+		if (!active || editingId !== 'warband' || turned !== 'edit') return null;
+		const warbandCard = cards[0];
+		if (warbandCard?.kind !== 'warband') return null;
+		return { left: warbandCard.gold.remaining, items: active.warband.stash.map(nameOf) };
 	});
 
 	/* Whether and how the fighter on the back can be dismissed. The leader stays:
@@ -293,14 +348,15 @@
 		if (!instance || card?.kind !== 'fighter') return null;
 		const moved =
 			draft?.fighter &&
-			(draft.fighter.equipment.join() !== instance.equipment.join() ||
+			(draft.fighter.bought.length > 0 ||
+				draft.fighter.equipment.join() !== instance.equipment.join() ||
 				draft.fighter.stash.join() !== active.warband.stash.join());
 		const blocked = battle
 			? IN_BATTLE
 			: hasKeyword(card, 'LEADER')
 				? 'The leader stays: dismissing one means electing another, which this app does not do.'
 				: moved
-					? 'Equipment has been moved on this back – keep it with Done first.'
+					? 'Equipment has been moved or bought on this back – keep it with Done first.'
 					: null;
 		const ruleset = active.warband.factionId ? RULESETS.get(active.warband.factionId) : undefined;
 		const after = active.warband.fighters.length - 1;
@@ -314,6 +370,44 @@
 			belowMinimum: after < min ? `That leaves ${after} fighters, and ${ruleset?.name} field at least ${min}.` : null
 		};
 	});
+
+	/* What Purchase on the back of the warband card would pay for. */
+	const backPurchase = $derived.by((): BackPurchase | null => {
+		if (!active || editingId !== 'warband' || turned !== 'edit') return null;
+		const warbandCard = cards[0];
+		if (warbandCard?.kind !== 'warband') return null;
+		/* Only a warband from the builder has anything waiting: the app pays with Done. */
+		const lines = active.warband.fighters.flatMap((f) => {
+			const card = cards.find((c) => c.instanceId === f.instanceId);
+			const name = card?.name ?? f.customName;
+			if (f.isPending) return [{ name, items: ['recruited, with all they carry'] }];
+			return f.pendingEquipment.length ? [{ name, items: f.pendingEquipment.map(nameOf) }] : [];
+		});
+		if (!lines.length) return null;
+		const { remaining, pending } = warbandCard.gold;
+		const left = remaining - pending;
+		return {
+			lines,
+			cost: pending,
+			left,
+			blocked: battle ? IN_BATTLE : left < 0 ? `Short by ${-left} gc.` : null
+		};
+	});
+
+	/* Written at once rather than with Done, like a dismissal: the back stays
+	   open, and what Done writes there does not touch what was bought. */
+	async function confirmPurchase() {
+		if (!active || !backPurchase || backPurchase.blocked) return;
+		const cost = backPurchase.cost;
+		try {
+			await putWarband(purchase($state.snapshot(active)));
+		} catch {
+			notify('The purchase could not be saved.', 'error');
+			return;
+		}
+		await refresh();
+		notify(`Bought for ${cost} gc.`);
+	}
 
 	/* What the dismissal sheet says the gold does. */
 	const dischargeCost = $derived.by(() => {
@@ -496,6 +590,7 @@
 						renownFloor: Math.max(0, ...levels),
 						spent: [],
 						equipment: [...instance.equipment],
+						bought: [],
 						stash: [...active.warband.stash],
 						/* Their own names too: `nameProblem` refuses a talent's name another
 						   fighter already has, and reads nothing else. */
@@ -510,7 +605,8 @@
 			history: isWarband ? $state.snapshot(active.history ?? []) : null,
 			colour: isWarband ? (active.colour ?? null) : null,
 			removed: [],
-			pending: emptyPending()
+			pending: emptyPending(),
+			goldAdded: []
 		};
 		photoDraft = instance ? { photo: stored.get(id) ?? null, changed: false } : null;
 		turned = 'edit';
@@ -854,6 +950,9 @@
 					equipment={backEquipment}
 					dismissal={backDismissal}
 					ondismiss={(toStash) => (discharged = { instanceId: card.instanceId, name: card.name, toStash })}
+					purchase={backPurchase}
+					stash={backStash}
+					onpurchase={confirmPurchase}
 				/>
 			{/if}
 		{/snippet}
