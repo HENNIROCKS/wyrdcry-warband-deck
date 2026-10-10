@@ -56,7 +56,7 @@
       "hit": 4,
       "crit": 7,
       "rules": ["pierce-2", "two-handed"],
-      "cost": 0
+      "cost": 45
     },
     {
       "id": "chaos-forged-sword",
@@ -67,7 +67,7 @@
       "hit": 3,
       "crit": 4,
       "rules": ["parry"],
-      "cost": 0
+      "cost": 30
     }
   ],
   "items": []

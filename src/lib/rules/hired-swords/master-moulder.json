@@ -49,7 +49,7 @@
       "hit": 2,
       "crit": 3,
       "rules": ["whipcrack"],
-      "cost": 0
+      "cost": 20
     }
   ],
   "items": []
