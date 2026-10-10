@@ -30,7 +30,7 @@
 		</p>
 
 		{#if insecure}
-			<div class="warn">
+			<div class="notice warn">
 				<p>
 					<strong>Over <code>http://</code> this is not a PWA.</strong>
 					Layout, swiping and tap targets can be checked this way. What cannot:
@@ -45,7 +45,9 @@
 		{/if}
 	{/if}
 
-	<p class="back"><a href="{base}/">Back to the deck</a></p>
+	<div class="btn-stack">
+		<a class="btn" href="{base}/">Back to the deck</a>
+	</div>
 </main>
 
 <style>
@@ -98,27 +100,21 @@
 		color: var(--ui-text-muted);
 	}
 
-	.warn {
+	.notice {
 		max-width: 44ch;
 		margin-top: 4px;
-		padding: 12px 14px;
-		border-radius: 10px;
 		text-align: left;
-		background: var(--ui-warn-bg);
-		border: 1px solid rgba(180, 83, 9, 0.4);
-		font-size: var(--ui-t-base);
-		line-height: 1.5;
 	}
 
-	.warn p {
+	.notice p {
 		margin: 0 0 8px;
 	}
 
-	.warn p:last-child {
+	.notice p:last-child {
 		margin-bottom: 0;
 	}
 
-	.warn ul {
+	.notice ul {
 		margin: 0 0 8px;
 		padding-left: 18px;
 		/* Tailwind's preflight strips list markers. */
@@ -130,12 +126,7 @@
 		font-size: 0.92em;
 	}
 
-	.back {
-		margin: 4px 0 0;
-		font-size: var(--ui-t-base);
-	}
-
-	.back a {
-		color: var(--ui-text-muted);
+	.btn-stack {
+		margin-top: 4px;
 	}
 </style>

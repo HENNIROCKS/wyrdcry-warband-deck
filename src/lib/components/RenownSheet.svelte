@@ -119,13 +119,13 @@
 	}
 </script>
 
-<div class="backdrop">
-	<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="renown-title">
+<div class="sheet-backdrop">
+	<div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="renown-title">
 		<h2 id="renown-title">{name}</h2>
 		<p class="count">
 			Renown {level}{#if waiting > 0}{' '}· {waiting} more waiting{/if}
 		</p>
-		<p class="note">
+		<p class="notice">
 			{NOTES[branch]}
 		</p>
 
@@ -171,16 +171,16 @@
 			{/each}
 		</div>
 		{#if talents && !options.some((o) => o.blocked === null)}
-			<p class="note out">No characteristic can be raised – choose a heroic talent.</p>
+			<p class="notice out">No characteristic can be raised – choose a heroic talent.</p>
 		{/if}
 		{/if}
 
-		<div class="actions">
-			<button class="ghost" onclick={onclose}>Decide later</button>
+		<div class="sheet-actions">
+			<button class="btn" onclick={onclose}>Decide later</button>
 			{#if talking}
 				<!-- The talent picker has its own confirm button. -->
 			{:else if options.some((o) => o.blocked === null)}
-				<button disabled={!picked || busy} onclick={() => picked && confirm({ kind: 'stat', option: picked })}>
+				<button class="btn primary" disabled={!picked || busy} onclick={() => picked && confirm({ kind: 'stat', option: picked })}>
 					{#if picked}
 						Raise {LABELS[picked.characteristic]} to {figure(picked.characteristic, picked.to)}
 					{:else}
@@ -188,54 +188,20 @@
 					{/if}
 				</button>
 			{:else if !open}
-				<button disabled={busy} onclick={() => confirm(null)}>Use up this level</button>
+				<button class="btn primary" disabled={busy} onclick={() => confirm(null)}>Use up this level</button>
 			{/if}
 		</div>
 	</div>
 </div>
 
 <style>
-	.backdrop {
-		position: fixed;
-		inset: 0;
-		z-index: 20;
-		display: flex;
-		align-items: flex-end;
-		justify-content: center;
-		background: var(--ui-backdrop);
-		padding: 12px;
-		padding-bottom: calc(12px + env(safe-area-inset-bottom));
-	}
-
-	.sheet {
-		width: 100%;
-		max-width: 420px;
+	.bottom-sheet {
 		max-height: 80vh;
 		overflow-y: auto;
-		background: var(--ui-surface);
-		border: 1px solid var(--ui-border);
-		border-radius: 14px;
-		padding: 16px;
 	}
 
-	h2 {
-		margin: 0;
-		font-size: var(--ui-t-xl);
-	}
-
-	.count {
-		margin: 3px 0 12px;
-		font-size: var(--ui-t-base);
-		color: var(--ui-text-muted);
-	}
-
-	.note {
-		margin: 0 0 12px;
-		padding: 10px 12px;
-		border-radius: 10px;
-		font-size: var(--ui-t-sm);
-		color: var(--ui-text-muted);
-		background: var(--ui-surface-2);
+	.notice {
+		margin-bottom: 12px;
 	}
 
 	.out {
@@ -256,7 +222,7 @@
 		min-height: 44px;
 		padding: 10px 12px;
 		border: 1px solid var(--ui-border);
-		border-radius: 10px;
+		border-radius: var(--ui-radius);
 		font-size: var(--ui-t-md);
 		text-align: left;
 		background: var(--ui-surface-2);
@@ -313,33 +279,6 @@
 
 	.tabs button.on {
 		border-bottom-color: var(--ui-accent-text, var(--ui-accent));
-		color: var(--ui-text);
-	}
-
-	.actions {
-		display: flex;
-		gap: 8px;
-		margin-top: 14px;
-	}
-
-	.actions button {
-		flex: 1;
-		padding: 12px;
-		border: 0;
-		border-radius: 10px;
-		font-size: var(--ui-t-lg);
-		font-weight: 600;
-		background: var(--ui-accent);
-		color: #fff;
-	}
-
-	.actions button:disabled {
-		color: var(--ui-text-muted);
-		background: var(--ui-surface);
-	}
-
-	.actions .ghost {
-		background: var(--ui-surface-2);
 		color: var(--ui-text);
 	}
 </style>

@@ -92,7 +92,7 @@
 		min-width: 180px;
 		padding: 5px;
 		border: 1px solid var(--ui-border);
-		border-radius: 11px;
+		border-radius: var(--ui-radius);
 		background: var(--ui-surface);
 		color: var(--ui-text);
 		box-shadow: 0 12px 28px var(--ui-shadow);
@@ -109,7 +109,7 @@
 		width: 100%;
 		padding: 10px 11px;
 		border: 0;
-		border-radius: 7px;
+		border-radius: 4px;
 		background: none;
 		font-size: var(--ui-t-md);
 		font-weight: 600;

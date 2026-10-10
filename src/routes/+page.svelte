@@ -695,7 +695,7 @@
 <header class="bar" class:locked={editingId !== null} inert={editingId !== null} bind:offsetHeight={headerHeight}>
 	<div class="identity">
 		{#if warbands.length > 1}
-			<select bind:value={activeId} aria-label="Choose warband">
+			<select class="field-input" bind:value={activeId} aria-label="Choose warband">
 				{#each warbands as entry (entry.warband.id)}
 					<option value={entry.warband.id}>{entry.warband.name}</option>
 				{/each}
@@ -864,8 +864,10 @@
 			Build one here step by step, or export it from the Warband Builder as JSON
 			and import that. Either way the data stays on this device.
 		</p>
-		<a class="go" href="{base}/build">Build a warband</a>
-		<button onclick={() => fileInput?.click()}>Import a file</button>
+		<div class="btn-stack">
+			<a class="btn primary" href="{base}/build">Build a warband</a>
+			<button class="btn" onclick={() => fileInput?.click()}>Import a file</button>
+		</div>
 	</div>
 {/if}
 
@@ -892,29 +894,29 @@
 {/if}
 
 {#if condemned}
-	<div class="backdrop">
-		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+	<div class="sheet-backdrop">
+		<div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="delete-title">
 			<h2 id="delete-title">Delete {condemned.warband.name}?</h2>
 			<p class="count">
 				{condemned.warband.fighters.length} fighters · Revision {condemned.revision}
 			</p>
-			<p class="note danger">
+			<p class="notice danger">
 				<strong>This cannot be undone.</strong> The warband and the battle it is in the
 				middle of are on this device only. Export it first if the campaign is to be kept –
 				the photos of its fighters are not part of the export.
 			</p>
-			<div class="actions">
-				<button class="ghost" onclick={() => (condemned = null)}>Cancel</button>
-				<button class="ghost" onclick={exportCondemned}>Export</button>
-				<button class="danger" onclick={confirmDelete}>Delete</button>
+			<div class="sheet-actions">
+				<button class="btn" onclick={() => (condemned = null)}>Cancel</button>
+				<button class="btn" onclick={exportCondemned}>Export</button>
+				<button class="btn danger" onclick={confirmDelete}>Delete</button>
 			</div>
 		</div>
 	</div>
 {/if}
 
 {#if discharged && dischargeCost}
-	<div class="backdrop">
-		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dismiss-title">
+	<div class="sheet-backdrop">
+		<div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="dismiss-title">
 			<h2 id="dismiss-title">Dismiss {discharged.name}?</h2>
 			<p class="count">
 				{#if dischargeCost.stash.length}{dischargeCost.stash.join(', ')} to the stash ·{' '}{/if}
@@ -924,30 +926,30 @@
 					{dischargeCost.value} gc leave the warband's value · Gold left stays {dischargeCost.remaining}
 				{/if}
 			</p>
-			<p class="note danger">
+			<p class="notice danger">
 				<strong>This cannot be undone.</strong> The fighter leaves the warband with
 				everything not sent to the stash, its experience, renown, notes and fluff.
 			</p>
-			<div class="actions">
-				<button class="ghost" onclick={() => (discharged = null)}>Keep</button>
-				<button class="danger" onclick={confirmDismiss}>Dismiss</button>
+			<div class="sheet-actions">
+				<button class="btn" onclick={() => (discharged = null)}>Keep</button>
+				<button class="btn danger" onclick={confirmDismiss}>Dismiss</button>
 			</div>
 		</div>
 	</div>
 {/if}
 
 {#if abandoning && battle}
-	<div class="backdrop">
-		<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="abandon-title">
+	<div class="sheet-backdrop">
+		<div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="abandon-title">
 			<h2 id="abandon-title">Cancel the battle?</h2>
 			<p class="count">Round {battle.round}{#if out > 0}{' '}· {fighterCount(out)} out of action{/if}</p>
-			<p class="note danger">
+			<p class="notice danger">
 				<strong>This cannot be undone.</strong> Wounds, activations and who is out of
 				action are dropped, and nobody earns experience.
 			</p>
-			<div class="actions">
-				<button class="ghost" onclick={() => (abandoning = false)}>Keep playing</button>
-				<button class="danger" onclick={cancelBattle}>Cancel battle</button>
+			<div class="sheet-actions">
+				<button class="btn" onclick={() => (abandoning = false)}>Keep playing</button>
+				<button class="btn danger" onclick={cancelBattle}>Cancel battle</button>
 			</div>
 		</div>
 	</div>
@@ -985,13 +987,6 @@
 
 	select {
 		max-width: 100%;
-		background: var(--ui-surface);
-		color: var(--ui-text);
-		border: 1px solid var(--ui-field-border);
-		border-radius: 8px;
-		padding: 5px 8px;
-		font-size: var(--ui-t-lg);
-		font-weight: 600;
 	}
 
 	.tools {
@@ -1096,97 +1091,7 @@
 		color: var(--ui-text-muted);
 	}
 
-	.empty .go {
+	.empty .btn-stack {
 		margin-top: 6px;
-		padding: 12px 20px;
-		border-radius: 10px;
-		background: var(--ui-accent);
-		color: #fff;
-		font-size: var(--ui-t-lg);
-		font-weight: 600;
-	}
-
-	.empty button {
-		padding: 10px 18px;
-		font-size: var(--ui-t-md);
-		color: var(--ui-text);
-		background: var(--ui-surface);
-		border: 1px solid var(--ui-border);
-		border-radius: 10px;
-	}
-
-	/* The same sheet the import asks from, because both are a question about a
-	   warband that is about to be overwritten or lost. */
-	.backdrop {
-		position: fixed;
-		inset: 0;
-		z-index: 20;
-		display: flex;
-		align-items: flex-end;
-		justify-content: center;
-		background: var(--ui-backdrop);
-		padding: 12px;
-		padding-bottom: calc(12px + env(safe-area-inset-bottom));
-	}
-
-	.sheet {
-		width: 100%;
-		max-width: 420px;
-		padding: 16px;
-		background: var(--ui-surface);
-		border: 1px solid var(--ui-border);
-		border-radius: 14px;
-	}
-
-	.sheet h2 {
-		margin: 0;
-		font-size: var(--ui-t-xl);
-		overflow-wrap: anywhere;
-	}
-
-	.count {
-		margin: 3px 0 12px;
-		font-size: var(--ui-t-base);
-		color: var(--ui-text-muted);
-	}
-
-	.note {
-		margin: 0;
-		padding: 10px 12px;
-		font-size: var(--ui-t-md);
-		line-height: 1.45;
-		border-radius: 10px;
-		background: var(--ui-surface-2);
-	}
-
-	.note.danger {
-		background: var(--ui-danger-bg);
-		color: var(--ui-danger-text);
-	}
-
-	.actions {
-		display: flex;
-		gap: 8px;
-		margin-top: 14px;
-	}
-
-	.actions button {
-		flex: 1;
-		padding: 12px;
-		font-size: var(--ui-t-lg);
-		font-weight: 600;
-		color: #fff;
-		background: var(--ui-accent);
-		border: 0;
-		border-radius: 10px;
-	}
-
-	.actions .ghost {
-		color: var(--ui-text);
-		background: var(--ui-surface-2);
-	}
-
-	.actions .danger {
-		background: var(--ui-danger);
 	}
 </style>

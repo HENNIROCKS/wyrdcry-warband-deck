@@ -88,8 +88,8 @@
 		<!-- While a card is turned over the bar only finishes the edit: a state
 		     changed now would land on a card whose front is not in view. -->
 		<div class="finish">
-			<button class="ghost" onclick={() => oncancel?.()}>Cancel</button>
-			<button onclick={() => ondone?.()}>{doneLabel}</button>
+			<button class="btn" onclick={() => oncancel?.()}>Cancel</button>
+			<button class="btn primary" onclick={() => ondone?.()}>{doneLabel}</button>
 		</div>
 	{:else if state}
 		<div class="wounds">
@@ -247,7 +247,7 @@
 		height: 44px;
 		padding: 0;
 		border: 1px solid var(--ui-border);
-		border-radius: 10px;
+		border-radius: var(--ui-radius);
 		background: var(--ui-surface);
 		color: var(--ui-text);
 		font-size: var(--ui-t-2xl);
@@ -326,19 +326,7 @@
 		width: 100%;
 	}
 
-	.finish button {
+	.finish .btn {
 		flex: 1;
-		height: 44px;
-		border: 0;
-		border-radius: 10px;
-		font-size: var(--ui-t-lg);
-		font-weight: 600;
-		background: var(--ui-accent);
-		color: #fff;
-	}
-
-	.finish .ghost {
-		background: var(--ui-surface-2);
-		color: var(--ui-text);
 	}
 </style>

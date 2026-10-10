@@ -157,8 +157,8 @@
 
 	<div class="body">
 		<label class="named">
-			<span>Name</span>
-			<input bind:value={entry.name} placeholder={fighter.name} maxlength="28" />
+			<span class="field-label">Name <span class="aside">{entry.name.length}/28</span></span>
+			<input class="field-input" bind:value={entry.name} placeholder={fighter.name} maxlength="28" />
 		</label>
 
 		<p class="profile">
@@ -171,7 +171,7 @@
 
 		{#if carries.length}
 			<section>
-				<h3>Abilities</h3>
+				<h3 class="field-label">Abilities</h3>
 				<ul class="abilities">
 					{#each carries as own (own.id)}
 						<li>
@@ -185,7 +185,7 @@
 
 		{#if choice}
 			<section class="choice" class:needs={missing}>
-				<h3>{ability?.name ?? 'Choose'}</h3>
+				<h3 class="field-label">{ability?.name ?? 'Choose'}</h3>
 				<p class="hint">{ability?.text ?? choice.prompt}</p>
 				{#if choice.kind === 'stat'}
 					<div class="chips" bind:this={chips}>
@@ -237,7 +237,7 @@
 		{/if}
 
 		<section>
-			<h3>Carried</h3>
+			<h3 class="field-label">Carried</h3>
 			{#if brought.length || entry.equipment.length}
 				<ul class="carried">
 					<!-- What the fighter was recruited with stands first and has no way off:
@@ -268,24 +268,24 @@
 			     lists nobody reads. The reason is said once, where the lists would
 			     have been, so the empty section is not a puzzle. -->
 			<section>
-				<h3>Equipment</h3>
+				<h3 class="field-label">Equipment</h3>
 				<p class="hint">A BEAST fights with what is on its profile.</p>
 			</section>
 		{:else if thrall}
 			<section>
-				<h3>Equipment</h3>
+				<h3 class="field-label">Equipment</h3>
 				<p class="hint">A THRALL cannot be given weapons, armour or equipment.</p>
 			</section>
 		{:else if ascended}
 			<section>
-				<h3>Equipment</h3>
+				<h3 class="field-label">Equipment</h3>
 				<p class="hint">An Ascended fighter refuses weapons, armour and equipment.</p>
 			</section>
 		{:else}
 			{#each [['Melee', groups.melee], ['Ranged', groups.ranged], ['Armour', groups.armour]] as const as [title, list] (title)}
 				{#if list.length}
 					<section>
-						<h3>{title}</h3>
+						<h3 class="field-label">{title}</h3>
 						<ul class="offers">
 							{#each list as offer (offer.id)}
 								<li>
@@ -302,11 +302,11 @@
 			{/each}
 		{/if}
 
-		<button class="remove" onclick={onremove}>Dismiss this fighter</button>
+		<button class="btn remove" onclick={onremove}>Dismiss this fighter</button>
 	</div>
 
 	<nav class="foot">
-		<button class="done" disabled={missing} onclick={onclose}>
+		<button class="btn primary" disabled={missing} onclick={onclose}>
 			{missing ? 'Choose first' : 'Done'}
 		</button>
 	</nav>
@@ -376,21 +376,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
-		font-size: var(--ui-t-sm);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--ui-text-subtle);
-	}
-
-	input {
-		padding: 11px 12px;
-		font-size: var(--ui-t-md);
-		letter-spacing: normal;
-		text-transform: none;
-		color: var(--ui-text);
-		background: var(--ui-surface);
-		border: 1px solid var(--ui-field-border);
-		border-radius: 9px;
 	}
 
 	.profile {
@@ -406,7 +391,7 @@
 		font-variant-numeric: tabular-nums;
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
-		border-radius: 7px;
+		border-radius: var(--ui-radius);
 	}
 
 	.profile .raised {
@@ -419,15 +404,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
-	}
-
-	h3 {
-		margin: 0;
-		font-size: var(--ui-t-sm);
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--ui-text-subtle);
 	}
 
 	.hint {
@@ -450,7 +426,7 @@
 		color: var(--ui-text);
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
-		border-radius: 9px;
+		border-radius: var(--ui-radius);
 	}
 
 	.chip.on {
@@ -472,7 +448,7 @@
 		color: var(--ui-accent-text);
 		background: var(--ui-accent-bg);
 		border: 1px solid var(--ui-accent);
-		border-radius: 9px;
+		border-radius: var(--ui-radius);
 	}
 
 	/* An option that carries a paragraph: the name on its own line, the sentence
@@ -487,7 +463,7 @@
 		color: var(--ui-text);
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
-		border-radius: 9px;
+		border-radius: var(--ui-radius);
 	}
 
 	.options button.on {
@@ -521,7 +497,7 @@
 		padding: 10px 12px;
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
-		border-radius: 9px;
+		border-radius: var(--ui-radius);
 	}
 
 	ul {
@@ -541,7 +517,7 @@
 		font-size: var(--ui-t-lg);
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
-		border-radius: 9px;
+		border-radius: var(--ui-radius);
 	}
 
 	.carried li span {
@@ -574,7 +550,7 @@
 		color: var(--ui-text);
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
-		border-radius: 9px;
+		border-radius: var(--ui-radius);
 	}
 
 	.offers button:disabled {
@@ -617,7 +593,7 @@
 		margin: -10px -12px;
 		background: var(--ui-warn-bg);
 		border: 1px solid var(--ui-warn);
-		border-radius: 10px;
+		border-radius: var(--ui-radius);
 	}
 
 	.open {
@@ -635,29 +611,12 @@
 		border-top: 1px solid var(--ui-border);
 	}
 
-	.done {
+	.foot .btn {
 		flex: 1;
-		padding: 13px;
-		font-size: var(--ui-t-lg);
-		font-weight: 600;
-		color: #fff;
-		background: var(--ui-accent);
-		border: 0;
-		border-radius: 10px;
-	}
-
-	.done:disabled {
-		color: var(--ui-text-muted);
-		background: var(--ui-surface);
 	}
 
 	.remove {
 		margin-top: 6px;
-		padding: 12px;
-		font-size: var(--ui-t-md);
 		color: var(--ui-text-muted);
-		background: none;
-		border: 1px solid var(--ui-border);
-		border-radius: 9px;
 	}
 </style>

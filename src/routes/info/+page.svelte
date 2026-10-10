@@ -71,8 +71,9 @@
 		</p>
 		<!-- Said on the page rather than only in the README: whoever builds a
 		     warband here is about to rely on it, and the way back is the thing they
-		     cannot find out by trying it once. -->
-		<p class="notice">
+		     cannot find out by trying it once. Marked as a warning where it stands
+		     rather than left to read as a third paragraph. -->
+		<p class="notice warn">
 			<strong>The way back to the Warband Builder is not currently assured.</strong>
 			Warbands built here carry factions and corrections the builder's own data
 			does not have. Keep a copy through Export or Snapshot.
@@ -131,16 +132,16 @@
 	<section>
 		<h2>Links</h2>
 		<ul class="links">
-			<li><a href="https://wyrdcry.net">Wyrdcry – rules and Warband Builder</a></li>
-			<li><a href="https://wyrdcry.net/docs/next/">The 0.9 draft rules this app follows</a></li>
-			<li><a href="{REPO}/issues">Feedback and bug reports</a></li>
-			<li><a href={REPO}>Source code</a></li>
-			<li><a href="{REPO}/blob/main/ROADMAP.md">What is planned</a></li>
+			<li><a class="btn" href="https://wyrdcry.net">Wyrdcry – rules and Warband Builder</a></li>
+			<li><a class="btn" href="https://wyrdcry.net/docs/next/">The 0.9 draft rules this app follows</a></li>
+			<li><a class="btn" href="{REPO}/issues">Feedback and bug reports</a></li>
+			<li><a class="btn" href={REPO}>Source code</a></li>
+			<li><a class="btn" href="{REPO}/blob/main/ROADMAP.md">What is planned</a></li>
 		</ul>
 	</section>
 
 	<footer>
-		<p class="back"><a href="{base}/">Back to the deck</a></p>
+		<a class="btn" href="{base}/">Back to the deck</a>
 	</footer>
 </main>
 
@@ -194,16 +195,6 @@
 		color: var(--ui-text-muted);
 	}
 
-	/* The one thing on this page that could cost someone their work, so it is
-	   marked where it stands rather than left to read as a third paragraph. */
-	.notice {
-		padding: 10px 12px;
-		font-size: var(--ui-t-base);
-		background: var(--ui-warn-bg);
-		border: 1px solid var(--ui-warn);
-		border-radius: 9px;
-	}
-
 	ul {
 		margin: 0;
 		padding-left: 18px;
@@ -230,28 +221,10 @@
 		margin-top: 0;
 	}
 
-	/* The surface and border of the header's icon buttons, so a link that acts
-	   like a button looks like the ones already on screen. */
-	.links a,
-	.back a {
-		display: block;
-		padding: 11px 13px;
-		border: 1px solid var(--ui-border);
-		border-radius: 9px;
-		background: var(--ui-surface);
-		text-decoration: none;
-	}
-
-	.links a {
-		color: var(--ui-accent-text);
-		text-align: center;
-	}
-
-	.links a:hover,
-	.back a:hover,
-	.links a:focus-visible,
-	.back a:focus-visible {
-		background: var(--ui-surface-2);
+	/* One width for every way off the page, the way back included. */
+	.links .btn,
+	footer .btn {
+		width: 100%;
 	}
 
 	/* Rules, not boxes: the links below are the buttons on this page, and two
@@ -322,16 +295,5 @@
 	   of – the way back is not a fifth destination. */
 	footer {
 		margin-top: 14px;
-	}
-
-	.back {
-		font-size: var(--ui-t-base);
-	}
-
-	/* The way back, not a destination of its own – same shape as the links
-	   above, without their colour. */
-	.back a {
-		color: var(--ui-text-muted);
-		text-align: center;
 	}
 </style>

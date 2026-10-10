@@ -163,12 +163,13 @@
 		--p-bg: var(--ui-surface-2);
 		--p-border: var(--ui-border);
 		--p-field-border: var(--ui-field-border);
+		--p-field-bg: var(--ui-surface);
 		--p-accent: var(--ui-accent-text, var(--ui-accent));
-		--p-action: var(--ui-accent);
+		--p-action: var(--ui-action);
 		--p-on-action: #fff;
 		--p-ink: var(--ui-text);
 		--p-muted: var(--ui-text-muted);
-		--p-radius: 10px;
+		--p-radius: var(--ui-radius);
 		--p-box: 10px;
 		--p-size: var(--ui-t-md);
 		--p-small: var(--ui-t-sm);
@@ -176,6 +177,7 @@
 
 	.picker.in-card {
 		--p-bg: var(--card-field);
+		--p-field-bg: var(--card-field);
 		--p-box: calc(24 * var(--u));
 		--p-border: var(--card-green);
 		--p-accent: var(--card-green);
@@ -312,10 +314,22 @@
 		padding: 6px 14px;
 		border: 1px solid var(--p-field-border);
 		border-radius: var(--p-radius);
-		background: var(--p-bg);
+		background: var(--p-field-bg);
 		color: var(--p-ink);
 		font: inherit;
 		font-size: max(16px, var(--p-size));
+	}
+
+	/* The interface's own field, as .field-input has it. */
+	.in-sheet .field input {
+		min-height: 0;
+		padding: 6px 10px;
+		line-height: 1.45;
+	}
+
+	.in-sheet .field input:focus {
+		outline: none;
+		border-color: var(--ui-accent);
 	}
 
 	.confirm {

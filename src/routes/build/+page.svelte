@@ -30,10 +30,10 @@
 	type Step = 'warband' | 'name' | 'roster' | 'finish';
 
 	const STEPS: { id: Step; title: string }[] = [
-		{ id: 'warband', title: 'Warband' },
-		{ id: 'name', title: 'Name' },
-		{ id: 'roster', title: 'Fighters' },
-		{ id: 'finish', title: 'Finish' }
+		{ id: 'warband', title: 'Select a faction' },
+		{ id: 'name', title: 'Name your warband' },
+		{ id: 'roster', title: 'Recruit fighters' },
+		{ id: 'finish', title: 'Check and create' }
 	];
 
 	const factions = [...FACTIONS.values()];
@@ -267,12 +267,12 @@
 </script>
 
 <header class="bar">
-	<a class="icon-button" href="{base}/" aria-label="Leave the builder">
-		<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-			<path d="M6 6l12 12M18 6L6 18" />
+	<a class="leave" href="{base}/" aria-label="Leave the builder">
+		<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M19 12H5M11 18l-6-6 6-6" />
 		</svg>
 	</a>
-	<h1>{STEPS[index]?.title}</h1>
+	<h1>Build a warband</h1>
 	<span class="gold" class:over={left < 0}>{left} gc</span>
 </header>
 
@@ -283,11 +283,13 @@
 </ol>
 
 <div class="body">
+	<h2 class="step">{index + 1}. {STEPS[index]?.title}</h2>
 	{#if step === 'warband' && faction}
 		<section>
-			<h2>Faction</h2>
+			<label class="field-label" for="faction">Faction <span class="aside">(select)</span></label>
 			<select
-				class="faction-select"
+				id="faction"
+				class="field-input"
 				value={draft.factionId}
 				onchange={(event) => {
 					draft.factionId = event.currentTarget.value;
@@ -307,40 +309,45 @@
 			</select>
 		</section>
 
-		{#each faction.rules as rule (rule.id)}
+		{#if faction.rules.length}
 			<section>
-				<h2>{rule.name}</h2>
-				<p class="hint rule"><RuleText text={ruleText(rule)} /></p>
-				{#if rule.pick !== null}
-					{@const picked = (draft.ruleChoices[rule.id] ?? []).length}
-					<p class="count" class:open={picked !== rule.pick}>
-						{picked} of {rule.pick} chosen
-					</p>
-					<ul class="options">
-						{#each rule.options as option (option.id)}
-							{@const on = (draft.ruleChoices[rule.id] ?? []).includes(option.id)}
-							<li>
-								<button
-									class:on
-									aria-pressed={on}
-									onclick={() => toggleRule(rule.id, option.id, rule.pick ?? 1)}
-								>
-									<span class="name">{option.name}</span>
-									<span class="text">{option.text}</span>
-									{#if option.phase !== 'recruitment'}
-										<span class="phase">{option.phase}</span>
-									{/if}
-								</button>
-							</li>
-						{/each}
-					</ul>
-				{/if}
+				<h3 class="field-label">Faction rules</h3>
+				{#each faction.rules as rule (rule.id)}
+					<article class="faction-rule">
+						<h4>{rule.name}</h4>
+						<p class="hint rule"><RuleText text={ruleText(rule)} /></p>
+						{#if rule.pick !== null}
+							{@const picked = (draft.ruleChoices[rule.id] ?? []).length}
+							<p class="count" class:open={picked !== rule.pick}>
+								{picked} of {rule.pick} chosen
+							</p>
+							<ul class="options">
+								{#each rule.options as option (option.id)}
+									{@const on = (draft.ruleChoices[rule.id] ?? []).includes(option.id)}
+									<li>
+										<button
+											class:on
+											aria-pressed={on}
+											onclick={() => toggleRule(rule.id, option.id, rule.pick ?? 1)}
+										>
+											<span class="name">{option.name}</span>
+											<span class="text">{option.text}</span>
+											{#if option.phase !== 'recruitment'}
+												<span class="phase">{option.phase}</span>
+											{/if}
+										</button>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</article>
+				{/each}
 			</section>
-		{/each}
+		{/if}
 	{:else if step === 'name'}
 		<label class="named" class:missing={!named}>
-			<span>Name</span>
-			<input
+			<span class="field-label">Name <span class="aside">{draft.name.length}/40</span></span>
+			<input class="field-input"
 				bind:value={draft.name}
 				placeholder="The Ostermark Free Company"
 				maxlength="40"
@@ -350,14 +357,14 @@
 			{#if !named}
 				<!-- The wording comes from `problems`, so the field and the finish step
 				     cannot say it differently. -->
-				<p class="open" id="name-open">{nameProblem}</p>
+				<p class="notice warn" id="name-open">{nameProblem}</p>
 			{/if}
 		</label>
 	{:else if step === 'roster' && faction}
 		<section>
-			<h2>Recruited · {draft.fighters.length} of {faction.warband_size.max}</h2>
+			<h3 class="field-label">Recruited · {draft.fighters.length} of {faction.warband_size.max}</h3>
 			{#each rosterProblems as problem, at (`${problem.step}-${at}`)}
-				<p class="open">{problem.text}</p>
+				<p class="notice warn">{problem.text}</p>
 			{/each}
 			{#if draft.fighters.length}
 				<ul class="recruited">
@@ -381,7 +388,7 @@
 		</section>
 
 		<section>
-			<h2>Recruit</h2>
+			<h3 class="field-label">Recruit</h3>
 			<ul class="options">
 				{#each roster as row (row.fighter.id)}
 					<li>
@@ -402,7 +409,7 @@
 		</section>
 	{:else if step === 'finish' && faction}
 		<section>
-			<h2>{draft.name || 'Unnamed'}</h2>
+			<h3 class="field-label">{draft.name || 'Unnamed'}</h3>
 			<p class="hint">
 				{faction.name} · {draft.fighters.length} fighters · {spent} gc of {budget()} spent,
 				{left} gc left over as the warband's treasury.
@@ -411,10 +418,10 @@
 
 		<section>
 			<label class="named">
-				<span>Favour</span>
-				<input type="number" min="0" max="999" bind:value={draft.favour} />
+				<span class="field-label">Favour</span>
+				<input class="field-input" type="number" min="0" max="999" bind:value={draft.favour} />
 			</label>
-			<p class="hint">
+			<p class="field-hint">
 				Standing {favourTier?.label ?? '—'}, worth {favourTier?.income ?? 0} gc of income in
 				the aftermath. A warband that has not fought yet carries none, so 0 is the usual
 				answer.
@@ -422,7 +429,7 @@
 		</section>
 
 		<section>
-			<h2>Rules in play</h2>
+			<h3 class="field-label">Rules in play</h3>
 			<ul class="plain">
 				{#each inPlay as { rule, option } (option ?? rule.id)}
 					<li>
@@ -435,7 +442,7 @@
 		</section>
 
 		<section>
-			<h2>The warband</h2>
+			<h3 class="field-label">The warband</h3>
 			<ul class="plain">
 				{#each draft.fighters as entry (entry.key)}
 					<li>{nameOf(entry)} · {costOf(entry)} gc</li>
@@ -445,28 +452,28 @@
 	{/if}
 
 	{#if failed}
-		<p class="open">{failed}</p>
+		<p class="notice warn">{failed}</p>
 	{/if}
 
 	{#if step === 'finish' && found.length}
 		<section>
-			<h2>Still open</h2>
+			<h3 class="field-label">Still open</h3>
 			{#each found as problem, at (`${problem.step}-${problem.key ?? at}`)}
-				<p class="open">{problem.text}</p>
+				<p class="notice warn">{problem.text}</p>
 			{/each}
 		</section>
 	{/if}
 </div>
 
 <nav class="foot">
-	<button class="ghost" disabled={index === 0} onclick={back}>Back</button>
+	<button class="btn" disabled={index === 0} onclick={back}>Back</button>
 	{#if step === 'finish'}
-		<button class="go" disabled={found.length > 0 || saving} onclick={finish}>
+		<button class="btn primary" disabled={found.length > 0 || saving} onclick={finish}>
 			{saving ? 'Saving…' : 'Create the deck'}
 		</button>
 	{:else}
 		<button
-			class="go"
+			class="btn primary"
 			disabled={here.length > 0}
 			onclick={() => goStep(STEPS[Math.min(index + 1, STEPS.length - 1)].id)}
 		>
@@ -496,14 +503,17 @@
 		background: var(--ui-header-bg);
 	}
 
+	/* The Card Creator's editor title. */
 	h1 {
 		flex: 1;
 		margin: 0;
-		font-size: var(--ui-t-xl);
-		font-weight: 600;
+		font-size: var(--ui-t-sm);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
 	}
 
-	.icon-button {
+	.leave {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -553,63 +563,55 @@
 		padding: 16px 12px 24px;
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 40px;
+	}
+
+	.step {
+		margin: 0;
+		font-size: var(--ui-t-xl);
+		font-weight: 600;
 	}
 
 	section {
 		display: flex;
 		flex-direction: column;
+		gap: 6px;
+	}
+
+	/* Each rule set off on a surface of its own, so where one ends and the next
+	   begins does not rest on a heading alone. */
+	.faction-rule {
+		display: flex;
+		flex-direction: column;
 		gap: 8px;
-	}
-
-	h2 {
-		margin: 0;
-		font-size: var(--ui-t-sm);
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--ui-text-subtle);
-	}
-
-	.faction-select {
-		padding: 11px 12px;
-		font-size: var(--ui-t-md);
-		color: var(--ui-text);
+		padding: 12px;
 		background: var(--ui-surface);
-		border: 1px solid var(--ui-field-border);
-		border-radius: 9px;
+		border-radius: var(--ui-radius);
 	}
+
+	.faction-rule h4 {
+		margin: 0;
+		font-size: var(--ui-t-md);
+		font-weight: 700;
+	}
+
+	/* A step up from the panel, the way the rows of the renown sheet sit on it. */
+	.faction-rule .options button:not(.on) {
+		background: var(--ui-surface-2);
+	}
+
+
 
 	.named {
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
-		font-size: var(--ui-t-sm);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--ui-text-subtle);
-	}
-
-	input {
-		padding: 11px 12px;
-		font-size: var(--ui-t-md);
-		letter-spacing: normal;
-		text-transform: none;
-		color: var(--ui-text);
-		background: var(--ui-surface);
-		border: 1px solid var(--ui-field-border);
-		border-radius: 9px;
 	}
 
 	/* The border carries it as well as the message, so the state survives the
 	   message being read and ignored. */
 	.named.missing input {
 		border-color: var(--ui-warn);
-	}
-
-	.named .open {
-		text-transform: none;
-		letter-spacing: normal;
 	}
 
 	.hint,
@@ -642,7 +644,7 @@
 		color: var(--ui-text);
 		background: var(--ui-warn-bg);
 		border: 1px solid var(--ui-warn);
-		border-radius: 8px;
+		border-radius: var(--ui-radius);
 	}
 
 	.count.open {
@@ -680,7 +682,7 @@
 		color: var(--ui-text);
 		background: var(--ui-surface);
 		border: 1px solid var(--ui-border);
-		border-radius: 10px;
+		border-radius: var(--ui-radius);
 	}
 
 	button.on {
@@ -751,31 +753,8 @@
 		border-top: 1px solid var(--ui-border);
 	}
 
-	.foot button {
-		flex: 1;
-		padding: 13px;
-		font-size: var(--ui-t-lg);
-		font-weight: 600;
-		border: 0;
-		border-radius: 10px;
-	}
-
-	.ghost {
-		flex: none;
-		padding-inline: 20px;
-		color: var(--ui-text);
-		background: var(--ui-surface);
-	}
-
-	.go {
-		color: #fff;
-		background: var(--ui-accent);
-	}
-
-	.foot button:disabled {
-		/* A disabled control is outside 1.4.3, but this one is the whole signal of
-		   a step: 5.8:1 rather than the subtle grey's 3.1:1. */
-		color: var(--ui-text-muted);
-		background: var(--ui-surface);
+	/* Back and on are of one width, whatever their labels say. */
+	.foot .btn {
+		flex: 1 1 0;
 	}
 </style>
