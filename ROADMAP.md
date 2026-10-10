@@ -38,6 +38,7 @@
 - [x] 🎨 Light and dark mode, together with going over the design outside the cards
 - [x] 📈 The rest of the aftermath: favour, income, recalculated reputation
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
+- [ ] 🛠️ Recruit new fighters into a warband after the build, between battles
 - [ ] 📈 Heroic traits: Magical Affinity teaches a further magical ability
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
