@@ -2,7 +2,7 @@
   "id": "goblin-shaman",
   "name": "Goblin Shaman",
   "origin": "homebrew",
-  "version": "0.1",
+  "version": "0.3",
   "author": "Hendrik Berends",
   "cost": 50,
   "limit": { "min": 0, "max": 1 },
@@ -12,7 +12,7 @@
     "move": 5,
     "fight": 2,
     "shoot": 3,
-    "defense": 3,
+    "defense": 0,
     "health": 10,
     "bravery": 6
   },

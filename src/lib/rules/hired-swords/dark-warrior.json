@@ -2,7 +2,7 @@
   "id": "dark-warrior",
   "name": "Dark Warrior",
   "origin": "homebrew",
-  "version": "0.1",
+  "version": "0.3",
   "author": "Hendrik Berends",
   "cost": 120,
   "limit": { "min": 0, "max": 1 },
@@ -19,7 +19,7 @@
     "move": 5,
     "fight": 6,
     "shoot": 3,
-    "defense": 6,
+    "defense": 3,
     "health": 18,
     "bravery": 3
   },
@@ -31,7 +31,7 @@
       "id": "chaos-armour",
       "name": "Chaos Armour",
       "type": "trait",
-      "text": "The Defense characteristic of this fighter can never be reduced."
+      "text": "The Armour characteristic of this fighter can never be reduced."
     },
     {
       "id": "heart-of-the-warrior",
@@ -55,7 +55,7 @@
       "attacks": 2,
       "hit": 4,
       "crit": 7,
-      "rules": ["mighty-2", "two-handed"],
+      "rules": ["pierce-2", "two-handed"],
       "cost": 0
     },
     {
