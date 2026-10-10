@@ -24,7 +24,7 @@
       "id": "fearsome",
       "name": "Fearsome",
       "type": "trait",
-      "text": "Enemy fighters must take a Panic test when making melee attack actions against this fighter."
+      "text": "Enemy fighters must take a Bravery test or become panicked when making melee attack actions against this fighter."
     },
     {
       "id": "regeneration",
