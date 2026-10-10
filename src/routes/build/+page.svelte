@@ -499,7 +499,7 @@
 		align-items: center;
 		gap: 8px;
 		flex: none;
-		padding: 10px 12px;
+		padding: 10px 14px;
 		background: var(--ui-header-bg);
 	}
 
@@ -560,14 +560,15 @@
 	.body {
 		flex: 1;
 		overflow-y: auto;
-		padding: 16px 12px 24px;
+		padding: 16px 14px 24px;
 		display: flex;
 		flex-direction: column;
 		gap: 40px;
 	}
 
+	/* Closer to what it heads than the sections are to each other. */
 	.step {
-		margin: 0;
+		margin: 0 0 -24px;
 		font-size: var(--ui-t-xl);
 		font-weight: 600;
 	}
@@ -747,7 +748,7 @@
 		display: flex;
 		gap: 8px;
 		flex: none;
-		padding: 10px 12px;
+		padding: 10px 14px;
 		padding-bottom: max(10px, env(safe-area-inset-bottom));
 		background: var(--ui-header-bg);
 		border-top: 1px solid var(--ui-border);

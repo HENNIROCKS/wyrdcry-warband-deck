@@ -703,7 +703,7 @@
 		{:else if active}
 			<h1>{active.warband.name}</h1>
 		{:else}
-			<h1>Warband Deck</h1>
+			<h1 class="app-title">Wyrdcry Warband Deck <span class="badge">Early</span></h1>
 		{/if}
 	</div>
 
@@ -970,6 +970,7 @@
 	}
 
 	.identity {
+		container: identity / inline-size;
 		display: flex;
 		flex: 1;
 		min-width: 0;
@@ -983,6 +984,14 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	/* The app's own name with its badge takes 273px at the title size. Where the
+	   buttons leave less, it steps down rather than cut the badge off. */
+	@container identity (max-width: 272px) {
+		.app-title {
+			font-size: var(--ui-t-lg);
+		}
 	}
 
 	select {

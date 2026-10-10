@@ -307,12 +307,30 @@ button {
 	background: var(--ui-danger);
 }
 
-/* Outside 1.4.3, but often the whole signal of a step: muted text at 5.8:1
-   rather than a faded button. */
+/* Half the plain fill over whatever it stands on, so it falls back behind an
+   enabled button in either mode. Outside 1.4.3, but often the whole signal of a
+   step: the muted text holds 5.5:1 dark and 4.9:1 light on the page rather than
+   fading with the button. */
 .btn:disabled {
 	color: var(--ui-text-muted);
-	background: var(--ui-surface);
+	background: color-mix(in srgb, var(--ui-surface-2) 50%, transparent);
 	cursor: default;
+}
+
+/* A release stage beside a title, the Card Creator's BETA. */
+.badge {
+	display: inline-block;
+	padding: 2px 8px;
+	font-size: var(--ui-t-xs);
+	font-weight: 600;
+	line-height: 1.3;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	vertical-align: middle;
+	color: var(--ui-text-muted);
+	background: var(--ui-surface);
+	border: 1px solid var(--ui-field-border);
+	border-radius: 4px;
 }
 
 /* Buttons that are offered together, one under the other and of one width. */
