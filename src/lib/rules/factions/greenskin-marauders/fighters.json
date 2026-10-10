@@ -104,13 +104,13 @@
   {
     "id": "goblin-warrior",
     "name": "Goblin Warrior",
-    "cost": 40,
+    "cost": 50,
     "limit": { "min": 0, "max": null },
     "description": "Small, spiteful and far too numerous, Goblins are dragged along to carry the loot and soak up the arrows. They fight best in crowds and run fastest alone.",
     "profile": {
       "move": 5,
       "fight": 2,
-      "shoot": 2,
+      "shoot": 3,
       "defense": 0,
       "health": 8,
       "bravery": 6

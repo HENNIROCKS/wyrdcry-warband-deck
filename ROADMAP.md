@@ -32,11 +32,11 @@
 - [x] ⚔️ Witch Hunters: count zeal through a battle, the way wounds already are
 - [x] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
 - [x] 🃏 Fit the warband card's values again after editing its back, where Disposable shrinks to Dispo…
+- [x] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
 - [ ] 📈 Heroic traits: Magical Affinity teaches a further magical ability
 - [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
 - [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
 - [ ] 📈 Roll injuries after a battle and write them back into the warband
-- [ ] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
 - [ ] 🛠️ Sell or discard from the warband stash after the build
 - [ ] 🛠️ Buy and sell at the trading post between battles
 - [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation

@@ -17,9 +17,9 @@ way back to the Warband Builder is not currently assured – see
 - Build a warband step by step: faction, its rules, then one fighter at a time,
   with the budget, the roster limits and the equipment restrictions checked as
   you go. Six factions out of the rulebook: Mercenaries, Clan Eshin, Sisters of
-  Sigmar, Undead, Witch Hunters and the Possessed. The homebrew Clan Pestilens
-  and Greenskin Marauders are not offered until they follow the 0.9 draft; a
-  warband already built from them still shows its cards
+  Sigmar, Undead, Witch Hunters and the Possessed. Two homebrew factions
+  beside them, under a heading of their own: Clan Pestilens and the Greenskin
+  Marauders
 - Import warband JSON from the builder
 - Show the warband itself as the first card: faction, standing, favour,
   reputation, gold, value, stash, its heroes and henchmen at a glance, the

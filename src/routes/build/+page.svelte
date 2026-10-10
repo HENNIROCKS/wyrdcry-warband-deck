@@ -36,11 +36,7 @@
 		{ id: 'finish', title: 'Finish' }
 	];
 
-	/* Clan Pestilens and the Greenskin Marauders are not yet brought to the 0.9
-	   draft, so only the official factions are offered. Their files stay: a
-	   warband already built from them still deals its cards. */
-	const OFFERED = ['official'];
-	const factions = [...FACTIONS.values()].filter((entry) => OFFERED.includes(entry.origin));
+	const factions = [...FACTIONS.values()];
 
 	/* Homebrew stands under its own heading rather than mixed into the list. At
 	   the table it decides whether the opponent can look the faction up, and a

@@ -53,7 +53,7 @@
 		{
 			question: 'Which factions can I build?',
 			answer:
-				'The six out of the rulebook: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead, Witch Hunters and the Possessed. The homebrew Clan Pestilens and Greenskin Marauders come back once they follow the 0.9 draft; a warband already built from them keeps its cards. Each one is transcribed by hand against the game data, so a value here can differ from the builder – the characteristics deliberately do, because this app works modifiers into them that the builder leaves in the item text.'
+				'The six out of the rulebook: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead, Witch Hunters and the Possessed. Beside them, under a heading of their own, the homebrew Clan Pestilens and Greenskin Marauders, written for the 0.9 draft as well. Each one is transcribed by hand against the game data, so a value here can differ from the builder – the characteristics deliberately do, because this app works modifiers into them that the builder leaves in the item text.'
 		}
 	];
 </script>
