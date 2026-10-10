@@ -11,7 +11,6 @@ import factions from './data/factions.json';
 import weaponRules from './data/weapon-rules.json';
 import universalAbilities from './data/universal-abilities.json';
 import ruleset from './data/ruleset.json';
-import campaignRules from './data/campaign-rules.json';
 import ownRuleset from './rules/ruleset.json';
 import {
 	RULE_ABILITIES,
@@ -170,19 +169,6 @@ export const ABILITIES = filledFrom(
 );
 
 export const UNIVERSAL_ABILITIES = universalAbilities as UniversalAbility[];
-
-/**
- * The campaign level: how much favour buys which standing, what a warband starts
- * with. The builder reads the same file, so both name the same tier.
- */
-export interface CampaignRules {
-	default_favour: number;
-	warband_budget: number;
-	standing_thresholds: { min: number; max: number; label: string }[];
-	favour_tiers: { min: number; max: number; label: string; default_gold: number }[];
-}
-
-export const CAMPAIGN_RULES = campaignRules as CampaignRules;
 
 /**
  * Version of the ruleset this app was built against. Goes into every export.
