@@ -33,18 +33,18 @@
 - [x] 📈 Heroic traits: what a HERO picks instead of raising a characteristic
 - [x] 🃏 Fit the warband card's values again after editing its back, where Disposable shrinks to Dispo…
 - [x] ⚙️ Bring Clan Pestilens and the Greenskin Marauders to the 0.9 draft and offer them again
-- [ ] 📈 Heroic traits: Magical Affinity teaches a further magical ability
-- [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
-- [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
-- [ ] 📈 Roll injuries after a battle and write them back into the warband
 - [x] 🛠️ Sell or discard from the warband stash after the build
 - [x] 🛠️ Buy and sell at the trading post between battles
-- [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
-- [ ] 🎨 Go over the design and the interface outside the cards
 - [x] 🎨 Light and dark mode, together with going over the design outside the cards
-- [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
+- [ ] 📈 The rest of the aftermath: favour, income, recalculated reputation
+- [ ] 📈 Roll injuries after a battle and write them back into the warband
+- [ ] 📈 Heroic traits: Magical Affinity teaches a further magical ability
 - [ ] 🛠️ Hire a Hired Sword for a single battle
 - [ ] 📈 Show a hired sword's author name once hiring one is possible
+- [ ] ⚙️ Sync the wavering and panic rules text from the rulebook pages, for the wavering sheet
+- [ ] ⚙️ Measure Warband Builder compatibility rather than assuming it
+- [ ] 🎨 Go over the design and the interface outside the cards
+- [ ] ⚙️ Follow the 0.9 draft: hired swords once the site repo has them
 
 ## Ideas
 
