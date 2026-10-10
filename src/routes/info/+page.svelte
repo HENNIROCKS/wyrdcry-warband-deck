@@ -43,43 +43,43 @@
 		{
 			question: 'Can I keep working in the Warband Builder?',
 			answer:
-				'Not reliably, not yet. The export is still written in the shape the builder reads, and for the six official factions the way back is built to hold – but it has not been checked since this app grew a builder of its own. The builder opens on the 0.5 rules; a warband from here belongs in its 0.9 draft, which its version switch selects. A warband of a homebrew faction cannot go back at all: Clan Pestilens and the Greenskin Marauders exist only here, so the builder accepts the file and then finds neither the faction nor any of its fighters. Export and snapshot are the way to keep a copy meanwhile.'
+				'Not reliably, not yet. The export is still written in the shape the builder reads, and for the six official factions the way back is built to hold – but it has not been checked since this app grew a builder of its own. The builder now opens on 0.9, the rules a warband from here is built for. A warband of a homebrew faction cannot go back at all: Clan Pestilens and the Greenskin Marauders exist only here, so the builder accepts the file and then finds neither the faction nor any of its fighters. Export and snapshot are the way to keep a copy meanwhile.'
 		},
 		{
 			question: 'Which rules does the app follow?',
 			answer:
-				'The 0.9 draft, which the group is playtesting. The rulebook PDF and the main pages of wyrdcry.net are still the stable 0.5; the 0.9 rules are on the site under /docs/next. Where the two differ, the cards here follow 0.9 – Armour, for one, is now taken off the damage of each attack rather than rolled against.'
+				'0.9, the current ruleset on wyrdcry.net; the deprecated 0.5 stays archived under /docs/0.5. Where the two differ, the cards here follow 0.9 – Armour, for one, is now taken off the damage of each attack rather than rolled against.'
 		},
 		{
 			question: 'Which factions can I build?',
 			answer:
-				'The six out of the rulebook: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead, Witch Hunters and the Possessed. Beside them, under a heading of their own, the homebrew Clan Pestilens and Greenskin Marauders, written for the 0.9 draft as well. Each one is transcribed by hand against the game data, so a value here can differ from the builder – the characteristics deliberately do, because this app works modifiers into them that the builder leaves in the item text.'
+				'The six out of the rulebook: Mercenaries, Clan Eshin, Sisters of Sigmar, Undead, Witch Hunters and the Possessed. Beside them, under a heading of their own, the homebrew Clan Pestilens and Greenskin Marauders, written for 0.9 as well. Each one is transcribed by hand against the game data, so a value here can differ from the builder – the characteristics deliberately do, because this app works modifiers into them that the builder leaves in the item text.'
 		}
 	];
 </script>
 
 <main>
-	<h1>About</h1>
+	<header>
+		<h1>About</h1>
+		<p class="version">
+			Version {__APP_VERSION__} <span class="badge">Early</span>{#if buildDate}{' '}<span class="part">· Build {buildDate}</span>{/if}{#if ruleset}{' '}<span class="part">· Ruleset {ruleset}</span>{/if}
+		</p>
+	</header>
 
 	<section>
 		<p>
 			Your own Wyrdcry warband as a deck of cards: build it here or import it
 			from the Warband Builder, swipe through the fighters, track a battle.
+			Wyrdcry is an "unofficial fan-made hack of Warcry, dragged through the dirt
+			and madness of Mordheim."
 		</p>
 		<p class="muted">
-			An independent fan project. No connection to Games Workshop.
+			This is a fan project made for the community; it is not commercial and has no
+			affiliation with or endorsement from Games Workshop.
 		</p>
-		<!-- Said on the page rather than only in the README: whoever builds a
-		     warband here is about to rely on it, and the way back is the thing they
-		     cannot find out by trying it once. Marked as a warning where it stands
-		     rather than left to read as a third paragraph. -->
-		<p class="notice warn">
-			<strong>The way back to the Warband Builder is not currently assured.</strong>
-			Warbands built here carry factions and corrections the builder's own data
-			does not have. Keep a copy through Export or Snapshot.
-		</p>
-		<p class="version">
-			Version {__APP_VERSION__} · Early{#if buildDate}{' '}· Build {buildDate}{/if}{#if ruleset}{' '}· Ruleset {ruleset}{/if}
+		<p class="muted">
+			You like this? Check out the
+			<a href="https://hennirocks.github.io/warcry-card-creator-2026/">Warcry Card Creator 2026</a>
 		</p>
 	</section>
 
@@ -101,6 +101,15 @@
 		<p>
 			The warband lives in this browser's database, on this device alone. No
 			account, no server, no sync.
+		</p>
+		<!-- Said on the page rather than only in the README: whoever builds a
+		     warband here is about to rely on it, and the way back is the thing they
+		     cannot find out by trying it once. Marked as a warning rather than left
+		     to read as one more paragraph about the data. -->
+		<p class="notice warn">
+			<strong>The way back to the Warband Builder is not currently assured.</strong>
+			Warbands built here carry factions and corrections the builder's own data
+			does not have. Keep a copy through Export or Snapshot.
 		</p>
 		<p>
 			<strong>Export</strong> writes the current state as JSON, in the shape the
@@ -132,16 +141,15 @@
 	<section>
 		<h2>Links</h2>
 		<ul class="links">
-			<li><a class="btn" href="https://wyrdcry.net">Wyrdcry – rules and Warband Builder</a></li>
-			<li><a class="btn" href="https://wyrdcry.net/docs/next/">The 0.9 draft rules this app follows</a></li>
-			<li><a class="btn" href="{REPO}/issues">Feedback and bug reports</a></li>
-			<li><a class="btn" href={REPO}>Source code</a></li>
-			<li><a class="btn" href="{REPO}/blob/main/ROADMAP.md">What is planned</a></li>
+			<li><a class="btn" href="https://wyrdcry.net/docs/rules/introduction/">Wyrdcry Rules</a></li>
+			<li><a class="btn primary" href="{REPO}/issues"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>Feedback and bug reports</a></li>
+			<li><a class="btn primary" href={REPO}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>Source code</a></li>
+			<li><a class="btn primary" href="{REPO}/blob/main/ROADMAP.md"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>What is planned</a></li>
 		</ul>
 	</section>
 
 	<footer>
-		<a class="btn" href="{base}/">Back to the deck</a>
+		<a class="btn primary" href="{base}/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>Back to the deck</a>
 	</footer>
 </main>
 
@@ -193,6 +201,12 @@
 
 	.muted {
 		color: var(--ui-text-muted);
+	}
+
+	/* Tailwind's preflight takes the underline off; a link in running text needs it. */
+	.muted a {
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
 
 	ul {
@@ -284,11 +298,21 @@
 		color: var(--ui-text-muted);
 	}
 
-	/* Smaller than the notice above it, not fainter: at this size the subtle
-	   grey falls to 3.5:1 on the page, where the muted one holds 6.6:1. */
+	header {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	/* Which build is open is the first thing a bug report needs. */
 	.version {
-		font-size: var(--ui-t-sm);
-		color: var(--ui-text-muted);
+		margin: 0;
+		font-size: var(--ui-t-md);
+	}
+
+	/* A line too long for the phone breaks before a dot, never after it. */
+	.version .part {
+		white-space: nowrap;
 	}
 
 	/* Set apart from the links above, which it would otherwise read as the last
