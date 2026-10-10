@@ -95,7 +95,7 @@
 		border-radius: 11px;
 		background: var(--ui-surface);
 		color: var(--ui-text);
-		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+		box-shadow: 0 12px 28px var(--ui-shadow);
 	}
 
 	.menu:not(:popover-open) {
@@ -126,7 +126,7 @@
 	/* An entry that loses something. It reads differently from the rest before it
 	   is tapped, not only in the question that follows. */
 	.menu :global(button.danger) {
-		color: #fca5a5;
+		color: var(--ui-danger-text);
 	}
 
 	.menu :global(hr) {

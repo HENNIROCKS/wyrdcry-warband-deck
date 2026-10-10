@@ -389,7 +389,7 @@
 		text-transform: none;
 		color: var(--ui-text);
 		background: var(--ui-surface);
-		border: 1px solid var(--ui-border);
+		border: 1px solid var(--ui-field-border);
 		border-radius: 9px;
 	}
 

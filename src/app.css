@@ -4,9 +4,14 @@
  * Colours and typography follow the Card Creator so both projects look alike.
  * The card geometry deliberately does not: the printed card has a fixed height,
  * here it grows.
+ *
+ * Dark is the default, light follows the system setting – no switch of its own.
+ * Only the interface changes with it: a card lies on its own texture and keeps
+ * its colours either way.
  */
 
 :root {
+	color-scheme: dark;
 	--ui-text: #e4e4e7;
 	--ui-text-muted: #a1a1aa;
 	--ui-text-subtle: #71717a;
@@ -23,6 +28,13 @@
 	--ui-warn-text: #f59e0b;
 	--ui-warn-bg: rgba(180, 83, 9, 0.15);
 	--ui-danger: #b91c1c;
+	--ui-danger-text: #fca5a5;
+	--ui-danger-bg: rgba(185, 28, 28, 0.18);
+	/* The edge of something typed into or picked from. */
+	--ui-field-border: var(--ui-border);
+	/* What a sheet or a menu lifts off the page with. */
+	--ui-backdrop: rgba(0, 0, 0, 0.6);
+	--ui-shadow: rgba(0, 0, 0, 0.45);
 
 	/*
 	 * The interface's type scale. Every size outside a card names one of these
@@ -98,6 +110,36 @@
 		var(--card-unit-floor),
 		calc(min(100vw - 2 * var(--deck-gutter), var(--deck-max-width)) / var(--card-design-width))
 	);
+}
+
+/*
+ * The Card Creator's parchment light. Its surfaces are taken as they are; the
+ * colours that carry words are darker than there, because here the page itself
+ * is --ui-header-bg and each of them reaches 4.5:1 on the darkest surface it
+ * lands on – the muted text on --ui-surface-2, the accent, warning and danger
+ * text on their own tinted backgrounds. A field's edge reaches 3:1 against the
+ * page and the field.
+ */
+@media (prefers-color-scheme: light) {
+	:root {
+		color-scheme: light;
+		--ui-text: #2e2620;
+		--ui-text-muted: #584e44;
+		--ui-text-subtle: #64584d;
+		--ui-surface: #ede8e2;
+		--ui-surface-2: #c8c0b5;
+		--ui-border: #c4bdb1;
+		--ui-header-bg: #d8d0c5;
+		--ui-accent-text: #105335;
+		--ui-accent-bg: rgba(22, 117, 74, 0.1);
+		--ui-warn-text: #853d07;
+		--ui-warn-bg: rgba(180, 83, 9, 0.12);
+		--ui-danger-text: #8d1515;
+		--ui-danger-bg: rgba(185, 28, 28, 0.1);
+		--ui-field-border: #78736c;
+		--ui-backdrop: rgba(46, 38, 32, 0.45);
+		--ui-shadow: rgba(46, 38, 32, 0.2);
+	}
 }
 
 /*

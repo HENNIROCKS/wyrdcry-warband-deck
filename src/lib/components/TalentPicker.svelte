@@ -162,6 +162,7 @@
 	.picker.in-sheet {
 		--p-bg: var(--ui-surface-2);
 		--p-border: var(--ui-border);
+		--p-field-border: var(--ui-field-border);
 		--p-accent: var(--ui-accent-text, var(--ui-accent));
 		--p-action: var(--ui-accent);
 		--p-on-action: #fff;
@@ -309,7 +310,7 @@
 	.field input {
 		min-height: 44px;
 		padding: 6px 14px;
-		border: 1px solid var(--p-border);
+		border: 1px solid var(--p-field-border);
 		border-radius: var(--p-radius);
 		background: var(--p-bg);
 		color: var(--p-ink);

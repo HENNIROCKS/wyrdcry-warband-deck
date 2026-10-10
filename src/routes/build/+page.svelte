@@ -522,7 +522,7 @@
 	}
 
 	.gold.over {
-		color: var(--ui-warn);
+		color: var(--ui-warn-text);
 	}
 
 	/* Also the rule under the header: the body scrolls right up against it, and a
@@ -576,7 +576,7 @@
 		font-size: var(--ui-t-md);
 		color: var(--ui-text);
 		background: var(--ui-surface);
-		border: 1px solid var(--ui-border);
+		border: 1px solid var(--ui-field-border);
 		border-radius: 9px;
 	}
 
@@ -597,7 +597,7 @@
 		text-transform: none;
 		color: var(--ui-text);
 		background: var(--ui-surface);
-		border: 1px solid var(--ui-border);
+		border: 1px solid var(--ui-field-border);
 		border-radius: 9px;
 	}
 

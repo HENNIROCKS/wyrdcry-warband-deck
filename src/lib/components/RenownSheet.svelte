@@ -202,7 +202,7 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.6);
+		background: var(--ui-backdrop);
 		padding: 12px;
 		padding-bottom: calc(12px + env(safe-area-inset-bottom));
 	}

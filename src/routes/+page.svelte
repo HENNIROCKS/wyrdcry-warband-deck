@@ -987,7 +987,7 @@
 		max-width: 100%;
 		background: var(--ui-surface);
 		color: var(--ui-text);
-		border: 1px solid var(--ui-border);
+		border: 1px solid var(--ui-field-border);
 		border-radius: 8px;
 		padding: 5px 8px;
 		font-size: var(--ui-t-lg);
@@ -1124,7 +1124,7 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.6);
+		background: var(--ui-backdrop);
 		padding: 12px;
 		padding-bottom: calc(12px + env(safe-area-inset-bottom));
 	}
@@ -1160,8 +1160,8 @@
 	}
 
 	.note.danger {
-		background: rgba(185, 28, 28, 0.18);
-		color: #fca5a5;
+		background: var(--ui-danger-bg);
+		color: var(--ui-danger-text);
 	}
 
 	.actions {
