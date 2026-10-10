@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fitText } from '../fit-text';
 	import imageMask from '../image-mask.svg?raw';
+	import { goldText } from '../roster-sheet';
 	import RuleText from './RuleText.svelte';
 	import type { RosterEntry, WarbandCardData } from '../types/card';
 
@@ -63,12 +64,12 @@
 			</div>
 		</div>
 
-		{#if card.stash}
-			<section class="notes" data-anchor="stash"><p class="entry"><strong>Stash</strong>: {card.stash}</p></section>
-		{/if}
+		<section class="notes" data-anchor="stash">
+			<p class="entry"><strong>Stash</strong>: {[goldText(card), card.stash].filter(Boolean).join(', ')}</p>
+		</section>
 
 		{#if card.notes}
-			<section class="notes">{@render note(card.notes)}</section>
+			<section class="notes">{@render note(card.notes, 'Notes')}</section>
 		{/if}
 
 		{#if card.battles.length}
@@ -101,8 +102,8 @@
 
 <!-- Written on one line: the paragraphs are pre-wrap, so a line break in the
      template would end up on the card. -->
-{#snippet note(text: string)}
-	<p class="entry"><RuleText text={text} /></p>
+{#snippet note(text: string, title: string)}
+	<p class="entry"><strong>{title}</strong>: <RuleText text={text} /></p>
 {/snippet}
 
 <!-- A group without fighters keeps its heading, so the box always names both ranks. -->
@@ -371,12 +372,16 @@
 		background: var(--card-wash);
 	}
 
-	/* A log rather than a figure of the warband: the boxes' light wash and
-	   padding but no border and no green, a solid rule under the heading and a
-	   dashed one between the rows, and twice the parchment's gap away from the
-	   notes. */
+	/* Stash, notes and battles stand twice the parchment's gap apart. */
+	.notes ~ .notes,
 	.battles {
 		margin-top: calc(14 * var(--u));
+	}
+
+	/* A log rather than a figure of the warband: the boxes' light wash and
+	   padding but no border and no green, a solid rule under the heading and a
+	   dashed one between the rows. */
+	.battles {
 		padding: calc(14 * var(--u)) calc(16 * var(--u));
 		border-radius: calc(7.5 * var(--u));
 		background: var(--card-wash);

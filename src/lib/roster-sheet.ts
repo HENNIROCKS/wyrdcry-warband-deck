@@ -80,10 +80,16 @@ function cardValue(card: WarbandCardData, key: string): string {
 	return card.tables.flat().find((v) => v.key === key)?.value ?? '';
 }
 
-function goldText(card: WarbandCardData): string {
+/** The gold left, which opens the stash on the card and on the roster. */
+export function goldText(card: WarbandCardData): string {
 	const { remaining, pending } = card.gold;
 	if (pending > 0) return `${remaining} gold coins (${pending} of them pending)`;
 	return `${remaining} gold coins`;
+}
+
+/** An entry whose label names its type, "[Trait] Stealthy". */
+function isTyped(entry: CardEntry): boolean {
+	return /^\[\w+\]/.test(entry.label);
 }
 
 function toFighter(card: FighterCardData): RosterFighter {
@@ -96,9 +102,12 @@ function toFighter(card: FighterCardData): RosterFighter {
 		renown: card.renown,
 		cost: card.cost,
 		keywords: card.keywords.join(', '),
-		talents: entries(card, 'fighter', 'other').map((e) => e.label),
+		/* A talent an item gives stands under the item on the card, and with the
+		   talents here: it is what the fighter can do, not what it carries. */
+		talents: [...entries(card, 'fighter', 'other'), ...entries(card, 'equipment').filter(isTyped)].map((e) => e.label),
 		weapons: card.weapons,
 		items: entries(card, 'equipment')
+			.filter((e) => !isTyped(e))
 			.map((e) => e.label)
 			.join(', '),
 		notes: entries(card, 'notes').map((e) => e.text)

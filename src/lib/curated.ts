@@ -14,6 +14,7 @@
 
 import conditions from './curated/conditions.json';
 import extra from './curated/item-effects.json';
+import grants from './curated/item-grants.json';
 import { ITEMS, WEAPON_RULES } from './gamedata';
 import { STAT_KEYS, type StatKey } from './types/warband';
 
@@ -54,6 +55,41 @@ function build(): Map<string, { characteristic: StatKey; bonus: number }[]> {
 }
 
 export const CURATED_ITEM_EFFECTS = build();
+
+interface CuratedGrant {
+	item: string;
+	talent: string;
+	expect: string;
+}
+
+/**
+ * Talents an item gives while it is carried, by the item's id – the Elven
+ * Cloak's Stealthy. The game data says so only in the item's prose, the same
+ * way it says Heavy Armour's Move, so it is kept here by hand and checked
+ * against that prose in a development build.
+ */
+function buildGrants(): Map<string, string[]> {
+	const map = new Map<string, string[]>();
+
+	for (const entry of grants as CuratedGrant[]) {
+		const item = ITEMS.get(entry.item);
+		if (import.meta.env.DEV) {
+			if (!item) console.warn(`curated grants: no item "${entry.item}" in the game data`);
+			else if (!item.description.includes(entry.expect)) {
+				console.warn(
+					`curated grants: "${entry.item}" no longer reads "${entry.expect}" – check whether it still gives "${entry.talent}"`
+				);
+			}
+		}
+
+		if (!item) continue;
+		map.set(entry.item, [...(map.get(entry.item) ?? []), entry.talent]);
+	}
+
+	return map;
+}
+
+export const CURATED_ITEM_GRANTS = buildGrants();
 
 interface CuratedCondition {
 	weaponRule?: string;

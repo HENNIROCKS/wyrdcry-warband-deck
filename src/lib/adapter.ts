@@ -10,7 +10,7 @@
  */
 
 import { ALREADY_INCLUDED } from './build/export';
-import { CURATED_CONDITIONS, CURATED_ITEM_EFFECTS } from './curated';
+import { CURATED_CONDITIONS, CURATED_ITEM_EFFECTS, CURATED_ITEM_GRANTS } from './curated';
 import { RESULT_LABELS, displayDate, newestFirst, opponent, tally } from './history';
 import {
 	ABILITIES,
@@ -441,6 +441,8 @@ export function toCard(
 		else ranged.add(row);
 	};
 	const equipmentEntries: CardEntry[] = [];
+	/* Which item an entry stands for, for the talent it may give. */
+	const itemOf = new Map<CardEntry, string>();
 	/* Whatever the game data cannot account for, plus the fighter's own notes. */
 	const otherEntries: CardEntry[] = [];
 	let equipmentCost = 0;
@@ -459,11 +461,9 @@ export function toCard(
 			   characteristics above already carry it, and without the note a player
 			   adds it a second time. */
 			const counted = item.effect != null || CURATED_ITEM_EFFECTS.has(id);
-			equipmentEntries.push({
-				label: item.name,
-				text: item.description,
-				note: counted ? 'Already included.' : undefined
-			});
+			const entry = { label: item.name, text: item.description, note: counted ? 'Already included.' : undefined };
+			equipmentEntries.push(entry);
+			itemOf.set(entry, id);
 			continue;
 		}
 		const custom = warband.customWeapons.find((w) => w.id === id || w.name === id);
@@ -508,11 +508,9 @@ export function toCard(
 		   holds: the bonus is in the figure, it just arrived there with the
 		   profile. */
 		const inProfile = item.effect != null || CURATED_ITEM_EFFECTS.has(id);
-		equipmentEntries.push({
-			label: item.name,
-			text: item.description,
-			note: inProfile ? 'Already included.' : undefined
-		});
+		const entry = { label: item.name, text: item.description, note: inProfile ? 'Already included.' : undefined };
+		equipmentEntries.push(entry);
+		itemOf.set(entry, id);
 	}
 
 	/* A mutation that is a weapon, such as the Great Claw. Like the gear above it
@@ -570,6 +568,25 @@ export function toCard(
 			talentKeywords.set(talent.name.toLowerCase(), KEYWORDS.get(effect.keyword)?.name ?? effect.keyword.toUpperCase());
 		}
 	}
+	/* A talent an item gives, the Elven Cloak's Stealthy, stands right under
+	   the item while it is carried – unless the fighter has the talent already,
+	   which then stays among its abilities. */
+	const given = new Set<string>();
+	const items = equipmentEntries.flatMap((entry) => {
+		const id = itemOf.get(entry);
+		const grants = (id ? (CURATED_ITEM_GRANTS.get(id) ?? []) : [])
+			.map((talentId) => HEROIC_TALENTS.find((t) => t.id === talentId))
+			.filter((talent): talent is NonNullable<typeof talent> => {
+				if (!talent || talents.has(talent.id) || given.has(talent.id)) return false;
+				given.add(talent.id);
+				return true;
+			})
+			.map((talent) => ({
+				label: `[${talent.type[0].toUpperCase() + talent.type.slice(1)}] ${talent.name}`,
+				text: talent.text
+			}));
+		return [entry, ...grants];
+	});
 	/* A keyword the profile already carries, or that two sources give, is not
 	   printed twice. */
 	const gained = [...(rolled?.keywords ?? []), ...talentKeywords.values()].filter(
@@ -635,7 +652,7 @@ export function toCard(
 		),
 		picked ? '' : profile.ability_preamble
 	);
-	push('equipment', equipmentEntries);
+	push('equipment', items);
 	const leftOut = warband.factionId ? rulesLeftOut(warband.factionId, keywords) : new Map<string, string>();
 	/*
 	 * A warband built here carries its faction's rules as `customAbilities`, out
@@ -762,12 +779,12 @@ export function toWarbandCard(
 				modified: pending > 0
 			},
 			{ key: 'value', label: 'Value', value: String(value) },
-			/* A count alone reads like a sum; what it counts is listed further down. */
+			/* The stash holds the gold as well as the pieces, listed further down. */
 			{
 				key: 'stash',
 				label: 'Stash',
-				value: warband.stash.length ? `${warband.stash.length} ${warband.stash.length === 1 ? 'item' : 'items'}` : 'none',
-				target: warband.stash.length ? 'stash' : undefined
+				value: 'View',
+				target: 'stash'
 			}
 		]
 	];

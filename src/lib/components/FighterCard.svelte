@@ -247,6 +247,15 @@
 				</details>
 			{:else if section.kind === 'notes'}
 				<section class="notes">{@render paragraphs(section.entries)}</section>
+			{:else if section.kind === 'equipment'}
+				<!-- Titled like the folded sections, but open for good: what the
+				     fighter carries is in play. -->
+				<p class="divider">
+					<span class="rule"></span>
+					<span class="legend">Items</span>
+					<span class="rule"></span>
+				</p>
+				<section>{@render paragraphs(section.entries)}</section>
 			{:else}
 				{#if i > 0}<hr />{/if}
 				<section>
@@ -471,7 +480,8 @@
 		margin: calc(10 * var(--t)) 0;
 	}
 
-	summary {
+	summary,
+	.divider {
 		display: flex;
 		align-items: center;
 		gap: calc(8 * var(--t));
@@ -483,6 +493,11 @@
 		line-height: 1;
 		letter-spacing: 0.04em;
 		color: var(--card-green);
+	}
+
+	.divider {
+		margin: calc(10 * var(--t)) 0;
+		cursor: auto;
 	}
 
 	summary::-webkit-details-marker {
