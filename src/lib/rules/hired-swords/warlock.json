@@ -2,7 +2,7 @@
   "id": "warlock",
   "name": "Warlock",
   "origin": "official",
-  "version": "1.0.0",
+  "version": "1.0",
   "author": "Johan Markström",
   "cost": 60,
   "limit": { "min": 0, "max": 1 },

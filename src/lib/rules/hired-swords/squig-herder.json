@@ -2,7 +2,7 @@
   "id": "squig-herder",
   "name": "Squig Herder",
   "origin": "homebrew",
-  "version": "0.0.1",
+  "version": "0.1",
   "author": "Hendrik Berends",
   "cost": 55,
   "limit": { "min": 0, "max": 1 },

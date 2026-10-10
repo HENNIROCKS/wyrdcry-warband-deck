@@ -2,8 +2,8 @@
   "id": "greenskin-marauders",
   "name": "Greenskin Marauders",
   "keyword": "GREENSKIN MARAUDERS",
-  "warband_size": { "min": 3, "max": 20 },
+  "warband_size": { "min": 3, "max": 15 },
   "origin": "homebrew",
-  "version": "0.0.2",
+  "version": "0.3",
   "author": "Hendrik Berends"
 }

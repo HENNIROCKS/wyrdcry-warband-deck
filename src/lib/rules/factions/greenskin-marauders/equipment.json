@@ -10,5 +10,5 @@
   { "id": "weapon:crossbow", "allow": "all", "restrict": "orc" },
   { "id": "item:shield", "allow": "all" },
   { "id": "item:light-armour", "allow": "all" },
-  { "id": "item:heavy-armour", "allow": "all", "restrict": "orc" }
+  { "id": "item:heavy-armour", "allow": "hero", "restrict": "orc" }
 ]

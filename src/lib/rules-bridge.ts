@@ -185,16 +185,19 @@ export function raisedBy(factionId: string, fighterId: string, chosen?: string[]
 
 /**
  * The faction rules a fighter carrying `keywords` is left out of, by rule name,
- * each with the keyword that leaves it out, as the card spells it. By name
+ * each with the hint the card prints in place of the rule's text. By name
  * because the card only has the rule as the wizard wrote it into the warband.
  */
 export function rulesLeftOut(factionId: string, keywords: string[]): Map<string, string> {
 	const held = new Set(keywords.map((keyword) => keyword.toUpperCase()));
+	const spelled = (id: string) => KEYWORDS.get(id)?.name ?? id.toUpperCase();
 	const left = new Map<string, string>();
 	for (const rule of FACTIONS.get(factionId)?.rules ?? []) {
-		if (!rule.except) continue;
-		const name = KEYWORDS.get(rule.except)?.name ?? rule.except.toUpperCase();
-		if (held.has(name)) left.set(rule.name, name);
+		if (rule.except && held.has(spelled(rule.except))) {
+			left.set(rule.name, `Does not apply to a \`${spelled(rule.except)}\`.`);
+		} else if (rule.only && !held.has(spelled(rule.only))) {
+			left.set(rule.name, `Applies only to a \`${spelled(rule.only)}\`.`);
+		}
 	}
 	return left;
 }

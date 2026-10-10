@@ -31,8 +31,8 @@
       "attacks": 3,
       "hit": 2,
       "crit": 4,
-      "rules": ["mighty-1", "two-handed", "unreliable", "plague-vapour"],
-      "cost": 35
+      "rules": ["pierce-1", "two-handed", "unreliable", "plague-vapour"],
+      "cost": 30
     },
     {
       "id": "foetid-blade",

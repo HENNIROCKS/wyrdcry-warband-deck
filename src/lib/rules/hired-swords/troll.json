@@ -2,7 +2,7 @@
   "id": "troll",
   "name": "Troll",
   "origin": "homebrew",
-  "version": "0.0.1",
+  "version": "0.1",
   "author": "Hendrik Berends",
   "cost": 90,
   "limit": { "min": 0, "max": 1 },

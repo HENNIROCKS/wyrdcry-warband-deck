@@ -650,11 +650,12 @@ export function toCard(
 	 * the game data's list is still the only one there is.
 	 *
 	 * A rule that leaves this fighter out keeps its line, with a hint where the
-	 * rule's text would stand – Sudden Accusation on a War Hound.
+	 * rule's text would stand – Sudden Accusation on a War Hound, Animosity on
+	 * an Orc Boss.
 	 */
 	const ownFactionRules = customAbilities(warband, factionName).map((rule) => {
-		const keyword = leftOut.get(rule.name);
-		return keyword ? { ...rule, description: `Does not apply to a \`${keyword}\`.`, note: undefined } : rule;
+		const hint = leftOut.get(rule.name);
+		return hint ? { ...rule, description: hint, note: undefined } : rule;
 	});
 	push(
 		'faction',

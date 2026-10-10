@@ -332,8 +332,8 @@ for (const folder of folders) {
 	/* Only a homebrew faction versions a transcription; an official one has
 	   nothing of its own to version against. The shape is all a check can judge
 	   – what the number should be is a judgement about how much moved. */
-	if (faction.origin === 'homebrew' && !/^\d+\.\d+\.\d+$/.test(faction.version ?? '')) {
-		problem(file('faction'), `version is "${faction.version}" – write it as major.minor.patch`);
+	if (faction.origin === 'homebrew' && !/^\d+\.\d+$/.test(faction.version ?? '')) {
+		problem(file('faction'), `version is "${faction.version}" – write it as major.minor`);
 	} else if (faction.origin === 'official' && faction.version !== undefined) {
 		problem(file('faction'), `version is "${faction.version}" – an official faction carries no version`);
 	}
@@ -549,6 +549,12 @@ for (const folder of folders) {
 		if (rule.except !== undefined && !keywordIds.has(rule.except)) {
 			problem(file('rules'), `"${rule.id}" leaves out "${rule.except}", which is not a keyword`);
 		}
+		if (rule.only !== undefined && !keywordIds.has(rule.only)) {
+			problem(file('rules'), `"${rule.id}" applies only to "${rule.only}", which is not a keyword`);
+		}
+		if (rule.except !== undefined && rule.only !== undefined) {
+			problem(file('rules'), `"${rule.id}" has both except and only – one of them says it all`);
+		}
 
 		if (rule.table) {
 			/* Every D66 result lands in exactly one row: the wizard's Roll button
@@ -634,8 +640,8 @@ for (const { file, name, entry } of hiredSwords) {
 	}
 	/* The shape only, as on a faction: what the number should be is a judgement
 	   about how much of the entry moved. */
-	if (!/^\d+\.\d+\.\d+$/.test(entry.version ?? '')) {
-		problem(file, `version is "${entry.version}" – write it as major.minor.patch`);
+	if (!/^\d+\.\d+$/.test(entry.version ?? '')) {
+		problem(file, `version is "${entry.version}" – write it as major.minor`);
 	}
 	/* The fee, paid per battle. Zero would be a free hire, which no entry means. */
 	if (typeof entry.cost !== 'number' || entry.cost <= 0) {

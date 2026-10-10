@@ -292,6 +292,11 @@ export interface FactionRule {
 	 * for every Witch Hunter but a BEAST. The card prints a hint in its place.
 	 */
 	except?: string;
+	/**
+	 * The other way round: a keyword id only whose carriers the rule applies to,
+	 * such as Animosity for a Greenskin HENCHMAN. Every other card prints a hint.
+	 */
+	only?: string;
 }
 
 export interface Allowance {
@@ -315,7 +320,7 @@ export interface Faction {
 	 */
 	origin: 'official' | 'homebrew';
 	/**
-	 * Which version of this entry the deck holds, `major.minor.patch`. It is the
+	 * Which version of this entry the deck holds, `major.minor`. It is the
 	 * transcription's, not the game's, and only a homebrew faction carries one:
 	 * an official faction has nothing of its own to version against, since what
 	 * a player compares at the table is this faction against the game's own
@@ -366,7 +371,7 @@ export interface HiredSword {
 	name: string;
 	/** As on a faction: whether the game prints this one or the deck writes it. */
 	origin: 'official' | 'homebrew';
-	/** The transcription's version, `major.minor.patch`. */
+	/** The transcription's version, `major.minor`. */
 	version: string;
 	/** The hiring fee, paid for one battle. */
 	cost: number;

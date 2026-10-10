@@ -9,7 +9,7 @@
       "move": 5,
       "fight": 4,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 16,
       "bravery": 5
     },
@@ -28,14 +28,21 @@
       "move": 5,
       "fight": 3,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 12,
       "bravery": 5
     },
     "keywords": ["skaven", "clan-pestilens", "hero", "wizard"],
-    "abilities": ["black-fury", "warpfire"],
+    "abilities": [],
     "gear": [],
-    "choose": null
+    "choose": {
+      "source": null,
+      "prompt": "When recruiting a Plague Deacon, you must select one of the following magical abilities. In addition, the Plague Deacon may select the other magical ability instead of selecting a heroic talent.",
+      "kind": "ability",
+      "pick": 1,
+      "instead_of_talent": 1,
+      "abilities": ["black-fury", "warpfire"]
+    }
   },
   {
     "id": "plague-monk",
@@ -47,7 +54,7 @@
       "move": 5,
       "fight": 4,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 14,
       "bravery": 5
     },
@@ -66,7 +73,7 @@
       "move": 5,
       "fight": 3,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 10,
       "bravery": 6
     },
@@ -78,18 +85,18 @@
   {
     "id": "plague-rat",
     "name": "Plague Rat",
-    "cost": 40,
+    "cost": 50,
     "limit": { "min": 0, "max": null },
     "description": "Contagious rats the size of dogs, driven ahead of the clan in a chittering carpet.",
     "profile": {
       "move": 8,
       "fight": 2,
       "shoot": 2,
-      "defense": 2,
+      "defense": 0,
       "health": 6,
       "bravery": 6
     },
-    "keywords": ["beast", "clan-pestilens", "henchman"],
+    "keywords": ["skaven", "clan-pestilens", "beast"],
     "abilities": [],
     "gear": ["weapon:vicious-teeth"],
     "choose": null

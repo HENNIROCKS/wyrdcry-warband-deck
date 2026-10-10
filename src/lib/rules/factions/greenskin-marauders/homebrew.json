@@ -43,8 +43,8 @@
       "attacks": 3,
       "hit": 2,
       "crit": 3,
-      "rules": ["mighty-2", "two-handed", "unreliable"],
-      "cost": 25
+      "rules": ["pierce-2", "two-handed", "unreliable"],
+      "cost": 15
     }
   ]
 }

@@ -9,7 +9,7 @@
       "move": 5,
       "fight": 4,
       "shoot": 4,
-      "defense": 4,
+      "defense": 0,
       "health": 16,
       "bravery": 4
     },
@@ -28,7 +28,7 @@
       "move": 5,
       "fight": 4,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 14,
       "bravery": 4
     },
@@ -47,7 +47,7 @@
       "move": 5,
       "fight": 3,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 14,
       "bravery": 5
     },
@@ -56,9 +56,10 @@
     "gear": [],
     "choose": {
       "source": null,
-      "prompt": "When recruiting this fighter, you must select one of the following abilities:",
+      "prompt": "When recruiting an Orc Shaman, you must select one of the following magical abilities. In addition, the Orc Shaman may select another magical ability instead of selecting a heroic talent.",
       "kind": "ability",
       "pick": 1,
+      "instead_of_talent": 1,
       "abilities": ["oi-gerroff", "ledz-go", "zzap"]
     }
   },
@@ -72,7 +73,7 @@
       "move": 5,
       "fight": 3,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 10,
       "bravery": 6
     },
@@ -91,7 +92,7 @@
       "move": 5,
       "fight": 3,
       "shoot": 3,
-      "defense": 3,
+      "defense": 0,
       "health": 12,
       "bravery": 5
     },
@@ -110,7 +111,7 @@
       "move": 5,
       "fight": 2,
       "shoot": 2,
-      "defense": 3,
+      "defense": 0,
       "health": 8,
       "bravery": 6
     },

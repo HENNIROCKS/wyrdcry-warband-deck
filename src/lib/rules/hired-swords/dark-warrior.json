@@ -2,7 +2,7 @@
   "id": "dark-warrior",
   "name": "Dark Warrior",
   "origin": "homebrew",
-  "version": "0.0.1",
+  "version": "0.1",
   "author": "Hendrik Berends",
   "cost": 120,
   "limit": { "min": 0, "max": 1 },
