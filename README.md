@@ -6,10 +6,16 @@ through the fighters.
 
 Unofficial fan project. No connection to Games Workshop.
 
-**Status: early.** The app builds a warband of any of the eight factions, tracks
-a battle and edits a fighter afterwards – name, experience, renown, equipment,
-buying, selling, dismissal; it does not yet roll injuries, and the way back to
-the Warband Builder is not currently assured – see
+> **Archived.** This repository is read-only and the app is no longer hosted.
+> Work goes on in [Fantasy City Warbands](https://github.com/HENNIROCKS/fantasy-city-warbands),
+> which builds Wyrdcry warbands alongside other games and lays out its cards
+> the way this deck does. It does not import this app's files yet, and it has
+> no campaign so far.
+
+**Status: archived.** The app builds a warband of any of the eight factions,
+tracks a battle and edits a fighter afterwards – name, experience, renown,
+equipment, buying, selling, dismissal; it does not roll injuries, and the way
+back to the Warband Builder is not assured – see
 [Warband Builder compatibility](#warband-builder-compatibility).
 
 ## What it does
@@ -67,12 +73,13 @@ here. The builder accepts such a file and then resolves neither the faction nor
 any of its fighters.
 
 Until that is settled, treat Export and Snapshot as the way to keep a copy
-rather than as a round trip. Restoring it is the last item on the roadmap,
-because everything before it changes the file that would be checked.
+rather than as a round trip. Measuring it is one of the items the roadmap
+leaves open.
 
 ## Roadmap
 
-What is built and what comes next is a checklist in [`ROADMAP.md`](ROADMAP.md).
+What was built, and what was still open when the repository was archived, is a
+checklist in [`ROADMAP.md`](ROADMAP.md).
 
 ## Data
 
@@ -144,18 +151,20 @@ gitignored.
 
 ## Deployment
 
-<https://hennirocks.github.io/wyrdcry-warband-deck/>
+The app is no longer hosted; its GitHub Pages site is switched off. To run it,
+build it yourself with `make build` and serve `build/` from any host.
 
-GitHub Actions builds it on every push to `main`. Because the game data is not
-in this repo, the workflow checks out the site repo alongside and runs
-`sync:data` before the build – the deployed version therefore follows the data
-upstream, and a source that changed shape there stops the deploy.
+The workflow in `.github/workflows/deploy.yml` stays as it was used: because
+the game data is not in this repo, it checks out the site repo alongside and
+runs `sync:data` before the build, so a source that changed shape there stops
+the deploy.
 
 A service worker makes the app installable. That needs HTTPS, which is why it
 has to be a real host and not a file on the phone.
 
 ## Related projects
 
+- [`HENNIROCKS/fantasy-city-warbands`](https://github.com/HENNIROCKS/fantasy-city-warbands) – where the work goes on
 - [`jomblr/wyrdcry`](https://github.com/jomblr/wyrdcry) – rules site and Warband Builder, source of the data
 - `wyrdcry-card-creator` – cards for printing; the design comes from there
 

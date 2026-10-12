@@ -1,5 +1,8 @@
 # Roadmap
 
+Frozen: the repository is archived, and open items go on in
+[Fantasy City Warbands](https://github.com/HENNIROCKS/fantasy-city-warbands).
+
 <!-- One line per item, a short clause of detail is fine. No sub-items, no
      rationale, no dates. The emoji marks the kind of work: 📥 the warband file,
      🃏 the cards, 🛠️ building and editing a warband, ⚔️ during a battle,
